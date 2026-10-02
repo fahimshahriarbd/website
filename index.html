@@ -1,128 +1,1189 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fahim Shahriar | Portfolio & Blog</title>
-  <!-- Bangla Handwriting Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=BenSen&family=Hasir+Khata&family=Kolom&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'BenSen', sans-serif;
-      background: linear-gradient(135deg, #00c6ff, #0072ff);
-      color: #fff;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fahim Shahriar | Personal Portfolio</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    color:#14213d;
+    background:#ffffff;
+    line-height:1.6;
+}
+
+a{
+    text-decoration:none;
+    color:inherit;
+}
+
+.container{
+    width:min(1120px,92%);
+    margin:auto;
+}
+
+/* ================= HEADER ================= */
+
+.header{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:rgba(255,255,255,.96);
+    border-bottom:1px solid #e8eef7;
+    backdrop-filter:blur(10px);
+}
+
+.nav{
+    height:70px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:20px;
+    font-weight:700;
+}
+
+.logo-box{
+    width:38px;
+    height:38px;
+    border-radius:10px;
+    background:#0d6efd;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+}
+
+.menu{
+    display:flex;
+    gap:26px;
+    font-size:14px;
+    font-weight:600;
+}
+
+.menu a{
+    color:#344054;
+    transition:.2s;
+}
+
+.menu a:hover{
+    color:#0d6efd;
+}
+
+/* ================= HERO ================= */
+
+.hero{
+    background:linear-gradient(135deg,#f4f9ff,#ffffff);
+    padding:75px 0;
+}
+
+.hero-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    align-items:center;
+    gap:50px;
+}
+
+.small-title{
+    color:#0d6efd;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:1px;
+    margin-bottom:10px;
+}
+
+.hero h1{
+    font-size:56px;
+    line-height:1.08;
+    margin-bottom:15px;
+}
+
+.hero h1 span{
+    color:#0d6efd;
+}
+
+.hero h2{
+    font-size:21px;
+    font-weight:500;
+    color:#475467;
+    margin-bottom:20px;
+}
+
+.hero p{
+    max-width:560px;
+    color:#667085;
+    font-size:16px;
+    margin-bottom:28px;
+}
+
+.buttons{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+}
+
+.btn{
+    padding:13px 22px;
+    border-radius:9px;
+    font-weight:600;
+    font-size:14px;
+    display:inline-block;
+    transition:.2s;
+}
+
+.btn-primary{
+    background:#0d6efd;
+    color:white;
+}
+
+.btn-primary:hover{
+    background:#095dcc;
+}
+
+.btn-outline{
+    border:1px solid #0d6efd;
+    color:#0d6efd;
+    background:white;
+}
+
+.btn-outline:hover{
+    background:#f0f6ff;
+}
+
+.socials{
+    display:flex;
+    gap:15px;
+    margin-top:25px;
+}
+
+.socials a{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:#eaf3ff;
+    color:#0d6efd;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:14px;
+    font-weight:bold;
+}
+
+/* HERO IMAGE */
+
+.hero-image{
+    display:flex;
+    justify-content:center;
+}
+
+.hero-image img{
+    width:100%;
+    max-width:480px;
+    height:430px;
+    object-fit:cover;
+    border-radius:28px;
+    box-shadow:0 20px 50px rgba(13,110,253,.15);
+}
+
+/* ================= SECTIONS ================= */
+
+section{
+    padding:75px 0;
+}
+
+.section-title{
+    text-align:center;
+    margin-bottom:45px;
+}
+
+.section-title span{
+    color:#0d6efd;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:1px;
+}
+
+.section-title h2{
+    font-size:34px;
+    margin-top:5px;
+}
+
+/* ================= ABOUT ================= */
+
+.about-grid{
+    display:grid;
+    grid-template-columns:360px 1fr;
+    gap:55px;
+    align-items:center;
+}
+
+.about-img{
+    width:100%;
+    height:380px;
+    object-fit:cover;
+    border-radius:22px;
+}
+
+.about-text h2{
+    font-size:32px;
+    margin-bottom:15px;
+}
+
+.about-text p{
+    color:#667085;
+    margin-bottom:20px;
+}
+
+.info-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:15px;
+}
+
+.info{
+    padding:10px 15px;
+    background:#f5f9ff;
+    border-radius:8px;
+    color:#344054;
+    font-size:13px;
+}
+
+/* ================= WORK ================= */
+
+.work{
+    background:#f7fbff;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+}
+
+.card{
+    background:white;
+    padding:27px;
+    border-radius:16px;
+    border:1px solid #e8eef7;
+    box-shadow:0 8px 25px rgba(20,33,61,.05);
+    transition:.25s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 15px 35px rgba(20,33,61,.09);
+}
+
+.icon{
+    width:50px;
+    height:50px;
+    background:#eaf3ff;
+    color:#0d6efd;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    margin-bottom:18px;
+}
+
+.card h3{
+    font-size:18px;
+    margin-bottom:10px;
+}
+
+.card p{
+    font-size:14px;
+    color:#667085;
+}
+
+/* ================= BLOG ================= */
+
+.blog-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:22px;
+}
+
+.blog-card{
+    border:1px solid #e8eef7;
+    border-radius:15px;
+    overflow:hidden;
+    background:white;
+}
+
+.blog-card img{
+    width:100%;
+    height:180px;
+    object-fit:cover;
+}
+
+.blog-content{
+    padding:20px;
+}
+
+.blog-content small{
+    color:#0d6efd;
+    font-weight:600;
+}
+
+.blog-content h3{
+    margin:7px 0;
+    font-size:18px;
+}
+
+.blog-content p{
+    color:#667085;
+    font-size:14px;
+}
+
+/* ================= EDUCATION ================= */
+
+.education{
+    background:#f7fbff;
+}
+
+.timeline{
+    max-width:800px;
+    margin:auto;
+}
+
+.timeline-item{
+    display:grid;
+    grid-template-columns:30px 1fr;
+    gap:20px;
+    margin-bottom:30px;
+}
+
+.dot{
+    width:16px;
+    height:16px;
+    background:#0d6efd;
+    border-radius:50%;
+    margin-top:5px;
+    box-shadow:0 0 0 6px #eaf3ff;
+}
+
+.timeline-content{
+    background:white;
+    padding:20px;
+    border-radius:14px;
+    border:1px solid #e8eef7;
+}
+
+.timeline-content h3{
+    font-size:18px;
+}
+
+.timeline-content p{
+    color:#667085;
+    font-size:14px;
+}
+
+/* ================= CONTACT ================= */
+
+.contact-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:40px;
+    align-items:center;
+}
+
+.contact-text h2{
+    font-size:34px;
+    margin-bottom:15px;
+}
+
+.contact-text p{
+    color:#667085;
+    margin-bottom:20px;
+}
+
+.contact-box{
+    background:#f7fbff;
+    padding:30px;
+    border-radius:20px;
+    border:1px solid #e8eef7;
+}
+
+.contact-item{
+    display:flex;
+    gap:15px;
+    margin-bottom:18px;
+}
+
+.contact-icon{
+    width:40px;
+    height:40px;
+    background:#eaf3ff;
+    color:#0d6efd;
+    border-radius:10px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.contact-item strong{
+    display:block;
+}
+
+.contact-item span{
+    color:#667085;
+    font-size:14px;
+}
+
+/* ================= FOOTER ================= */
+
+footer{
+    background:#14213d;
+    color:white;
+    padding:25px 0;
+}
+
+.footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+}
+
+.footer p{
+    color:#b8c3d4;
+    font-size:13px;
+}
+
+.footer-social{
+    display:flex;
+    gap:12px;
+}
+
+.footer-social a{
+    font-size:13px;
+    color:#dce6f5;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:900px){
+
+    .menu{
+        gap:13px;
+        font-size:12px;
     }
-    header {
-      text-align: center;
-      padding: 50px;
+
+    .hero-grid{
+        grid-template-columns:1fr;
+        text-align:center;
     }
-    nav {
-      background: rgba(0,0,0,0.5);
-      padding: 10px;
-      text-align: center;
+
+    .hero p{
+        margin-left:auto;
+        margin-right:auto;
     }
-    nav a {
-      color: #fff;
-      margin: 0 15px;
-      text-decoration: none;
-      font-weight: bold;
+
+    .buttons,
+    .socials{
+        justify-content:center;
     }
-    section {
-      padding: 50px;
+
+    .hero-image{
+        order:-1;
     }
-    .dark-mode {
-      background: #111;
-      color: #eee;
+
+    .hero-image img{
+        height:340px;
+        max-width:380px;
     }
-    footer {
-      text-align: center;
-      padding: 20px;
-      background: rgba(0,0,0,0.5);
+
+    .about-grid{
+        grid-template-columns:1fr;
     }
-  </style>
+
+    .about-img{
+        max-width:400px;
+        display:block;
+        margin:auto;
+    }
+
+    .cards{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .contact-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:600px){
+
+    .header{
+        position:relative;
+    }
+
+    .nav{
+        height:auto;
+        padding:15px 0;
+        flex-direction:column;
+        gap:14px;
+    }
+
+    .menu{
+        width:100%;
+        justify-content:center;
+        flex-wrap:wrap;
+        gap:10px 16px;
+    }
+
+    .hero{
+        padding:45px 0;
+    }
+
+    .hero h1{
+        font-size:39px;
+    }
+
+    .hero h2{
+        font-size:17px;
+    }
+
+    .hero p{
+        font-size:14px;
+    }
+
+    .hero-image img{
+        height:300px;
+        border-radius:20px;
+    }
+
+    section{
+        padding:55px 0;
+    }
+
+    .section-title h2{
+        font-size:28px;
+    }
+
+    .about-text h2{
+        font-size:27px;
+    }
+
+    .cards{
+        grid-template-columns:1fr;
+    }
+
+    .blog-grid{
+        grid-template-columns:1fr;
+    }
+
+    .blog-card img{
+        height:200px;
+    }
+
+    .contact-grid{
+        grid-template-columns:1fr;
+    }
+
+    .footer{
+        flex-direction:column;
+        text-align:center;
+    }
+}
+
+@media(max-width:380px){
+
+    .hero h1{
+        font-size:33px;
+    }
+
+    .menu{
+        font-size:11px;
+        gap:8px 11px;
+    }
+
+    .btn{
+        width:100%;
+        text-align:center;
+    }
+}
+</style>
 </head>
+
 <body>
-  <header>
-    <h1>Fahim Shahriar</h1>
-    <p>Medical Student | Web Developer | Content Creator</p>
-  </header>
 
-  <nav>
-    <a href="#about">About</a>
-    <a href="#portfolio">Portfolio</a>
-    <a href="#blog">Blog</a>
-    <a href="#services">Services</a>
-    <a href="#gallery">Gallery</a>
-    <a href="#testimonials">Testimonials</a>
-    <a href="#contact">Contact</a>
-  </nav>
+<!-- HEADER -->
 
-  <!-- About Section -->
-  <section id="about">
-    <h2>About Me</h2>
-    <p>আমি Fahim Shahriar, Medical Student (BDS) at Chattogram Medical College Dental Unit। আমার লক্ষ্য হলো আধুনিক ডেন্টাল ল্যাব, গবেষণা ও শিক্ষা সিস্টেম তৈরি করা। পাশাপাশি টেকনিক্যাল টুলস, ওয়েব ডেভেলপমেন্ট ও ক্রিয়েটিভ কনটেন্টে আগ্রহী।</p>
-  </section>
+<header class="header">
+<div class="container nav">
 
-  <!-- Portfolio Section -->
-  <section id="portfolio">
-    <h2>Portfolio</h2>
-    <ul>
-      <li>Omega Tuition Media Projects</li>
-      <li>Web Development (GitHub Pages, DNS Setup)</li>
-      <li>Medical/Dental Research Notes</li>
-    </ul>
-  </section>
+    <a href="#home" class="logo">
+        <span class="logo-box">FS</span>
+        Fahim Shahriar
+    </a>
 
-  <!-- Blog Section -->
-  <section id="blog">
-    <h2>Blog & Articles</h2>
-    <p>এখানে প্রতিদিনের নতুন আর্টিকেল প্রকাশ হবে। শুধু <code>_posts</code> ফোল্ডারে নতুন Markdown ফাইল যোগ করলেই ব্লগে দেখা যাবে।</p>
-    <!-- Example Blog Post -->
-    <article>
-      <h3>My First Blog Post</h3>
-      <p>আজ আমি আমার প্রথম ব্লগ লিখছি। এখানে থাকবে মেডিকেল নোট, টেকনিক্যাল গাইড, আর ব্যক্তিগত অভিজ্ঞতা।</p>
-    </article>
-  </section>
+    <nav class="menu">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#work">Work</a>
+        <a href="#blog">Blog</a>
+        <a href="#education">Education</a>
+        <a href="#contact">Contact</a>
+    </nav>
 
-  <!-- Services Section -->
-  <section id="services">
-    <h2>Services</h2>
-    <ul>
-      <li>Tuition Media Management</li>
-      <li>Web Development Help</li>
-      <li>Medical/Dental Guidance</li>
-      <li>Creative Content Creation</li>
-    </ul>
-  </section>
+</div>
+</header>
 
-  <!-- Gallery Section -->
-  <section id="gallery">
-    <h2>Gallery</h2>
-    <p>ব্যক্তিগত ছবি, প্রজেক্ট স্ক্রিনশট, মেডিকেল/ডেন্টাল ছবি এখানে থাকবে।</p>
-  </section>
 
-  <!-- Testimonials Section -->
-  <section id="testimonials">
-    <h2>Testimonials</h2>
-    <p>শিক্ষার্থীদের রিভিউ, সহকর্মী/বন্ধুদের মন্তব্য, প্রজেক্ট/ক্লায়েন্টদের প্রশংসা এখানে থাকবে।</p>
-  </section>
+<!-- HERO -->
 
-  <!-- Contact Section -->
-  <section id="contact">
-    <h2>Contact</h2>
-    <p>Facebook | Instagram | YouTube | LinkedIn | Twitter</p>
-    <form>
-      <input type="text" placeholder="Your Name"><br>
-      <input type="email" placeholder="Your Email"><br>
-      <textarea placeholder="Your Message"></textarea><br>
-      <button type="submit">Send</button>
-    </form>
-  </section>
+<section class="hero" id="home">
 
-  <footer>
-    <p>© 2026 Fahim Shahriar | Portfolio & Blog</p>
-    <button onclick="document.body.classList.toggle('dark-mode')">Toggle Dark/Light Mode</button>
-  </footer>
+<div class="container hero-grid">
+
+    <div>
+
+        <div class="small-title">
+            HELLO, I'M
+        </div>
+
+        <h1>
+            Fahim <span>Shahriar</span>
+        </h1>
+
+        <h2>
+            Medical Student | Content Creator | Tutor
+        </h2>
+
+        <p>
+            I'm a medical student passionate about learning,
+            teaching, creating useful content and building
+            meaningful digital projects.
+        </p>
+
+        <div class="buttons">
+
+            <a href="#about" class="btn btn-primary">
+                About Me
+            </a>
+
+            <a href="#contact" class="btn btn-outline">
+                Contact Me
+            </a>
+
+        </div>
+
+        <div class="socials">
+
+            <a href="https://facebook.com/" target="_blank">f</a>
+            <a href="https://instagram.com/" target="_blank">◎</a>
+            <a href="https://youtube.com/" target="_blank">▶</a>
+            <a href="https://linkedin.com/" target="_blank">in</a>
+            <a href="mailto:fahimshahriar@gmail.com">@</a>
+
+        </div>
+
+    </div>
+
+
+    <div class="hero-image">
+
+        <!-- Replace this image URL with your own photo -->
+
+        <img
+        src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=900&q=80"
+        alt="Fahim Shahriar">
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- ABOUT -->
+
+<section id="about">
+
+<div class="container">
+
+    <div class="about-grid">
+
+        <img
+        class="about-img"
+        src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=700&q=80"
+        alt="About Fahim">
+
+        <div class="about-text">
+
+            <div class="small-title">
+                ABOUT ME
+            </div>
+
+            <h2>
+                A little bit about me
+            </h2>
+
+            <p>
+                I'm Fahim Shahriar, a medical student with
+                an interest in healthcare, education,
+                content creation and technology.
+            </p>
+
+            <p>
+                I enjoy learning new things, sharing useful
+                knowledge and working on small digital
+                projects that can make everyday life easier.
+            </p>
+
+            <div class="info-row">
+
+                <div class="info">
+                    📍 Chittagong, Bangladesh
+                </div>
+
+                <div class="info">
+                    🩺 Medical Student
+                </div>
+
+                <div class="info">
+                    📚 Always Learning
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- WORK -->
+
+<section class="work" id="work">
+
+<div class="container">
+
+    <div class="section-title">
+
+        <span>WHAT I DO</span>
+
+        <h2>
+            My Areas of Work & Passion
+        </h2>
+
+    </div>
+
+
+    <div class="cards">
+
+        <div class="card">
+
+            <div class="icon">🩺</div>
+
+            <h3>
+                Medical Education
+            </h3>
+
+            <p>
+                Studying, exploring and sharing
+                medical knowledge and useful
+                educational resources.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="icon">✍️</div>
+
+            <h3>
+                Content Creation
+            </h3>
+
+            <p>
+                Creating educational and informative
+                content for different platforms.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="icon">🎓</div>
+
+            <h3>
+                Tuition & Education
+            </h3>
+
+            <p>
+                Helping students learn better through
+                personalized guidance and support.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="icon">💻</div>
+
+            <h3>
+                Digital Projects
+            </h3>
+
+            <p>
+                Building useful websites, tools,
+                Google Sheets and AppSheet projects.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- BLOG -->
+
+<section id="blog">
+
+<div class="container">
+
+    <div class="section-title">
+
+        <span>LATEST POSTS</span>
+
+        <h2>
+            From My Blog
+        </h2>
+
+    </div>
+
+
+    <div class="blog-grid">
+
+        <article class="blog-card">
+
+            <img
+            src="https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=700&q=80"
+            alt="Medical">
+
+            <div class="blog-content">
+
+                <small>Medical Life</small>
+
+                <h3>
+                    MBBS Life: Challenges and What I've Learned
+                </h3>
+
+                <p>
+                    Thoughts and experiences from medical education.
+                </p>
+
+            </div>
+
+        </article>
+
+
+        <article class="blog-card">
+
+            <img
+            src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=700&q=80"
+            alt="Study">
+
+            <div class="blog-content">
+
+                <small>Study Tips</small>
+
+                <h3>
+                    How I Stay Productive as a Medical Student
+                </h3>
+
+                <p>
+                    Simple strategies for learning and productivity.
+                </p>
+
+            </div>
+
+        </article>
+
+
+        <article class="blog-card">
+
+            <img
+            src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=700&q=80"
+            alt="Books">
+
+            <div class="blog-content">
+
+                <small>Personal</small>
+
+                <h3>
+                    Why I Started Creating Content
+                </h3>
+
+                <p>
+                    My journey of learning, creating and sharing.
+                </p>
+
+            </div>
+
+        </article>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- EDUCATION -->
+
+<section class="education" id="education">
+
+<div class="container">
+
+    <div class="section-title">
+
+        <span>MY EDUCATION</span>
+
+        <h2>
+            Academic Journey
+        </h2>
+
+    </div>
+
+
+    <div class="timeline">
+
+        <div class="timeline-item">
+
+            <div class="dot"></div>
+
+            <div class="timeline-content">
+
+                <h3>
+                    MBBS / Medical Education
+                </h3>
+
+                <p>
+                    Currently studying medicine
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="timeline-item">
+
+            <div class="dot"></div>
+
+            <div class="timeline-content">
+
+                <h3>
+                    Higher Secondary Certificate
+                </h3>
+
+                <p>
+                    HSC — GPA 5.00
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="timeline-item">
+
+            <div class="dot"></div>
+
+            <div class="timeline-content">
+
+                <h3>
+                    Secondary School Certificate
+                </h3>
+
+                <p>
+                    SSC — GPA 5.00
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="timeline-item">
+
+            <div class="dot"></div>
+
+            <div class="timeline-content">
+
+                <h3>
+                    Other Learning & Interests
+                </h3>
+
+                <p>
+                    Technology, digital projects,
+                    education and continuous learning.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- CONTACT -->
+
+<section id="contact">
+
+<div class="container">
+
+    <div class="contact-grid">
+
+        <div class="contact-text">
+
+            <div class="small-title">
+                GET IN TOUCH
+            </div>
+
+            <h2>
+                Contact Me
+            </h2>
+
+            <p>
+                Have a question, collaboration idea
+                or simply want to say hello?
+                Feel free to reach out.
+            </p>
+
+            <div class="contact-box">
+
+                <div class="contact-item">
+
+                    <div class="contact-icon">
+                        @
+                    </div>
+
+                    <div>
+                        <strong>Email</strong>
+                        <span>
+                            fahimshahriar@gmail.com
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="contact-item">
+
+                    <div class="contact-icon">
+                        📍
+                    </div>
+
+                    <div>
+                        <strong>Location</strong>
+                        <span>
+                            Chittagong, Bangladesh
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="contact-box">
+
+            <h2 style="margin-bottom:10px;">
+                Let's Connect
+            </h2>
+
+            <p style="color:#667085;margin-bottom:20px;">
+                Follow me on social media or send me
+                an email.
+            </p>
+
+            <div class="socials">
+
+                <a href="https://facebook.com/" target="_blank">f</a>
+
+                <a href="https://instagram.com/" target="_blank">◎</a>
+
+                <a href="https://youtube.com/" target="_blank">▶</a>
+
+                <a href="https://linkedin.com/" target="_blank">in</a>
+
+                <a href="mailto:fahimshahriar@gmail.com">@</a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- FOOTER -->
+
+<footer>
+
+<div class="container footer">
+
+    <strong>
+        FS &nbsp; Fahim Shahriar
+    </strong>
+
+    <p>
+        © 2026 Fahim Shahriar. All Rights Reserved.
+    </p>
+
+    <div class="footer-social">
+
+        <a href="https://facebook.com/">Facebook</a>
+        <a href="https://instagram.com/">Instagram</a>
+        <a href="https://youtube.com/">YouTube</a>
+
+    </div>
+
+</div>
+
+</footer>
+
 </body>
 </html>
