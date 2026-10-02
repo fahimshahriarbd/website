@@ -1351,6 +1351,47 @@ libraryFilters.forEach(btn=>{
     renderLibrary(btn.dataset.libraryFilter);
   });
 });
+// গুগল শিট থেকে ব্লগ লোড করার কোড
+const BLOG_SHEET_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
+
+async function loadBlogsFromSheet() {
+  const blogGrid = document.getElementById("blogGrid");
+  if (!blogGrid || !BLOG_SHEET_URL || BLOG_SHEET_URL.includes("YOUR_GOOGLE_SCRIPT")) return;
+
+  try {
+    const response = await fetch(BLOG_SHEET_URL);
+    const blogs = await response.json();
+
+    if (blogs && blogs.length > 0) {
+      blogGrid.innerHTML = ""; // আগের ডেমো ব্লগ সরিয়ে ফেলবে
+      
+      blogs.forEach(blog => {
+        const article = document.createElement("article");
+        article.className = "card blog-card";
+        article.setAttribute("data-category", blog.category);
+
+        article.innerHTML = `
+          <img class="blog-cover" src="${blog.imageUrl}" alt="${blog.title}">
+          <div class="blog-body">
+            <div class="blog-meta">
+              <span style="text-transform:capitalize;">${blog.category}</span>
+              <span>${blog.date} · ${blog.readTime}</span>
+            </div>
+            <h3>${blog.title}</h3>
+            <p>${blog.summary}</p>
+            <a class="read-more" href="${blog.link}">Read article →</a>
+          </div>
+        `;
+        blogGrid.appendChild(article);
+      });
+    }
+  } catch (error) {
+    console.error("Error loading blogs from Google Sheet:", error);
+  }
+}
+
+// পেজ লোড হলে ব্লগগুলো নিয়ে আসবে
+document.addEventListener("DOMContentLoaded", loadBlogsFromSheet);
 renderLibrary();
 
 /* Current year */
