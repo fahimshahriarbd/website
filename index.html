@@ -411,6 +411,62 @@ button,input,textarea{font-size:16px}
   .socials a{width:44px;min-width:44px;padding:0}
   .socials a span{display:none}
 }
+
+/* Content Library */
+.library-toolbar{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  margin:0 0 24px;flex-wrap:wrap
+}
+.library-filters{display:flex;gap:8px;flex-wrap:wrap}
+.library-filter{
+  border:1px solid var(--border);background:var(--surface);color:var(--muted);
+  padding:8px 13px;border-radius:999px;font-weight:800;font-size:.82rem;cursor:pointer;
+  transition:.2s ease
+}
+.library-filter:hover,.library-filter.active{
+  color:var(--primary);border-color:color-mix(in srgb,var(--primary) 35%,var(--border));
+  background:color-mix(in srgb,var(--primary) 8%,var(--surface2))
+}
+.library-count{font-size:.82rem;color:var(--muted);font-weight:700}
+.library-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.library-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:18px;
+  padding:20px;box-shadow:var(--shadow);transition:.25s ease;cursor:pointer
+}
+.library-card:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--primary) 30%,var(--border))}
+.library-card-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.library-type{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--primary)}
+.library-card h3{font-size:1rem;line-height:1.4;margin:0 0 8px}
+.library-card p{font-size:.88rem;line-height:1.65;color:var(--muted);margin:0}
+.library-card mark{background:#fde68a;color:#111827;border-radius:3px;padding:1px 3px}
+[data-theme="dark"] .library-card mark{background:#facc15;color:#111827}
+.library-empty{grid-column:1/-1;text-align:center;padding:35px;color:var(--muted);border:1px dashed var(--border);border-radius:18px}
+.library-card.hidden{display:none}
+
+/* Centered mobile search overlay */
+@media(max-width:760px){
+  .search-wrap{position:static}
+  .search-box{
+    position:fixed;left:50%;right:auto;top:50%;width:calc(100vw - 28px);
+    max-width:520px;transform:translate(-50%,-50%);margin:0;
+    max-height:min(78vh,620px);overflow:hidden;padding:14px;
+    border-radius:20px;box-shadow:0 25px 70px rgba(15,23,42,.24);z-index:3000
+  }
+  .search-box::before{
+    content:"";position:fixed;inset:0;z-index:-1;
+    background:rgba(15,23,42,.34);backdrop-filter:blur(4px)
+  }
+  .search-box input{font-size:16px;padding:13px 44px 13px 14px}
+  .search-results{max-height:calc(min(78vh,620px) - 72px);padding-bottom:4px}
+  .search-result{padding:14px;font-size:.92rem}
+  .search-result-title{font-size:1rem}
+  .search-snippet{font-size:.9rem;line-height:1.7}
+  .library-grid{grid-template-columns:1fr}
+}
+@media(max-width:1000px) and (min-width:761px){
+  .library-grid{grid-template-columns:repeat(2,1fr)}
+}
+
 </style>
 </head>
 
@@ -872,6 +928,32 @@ button,input,textarea{font-size:16px}
   </div>
 </section>
 
+
+<!-- ================= CONTENT LIBRARY ================= -->
+<section class="section" id="library">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Content Library</span>
+      <h2>Everything in one place</h2>
+      <p>Browse posts, projects, notes, skills and other content by category—or use the search above.</p>
+    </div>
+
+    <div class="library-toolbar">
+      <div class="library-filters" id="libraryFilters">
+        <button class="library-filter active" type="button" data-library-filter="all">All</button>
+        <button class="library-filter" type="button" data-library-filter="blog">Blog</button>
+        <button class="library-filter" type="button" data-library-filter="project">Projects</button>
+        <button class="library-filter" type="button" data-library-filter="education">Education</button>
+        <button class="library-filter" type="button" data-library-filter="service">Services</button>
+        <button class="library-filter" type="button" data-library-filter="other">Other</button>
+      </div>
+      <span class="library-count" id="libraryCount"></span>
+    </div>
+
+    <div class="library-grid" id="libraryGrid"></div>
+  </div>
+</section>
+
 <!-- ================= CONTACT ================= -->
 <section class="section" id="contact">
   <div class="container">
@@ -1130,6 +1212,61 @@ const navObserver=new IntersectionObserver(entries=>{
   });
 },{rootMargin:'-35% 0px -55% 0px',threshold:0});
 navSections.forEach(section=>navObserver.observe(section));
+
+
+/* Content Library — automatically built from existing site content */
+const libraryGrid=document.getElementById('libraryGrid');
+const libraryCount=document.getElementById('libraryCount');
+const libraryFilters=document.querySelectorAll('.library-filter');
+
+function libraryType(item){
+  const t=(item.type+' '+item.title).toLowerCase();
+  if(t.includes('blog')) return 'blog';
+  if(t.includes('project')) return 'project';
+  if(t.includes('education') || t.includes('journey')) return 'education';
+  if(t.includes('service')) return 'service';
+  return 'other';
+}
+function librarySnippet(text){
+  const clean=text.replace(/\s+/g,' ').trim();
+  return clean.length>170 ? clean.slice(0,170).trim()+'…' : clean;
+}
+function renderLibrary(filter='all'){
+  const items=searchItems.filter(item=>item.id!=='library' && item.id!=='home' && item.id!=='contact');
+  const filtered=filter==='all'?items:items.filter(item=>libraryType(item)===filter);
+  libraryGrid.innerHTML='';
+  libraryCount.textContent=`${filtered.length} item${filtered.length===1?'':'s'}`;
+  if(!filtered.length){
+    libraryGrid.innerHTML='<div class="library-empty">No content found in this category.</div>';
+    return;
+  }
+  filtered.slice(0,30).forEach(item=>{
+    const card=document.createElement('article');
+    card.className='library-card';
+    card.innerHTML=`
+      <div class="library-card-top">
+        <span class="library-type">${escapeHtml(item.type)}</span>
+        <span aria-hidden="true">→</span>
+      </div>
+      <h3>${escapeHtml(item.title)}</h3>
+      <p>${escapeHtml(librarySnippet(item.text))}</p>
+    `;
+    card.addEventListener('click',()=>{
+      item.element?.scrollIntoView({behavior:'smooth',block:'center'});
+      item.element?.classList.add('search-hit');
+      setTimeout(()=>item.element?.classList.remove('search-hit'),1800);
+    });
+    libraryGrid.appendChild(card);
+  });
+}
+libraryFilters.forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    libraryFilters.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderLibrary(btn.dataset.libraryFilter);
+  });
+});
+renderLibrary();
 
 /* Current year */
 document.getElementById('year').textContent=new Date().getFullYear();
