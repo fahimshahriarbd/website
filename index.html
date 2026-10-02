@@ -1,77 +1,128 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fahim Shahriar - Portfolio</title>
+  <title>Fahim Shahriar | Portfolio & Blog</title>
+  <!-- Bangla Handwriting Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=BenSen&family=Hasir+Khata&family=Kolom&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-      background: #f5f5f5;
-      color: #333;
+      font-family: 'BenSen', sans-serif;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: #fff;
     }
     header {
-      background: #0077b6;
-      color: white;
-      padding: 20px;
       text-align: center;
+      padding: 50px;
     }
     nav {
-      background: #023e8a;
+      background: rgba(0,0,0,0.5);
       padding: 10px;
       text-align: center;
     }
     nav a {
-      color: white;
+      color: #fff;
       margin: 0 15px;
       text-decoration: none;
       font-weight: bold;
     }
     section {
-      padding: 40px;
-      text-align: center;
+      padding: 50px;
+    }
+    .dark-mode {
+      background: #111;
+      color: #eee;
     }
     footer {
-      background: #0077b6;
-      color: white;
       text-align: center;
-      padding: 15px;
-      margin-top: 20px;
+      padding: 20px;
+      background: rgba(0,0,0,0.5);
     }
   </style>
 </head>
 <body>
   <header>
     <h1>Fahim Shahriar</h1>
-    <p>Medical Student | Future Dentist | Tech Enthusiast</p>
+    <p>Medical Student | Web Developer | Content Creator</p>
   </header>
 
   <nav>
     <a href="#about">About</a>
     <a href="#portfolio">Portfolio</a>
+    <a href="#blog">Blog</a>
+    <a href="#services">Services</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#testimonials">Testimonials</a>
     <a href="#contact">Contact</a>
   </nav>
 
+  <!-- About Section -->
   <section id="about">
     <h2>About Me</h2>
-    <p>আমি চট্টগ্রাম মেডিকেল কলেজের ডেন্টাল ইউনিটে পড়াশোনা করছি। 
-       আমার লক্ষ্য হলো আধুনিক ডেন্টাল ল্যাব ও গবেষণা সিস্টেম তৈরি করা।</p>
+    <p>আমি Fahim Shahriar, Medical Student (BDS) at Chattogram Medical College Dental Unit। আমার লক্ষ্য হলো আধুনিক ডেন্টাল ল্যাব, গবেষণা ও শিক্ষা সিস্টেম তৈরি করা। পাশাপাশি টেকনিক্যাল টুলস, ওয়েব ডেভেলপমেন্ট ও ক্রিয়েটিভ কনটেন্টে আগ্রহী।</p>
   </section>
 
+  <!-- Portfolio Section -->
   <section id="portfolio">
-    <h2>My Work</h2>
-    <p>এখানে তুমি তোমার প্রজেক্ট, রিসার্চ বা মিডিয়া কাজের লিঙ্ক দিতে পারবে।</p>
+    <h2>Portfolio</h2>
+    <ul>
+      <li>Omega Tuition Media Projects</li>
+      <li>Web Development (GitHub Pages, DNS Setup)</li>
+      <li>Medical/Dental Research Notes</li>
+    </ul>
   </section>
 
+  <!-- Blog Section -->
+  <section id="blog">
+    <h2>Blog & Articles</h2>
+    <p>এখানে প্রতিদিনের নতুন আর্টিকেল প্রকাশ হবে। শুধু <code>_posts</code> ফোল্ডারে নতুন Markdown ফাইল যোগ করলেই ব্লগে দেখা যাবে।</p>
+    <!-- Example Blog Post -->
+    <article>
+      <h3>My First Blog Post</h3>
+      <p>আজ আমি আমার প্রথম ব্লগ লিখছি। এখানে থাকবে মেডিকেল নোট, টেকনিক্যাল গাইড, আর ব্যক্তিগত অভিজ্ঞতা।</p>
+    </article>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services">
+    <h2>Services</h2>
+    <ul>
+      <li>Tuition Media Management</li>
+      <li>Web Development Help</li>
+      <li>Medical/Dental Guidance</li>
+      <li>Creative Content Creation</li>
+    </ul>
+  </section>
+
+  <!-- Gallery Section -->
+  <section id="gallery">
+    <h2>Gallery</h2>
+    <p>ব্যক্তিগত ছবি, প্রজেক্ট স্ক্রিনশট, মেডিকেল/ডেন্টাল ছবি এখানে থাকবে।</p>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section id="testimonials">
+    <h2>Testimonials</h2>
+    <p>শিক্ষার্থীদের রিভিউ, সহকর্মী/বন্ধুদের মন্তব্য, প্রজেক্ট/ক্লায়েন্টদের প্রশংসা এখানে থাকবে।</p>
+  </section>
+
+  <!-- Contact Section -->
   <section id="contact">
     <h2>Contact</h2>
-    <p>Email: yourname@example.com</p>
-    <p>LinkedIn: linkedin.com/in/yourprofile</p>
+    <p>Facebook | Instagram | YouTube | LinkedIn | Twitter</p>
+    <form>
+      <input type="text" placeholder="Your Name"><br>
+      <input type="email" placeholder="Your Email"><br>
+      <textarea placeholder="Your Message"></textarea><br>
+      <button type="submit">Send</button>
+    </form>
   </section>
 
   <footer>
-    <p>© 2026 Fahim Shahriar | All Rights Reserved</p>
+    <p>© 2026 Fahim Shahriar | Portfolio & Blog</p>
+    <button onclick="document.body.classList.toggle('dark-mode')">Toggle Dark/Light Mode</button>
   </footer>
 </body>
 </html>
