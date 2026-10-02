@@ -9,46 +9,7 @@
 <meta property="og:title" content="Fahim Shahriar | Personal Portfolio">
 <meta property="og:description" content="Medical Student | Web Developer | Content Creator">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Fahim Shahriar Portfolio">
-<meta property="og:image" content="https://i.postimg.cc/3JFfY1zb/screenshot-5.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Fahim Shahriar | Personal Portfolio">
-<meta name="twitter:description" content="Medical Student | Web Developer | Content Creator">
-<meta name="twitter:image" content="https://i.postimg.cc/3JFfY1zb/screenshot-5.png">
 <title>Fahim Shahriar | Personal Portfolio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "Fahim Shahriar",
-  "jobTitle": "Dental Student & Web Developer",
-  "worksFor": {
-    "@type": "EducationalOrganization",
-    "name": "Chattogram Medical College, Dental Unit"
-  },
-  "url": "https://www.fahimshahriar.com.bd",
-  "image": "https://i.postimg.cc/3JFfY1zb/screenshot-5.png",
-  "sameAs": [
-    "https://www.facebook.com/fahim.shahriar.cumilla/",
-    "https://www.instagram.com/fahim.shahriar.bd/",
-    "https://www.youtube.com/@fahim-shahriar-bd",
-    "https://www.linkedin.com/in/drfahimshahriar/",
-    "https://x.com/fahimshahriarbd",
-    "https://www.tiktok.com/@fahim.shahriar.bd"
-  ],
-  "knowsAbout": [
-    "Dentistry",
-    "Clinical Medicine",
-    "Web Development",
-    "Digital Content Creation",
-    "Tuition Media"
-  ]
-}
-</script>
 
 <style>
 :root{
@@ -76,14 +37,15 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:85px}
 body{
-  font-family:'Plus Jakarta Sans',Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
   background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden;
 }
 a{text-decoration:none;color:inherit}
 img{max-width:100%;display:block}
-button,input,textarea{font:inherit;font-size:16px}
-body{font-size:16px}
+button,input,textarea{font:inherit}
 .container{width:min(var(--max),calc(100% - 32px));margin:auto}
+body{font-size:16px}
+button,input,textarea{font-size:16px}
 .section{padding:90px 0}
 .section-head{text-align:center;max-width:720px;margin:0 auto 45px}
 .eyebrow{
@@ -155,9 +117,10 @@ body{font-size:16px}
 .socials a[data-brand="linkedin"]{--social-color:#0a66c2}
 .socials a[data-brand="x"]{--social-color:#111827}
 [data-theme="dark"] .socials a[data-brand="x"]{--social-color:#fff}
-.socials a[data-brand="tiktok"]{--social-color:#000000}
+.socials a[data-brand="github"]{--social-color:#6e40c9}
 .scroll-progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--primary),#60a5fa);z-index:2000;box-shadow:0 0 12px rgba(37,99,235,.45)}
 .nav-links a.active{color:var(--primary);background:var(--surface2)}
+.hero-subtitle .typing{color:var(--primary)}
 .nav-links{display:flex;align-items:center;gap:5px;list-style:none}
 .nav-links a{padding:9px 11px;border-radius:10px;color:var(--muted);font-size:.9rem;font-weight:700}
 .nav-links a:hover{color:var(--primary);background:var(--surface2)}
@@ -214,6 +177,7 @@ body{font-size:16px}
 .badge{
  display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border:1px solid var(--border);
  background:var(--surface);border-radius:999px;color:var(--muted);font-weight:700;font-size:.82rem;margin-bottom:16px;
+
 }
 .dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 5px rgba(34,197,94,.10)}
 .hero h1{
@@ -237,9 +201,11 @@ body{font-size:16px}
 }
 .hero p{
  color:var(--muted);max-width:680px;font-size:1.04rem;
+
 }
 .hero-buttons{
  display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin:26px 0 22px;
+
 }
 .btn{
  display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;
@@ -251,6 +217,7 @@ body{font-size:16px}
 .btn-secondary{background:var(--surface)}
 .socials{
  display:flex;flex-wrap:wrap;justify-content:center;gap:10px;
+
 }
 .socials a{
  position:relative;width:45px;height:45px;border:1px solid var(--border);
@@ -272,12 +239,13 @@ body{font-size:16px}
 .socials a[data-brand="youtube"]{--social-color:#ff0000}
 .socials a[data-brand="linkedin"]{--social-color:#0a66c2}
 .socials a[data-brand="x"]{--social-color:#111827}
-.socials a[data-brand="tiktok"]{--social-color:#000000}
+.socials a[data-brand="github"]{--social-color:#24292f}
 @keyframes heroFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 @keyframes heroPulse{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.035);opacity:1}}
 @keyframes heroSpin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){
  .hero-photo-wrap,.hero-photo-wrap::before,.hero-photo-wrap::after{animation:none !important}
+ .hero-photo-wrap,.hero-photo-wrap::after,.hero-photo-wrap::before,.gradient-text,.typing{animation:none!important}
 }
 
 /* About / stats */
@@ -330,13 +298,17 @@ body{font-size:16px}
 .blog-meta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:.78rem;font-weight:700;margin-bottom:8px}
 .blog-card h3{font-size:1.2rem;margin-bottom:8px}
 .blog-card p{color:var(--muted);font-size:.9rem}
-.read-more{display:inline-flex;margin-top:16px;color:var(--primary);font-weight:900;font-size:.9rem;cursor:pointer}
+.read-more{display:inline-flex;margin-top:16px;color:var(--primary);font-weight:900;font-size:.9rem}
 .video-box{margin-top:18px;border-radius:15px;overflow:hidden;aspect-ratio:16/9;background:#000}
 .video-box iframe{width:100%;height:100%;border:0}
+.blog-note{
+ margin-top:25px;padding:17px 20px;border-radius:16px;background:var(--surface2);border:1px dashed var(--border);
+ color:var(--muted);font-size:.9rem
+}
 
 /* Gallery */
 .gallery-grid{grid-template-columns:repeat(4,1fr)}
-.gallery-item{position:relative;overflow:hidden;border-radius:17px;aspect-ratio:1/1;border:1px solid var(--border);background:var(--surface);cursor:pointer}
+.gallery-item{position:relative;overflow:hidden;border-radius:17px;aspect-ratio:1/1;border:1px solid var(--border);background:var(--surface)}
 .gallery-item img{width:100%;height:100%;object-fit:cover;transition:.4s}
 .gallery-item:hover img{transform:scale(1.06)}
 .gallery-caption{position:absolute;left:10px;right:10px;bottom:10px;padding:9px 11px;border-radius:10px;background:rgba(0,0,0,.58);color:#fff;font-size:.78rem;font-weight:800}
@@ -376,6 +348,70 @@ body{font-size:16px}
 }
 .top-btn.show{display:grid;place-items:center}
 
+/* Tablet */
+@media(max-width:1000px){
+ .container{width:min(var(--max),calc(100% - 30px))}
+ .hero-grid{grid-template-columns:1fr 380px;gap:35px}
+ .nav-links{gap:0}
+ .nav-links a{padding:8px 7px;font-size:.82rem}
+ .cards,.blog-grid{grid-template-columns:repeat(2,1fr)}
+ .gallery-grid{grid-template-columns:repeat(3,1fr)}
+}
+
+/* Mobile */
+@media(max-width:760px){
+ .section{padding:70px 0}
+ .navbar{height:65px}
+ .nav-links{
+   position:absolute;top:65px;left:0;right:0;background:var(--surface);
+   border-bottom:1px solid var(--border);padding:12px 18px;display:none;flex-direction:column;align-items:stretch;
+   box-shadow:var(--shadow)
+ }
+ .nav-links.open{display:flex}
+ .nav-links a{display:block;padding:12px 13px}
+ .menu-btn{display:grid}
+ .hero{min-height:auto;padding:42px 0 58px}
+ .hero-grid{grid-template-columns:1fr;text-align:center;gap:0}
+ .hero-photo-wrap{width:min(250px,68vw);margin-bottom:31px}
+ .hero-intro{width:100%}
+ .hero h1{font-size:clamp(2.25rem,11vw,3.35rem);line-height:1.02}
+ .hero-subtitle{font-size:1rem;line-height:1.7}
+ .hero-subtitle .typing{min-width:0}
+ .hero p{font-size:.97rem;line-height:1.7;margin:auto;max-width:520px}
+ .hero-buttons{margin:22px 0 20px}
+ .float-card{right:-2px;bottom:8px;padding:8px 11px;font-size:.76rem}
+ .float-card small{font-size:.66rem}
+ .hero-photo-wrap::after{inset:-20px}
+ .hero p{margin:auto}
+ .hero-buttons,.socials{justify-content:center}
+ .hero-photo-wrap{max-width:330px}
+ .float-card{right:-5px;bottom:15px}
+ .about-grid,.contact-grid{grid-template-columns:1fr}
+ .cards,.blog-grid,.testimonial-grid{grid-template-columns:1fr}
+ .gallery-grid{grid-template-columns:repeat(2,1fr)}
+ .stats{grid-template-columns:repeat(2,1fr)}
+ .form-grid{grid-template-columns:1fr}
+ .field.full{grid-column:auto}
+ .footer-inner{flex-direction:column;text-align:center}
+}
+
+/* Small phones */
+@media(max-width:420px){
+ .container{width:calc(100% - 24px)}
+ .hero h1{font-size:2.55rem}
+ .hero-photo-wrap{max-width:285px}
+ .panel,.card{padding:20px}
+ .stats{gap:9px}
+ .stat{padding:16px}
+ .stat strong{font-size:1.45rem}
+ .gallery-grid{gap:10px}
+ .blog-body{padding:18px}
+}
+@media(max-width:700px){
+  .socials a{width:44px;min-width:44px;padding:0}
+  .socials a span{display:none}
+}
+
 /* Content Library */
 .library-toolbar{
   display:flex;align-items:center;justify-content:space-between;gap:16px;
@@ -402,43 +438,70 @@ body{font-size:16px}
 .library-type{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--primary)}
 .library-card h3{font-size:1rem;line-height:1.4;margin:0 0 8px}
 .library-card p{font-size:.88rem;line-height:1.65;color:var(--muted);margin:0}
+.library-card mark{background:#fde68a;color:#111827;border-radius:3px;padding:1px 3px}
+[data-theme="dark"] .library-card mark{background:#facc15;color:#111827}
+.library-empty{grid-column:1/-1;text-align:center;padding:35px;color:var(--muted);border:1px dashed var(--border);border-radius:18px}
+.library-card.hidden{display:none}
 
-/* Modals */
-.modal-backdrop{
-  position:fixed;inset:0;background:rgba(15,23,42,.65);backdrop-filter:blur(6px);
-  display:none;place-items:center;z-index:3000;padding:16px;
-}
-.modal-backdrop.open{display:grid}
-.modal-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:24px;
-  box-shadow:0 25px 70px rgba(0,0,0,.25);width:min(720px,100%);max-height:88vh;
-  display:flex;flex-direction:column;overflow:hidden;position:relative;
-}
-.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.modal-body{padding:24px;overflow-y:auto;line-height:1.7}
-.modal-close{border:0;background:transparent;font-size:24px;color:var(--muted);cursor:pointer;padding:4px}
-
-@media(max-width:1000px){
-  .cards,.blog-grid{grid-template-columns:repeat(2,1fr)}
-  .gallery-grid{grid-template-columns:repeat(3,1fr)}
-}
+/* Mobile search overlay — keyboard-safe */
 @media(max-width:760px){
-  .about-grid,.contact-grid{grid-template-columns:1fr}
-  .cards,.blog-grid,.testimonial-grid,.library-grid{grid-template-columns:1fr}
-  .gallery-grid{grid-template-columns:repeat(2,1fr)}
-  .menu-btn{display:grid}
-  .nav-links{
-    position:absolute;top:72px;left:0;right:0;background:var(--surface);
-    border-bottom:1px solid var(--border);padding:14px 20px;display:none;flex-direction:column;gap:6px;
-    box-shadow:var(--shadow)
-  }
-  .nav-links.open{display:flex}
   .search-wrap{position:static}
+
   .search-box{
-    position:fixed;left:50%;right:auto;top:15px;width:calc(100vw - 28px);max-width:500px;
-    transform:translateX(-50%);max-height:85vh;overflow:hidden;padding:14px;border-radius:20px;z-index:3500;
+    position:fixed;
+    left:50%;
+    right:auto;
+    top:max(10px, env(safe-area-inset-top));
+    width:calc(100vw - 28px);
+    max-width:520px;
+
+    /* Only center horizontally; do not vertically center when keyboard opens */
+    transform:translateX(-50%);
+    margin:0;
+
+    /* Dynamic viewport handles mobile browser/keyboard changes better */
+    max-height:calc(100dvh - 20px);
+    overflow:hidden;
+    padding:14px;
+
+    border-radius:20px;
+    box-shadow:0 25px 70px rgba(15,23,42,.24);
+    z-index:3000;
   }
+
+  .search-box::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    background:rgba(15,23,42,.34);
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+  }
+
+  .search-box input{
+    width:100%;
+    font-size:16px;
+    padding:13px 44px 13px 14px;
+    box-sizing:border-box;
+  }
+
+  .search-results{
+    max-height:calc(100dvh - 105px);
+    overflow-y:auto;
+    padding-bottom:4px;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .search-result{padding:14px;font-size:.92rem}
+  .search-result-title{font-size:1rem}
+  .search-snippet{font-size:.9rem;line-height:1.7}
+  .library-grid{grid-template-columns:1fr}
 }
+@media(max-width:1000px) and (min-width:761px){
+  .library-grid{grid-template-columns:repeat(2,1fr)}
+}
+
 </style>
 </head>
 
@@ -456,13 +519,10 @@ body{font-size:16px}
       <ul class="nav-links" id="navLinks">
         <li><a href="#home">Home</a></li>
         <li><a href="#about">About</a></li>
-        <li><a href="#journey">Journey</a></li>
-        <li><a href="#skills">Skills</a></li>
         <li><a href="#projects">Projects</a></li>
         <li><a href="#blog">Blog</a></li>
         <li><a href="#services">Services</a></li>
         <li><a href="#gallery">Gallery</a></li>
-        <li><a href="#library">Library</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
@@ -471,7 +531,7 @@ body{font-size:16px}
       <div class="search-wrap">
         <button class="icon-btn search-btn" id="searchBtn" aria-label="Search">⌕</button>
         <div class="search-box" id="searchBox">
-          <input type="search" id="siteSearch" placeholder="Search this website... (e.g. Dental, Tech, GPA 5.00)" aria-label="Search this website">
+          <input type="search" id="siteSearch" placeholder="Search this website..." aria-label="Search this website">
           <button id="closeSearch" aria-label="Close search">×</button>
           <div class="search-results" id="searchResults"></div>
         </div>
@@ -487,27 +547,18 @@ body{font-size:16px}
 <!-- ================= HOME ================= -->
 <section class="hero" id="home">
   <div class="container hero-grid">
+
+    <!-- PROFILE IMAGE FIRST: strongest first impression on mobile -->
     <div class="hero-photo-wrap">
+      <!-- CHANGE PROFILE IMAGE URL HERE -->
       <img class="hero-photo"
         src="https://i.postimg.cc/3JFfY1zb/screenshot-5.png?auto=format&fit=crop&w=900&q=85"
         alt="Fahim Shahriar profile photo">
-      <div class="float-card">
-        <strong>BDS Student · CMC</strong>
-        <small>Chattogram Medical College</small>
-      </div>
+
     </div>
 
     <div class="hero-intro">
       <div class="badge"><span class="dot"></span> Welcome to my personal space</div>
-      <h1 class="gradient-text">Fahim Shahriar</h1>
-      
-      <div class="hero-subtitle">
-        <span class="hero-topic" onclick="openSearch('Dentistry')">Dentistry</span>
-        <span class="hero-topic" onclick="openSearch('Healthcare')">Healthcare</span>
-        <span class="hero-topic" onclick="openSearch('Technology')">Technology</span>
-        <span class="hero-topic" onclick="openSearch('Education')">Education</span>
-        <span class="hero-topic" onclick="openSearch('Creativity')">Creativity</span>
-      </div>
 
       <p>
         A personal space for my journey in dentistry, technology, education,
@@ -517,29 +568,24 @@ body{font-size:16px}
       <div class="hero-buttons">
         <a class="btn btn-primary" href="#projects">Explore My Work →</a>
         <a class="btn btn-secondary" href="#contact">Contact Me</a>
-        <button class="btn btn-secondary" onclick="openCvModal()">View CV / Resume</button>
       </div>
 
       <!-- SOCIAL LINKS -->
       <div class="socials" aria-label="Social media links">
         <a href="https://www.facebook.com/fahim.shahriar.cumilla/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook" data-brand="facebook">
-          <svg viewBox="0 0 24 24"><path d="M14 8h3V4h-3c-3.3 0-5 1.9-5 5v3H6v4h3v8h4v-8h3.2l.8-4H13V9c0-.7.3-1 1-1z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 8h3V4h-3c-3.3 0-5 1.9-5 5v3H6v4h3v8h4v-8h3.2l.8-4H13V9c0-.7.3-1 1-1z"/></svg>
         </a>
-        <a href="https://www.instagram.com/fahim.shahriar.bd/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram" data-brand="instagram">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg>
-        </a>
+        <a href="https://www.instagram.com/fahim.shahriar.bd/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram" data-brand="instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg></a>
         <a href="https://www.youtube.com/@fahim-shahriar-bd" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube" data-brand="youtube">
-          <svg viewBox="0 0 24 24"><path d="M21.6 7.1a2.9 2.9 0 0 0-2-2C17.8 4.6 12 4.6 12 4.6s-5.8 0-7.6.5a2.9 2.9 0 0 0-2 2A30 30 0 0 0 2 12a30 30 0 0 0 .4 4.9 2.9 2.9 0 0 0 2 2c1.8.5 7.6.5 7.6.5s5.8 0 7.6-.5a2.9 2.9 0 0 0 2-2A30 30 0 0 0 22 12a30 30 0 0 0-.4-4.9zM10 15.5v-7l6 3.5-6 3.5z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.6 7.1a2.9 2.9 0 0 0-2-2C17.8 4.6 12 4.6 12 4.6s-5.8 0-7.6.5a2.9 2.9 0 0 0-2 2A30 30 0 0 0 2 12a30 30 0 0 0 .4 4.9 2.9 2.9 0 0 0 2 2c1.8.5 7.6.5 7.6.5s5.8 0 7.6-.5a2.9 2.9 0 0 0 2-2A30 30 0 0 0 22 12a30 30 0 0 0-.4-4.9zM10 15.5v-7l6 3.5-6 3.5z"/></svg>
         </a>
         <a href="https://www.linkedin.com/in/drfahimshahriar/" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn" data-brand="linkedin">
-          <svg viewBox="0 0 24 24"><path d="M6.5 8H3V21h3.5V8zM4.75 3A2.05 2.05 0 1 0 4.75 7.1 2.05 2.05 0 0 0 4.75 3zM21 13.6c0-3.9-2.1-5.7-4.9-5.7-2.3 0-3.3 1.3-3.9 2.2V8H8.7v13h3.5v-6.5c0-1.7.3-3.4 2.5-3.4 2.1 0 2.1 2 2.1 3.5V21H21v-7.4z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 8H3V21h3.5V8zM4.75 3A2.05 2.05 0 1 0 4.75 7.1 2.05 2.05 0 0 0 4.75 3zM21 13.6c0-3.9-2.1-5.7-4.9-5.7-2.3 0-3.3 1.3-3.9 2.2V8H8.7v13h3.5v-6.5c0-1.7.3-3.4 2.5-3.4 2.1 0 2.1 2 2.1 3.5V21H21v-7.4z"/></svg>
         </a>
         <a href="https://x.com/fahimshahriarbd" target="_blank" rel="noopener" aria-label="X" title="X" data-brand="x">
-          <svg viewBox="0 0 24 24"><path d="M4 3h4.7l4.1 5.7L17.5 3H20l-6 7.1L20.5 21h-4.7l-4.5-6.2L6.1 21H3.5l6.1-7.5L4 3zm4.1 2 8.8 13h1.6L9.7 5H8.1z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h4.7l4.1 5.7L17.5 3H20l-6 7.1L20.5 21h-4.7l-4.5-6.2L6.1 21H3.5l6.1-7.5L4 3zm4.1 2 8.8 13h1.6L9.7 5H8.1z"/></svg>
         </a>
-        <a href="https://www.tiktok.com/@fahim.shahriar.bd" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok" data-brand="tiktok">
-          <svg viewBox="0 0 24 24"><path d="M16.6 3c.3 1.8 1.4 3.2 3.1 4.1v3.1c-1.5-.1-2.9-.6-4.1-1.4v6.3c0 4-2.7 6.4-6.2 6.4-3.1 0-5.4-2.2-5.4-5.2 0-3.2 2.6-5.4 5.8-5.4.3 0 .6 0 .9.1v3.2a3.8 3.8 0 0 0-.9-.1c-1.4 0-2.5.9-2.5 2.2 0 1.2.9 2.1 2.2 2.1 1.5 0 2.6-1 2.6-3V3h4.5z" fill="currentColor"/></svg>
-        </a>
+        <a href="https://www.tiktok.com/@fahim.shahriar.bd" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok" data-brand="tiktok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.6 3c.3 1.8 1.4 3.2 3.1 4.1v3.1c-1.5-.1-2.9-.6-4.1-1.4v6.3c0 4-2.7 6.4-6.2 6.4-3.1 0-5.4-2.2-5.4-5.2 0-3.2 2.6-5.4 5.8-5.4.3 0 .6 0 .9.1v3.2a3.8 3.8 0 0 0-.9-.1c-1.4 0-2.5.9-2.5 2.2 0 1.2.9 2.1 2.2 2.1 1.5 0 2.6-1 2.6-3V3h4.5z" fill="currentColor"/></svg></a>
       </div>
     </div>
   </div>
@@ -548,19 +594,20 @@ body{font-size:16px}
 <!-- ================= ABOUT ================= -->
 <section class="section" id="about">
   <div class="container">
-    <div class="section-head">
-      <span class="eyebrow">About Me</span>
-      <h2>A little about who I am</h2>
-      <p style="text-align: justify;">
-        I’m Fahim Shahriar, a dental student at Chittagong Medical College, Bangladesh.
-        I’m interested in dentistry, healthcare, technology, education, and creativity.
-        This is my personal space where I share my journey, thoughts, and experiences
-        through photos, videos, articles, and other content. You can also learn about
-        my studies, interests, skills, projects, and work here.
-      </p>
+    <div class="section-head reveal">
+     <span class="eyebrow">About Me</span>
+<h2>A little about who I am</h2>
+
+<p style="text-align: justify;">
+  I’m Fahim Shahriar, a dental student at Chittagong Medical College, Bangladesh.
+  I’m interested in dentistry, healthcare, technology, education, and creativity.
+  This is my personal space where I share my journey, thoughts, and experiences
+  through photos, videos, articles, and other content. You can also learn about
+  my studies, interests, skills, projects, and work here.
+</p>
     </div>
 
-    <div class="about-grid">
+    <div class="about-grid reveal">
       <div class="panel">
         <h3>My Story</h3>
         <p class="muted">
@@ -570,7 +617,7 @@ body{font-size:16px}
         </p>
         <p class="muted" style="margin-top:14px">
           My long-term interests include modern dental systems, research,
-          education, web development and building useful digital platforms that bridge healthcare and modern technology.
+          education, web development and building useful digital platforms.
         </p>
 
         <div class="info-list">
@@ -589,14 +636,10 @@ body{font-size:16px}
           <div class="stat"><strong>20%</strong><span>Creative Personal Work</span></div>
         </div>
         <div class="tags">
-          <span class="tag" onclick="openSearch('Dentistry')">Dentistry</span>
-          <span class="tag" onclick="openSearch('Research')">Research</span>
-          <span class="tag" onclick="openSearch('Cooking')">Cooking</span>
-          <span class="tag" onclick="openSearch('Content')">Content</span>
-          <span class="tag" onclick="openSearch('Writing')">Writing</span>
-          <span class="tag" onclick="openSearch('Photography')">Photography</span>
-          <span class="tag" onclick="openSearch('Education')">Education</span>
-          <span class="tag" onclick="openSearch('Technology')">Technology</span>
+          <span class="tag">Dentistry</span><span class="tag">Research</span>
+          <span class="tag">Cooking</span><span class="tag">Content</span>
+          <span class="tag">Writing</span><span class="tag">Photography</span>
+          <span class="tag">Education</span><span class="tag">Technology</span>
         </div>
       </div>
     </div>
@@ -606,19 +649,19 @@ body{font-size:16px}
 <!-- ================= JOURNEY ================= -->
 <section class="section" id="journey">
   <div class="container">
-    <div class="section-head">
+    <div class="section-head reveal">
       <span class="eyebrow">My Journey</span>
       <h2>Education & Growth</h2>
-      <p>Academic milestones, clinical dental training, and self-directed digital innovation.</p>
+      <p>Successfully Completed This Website</p>
     </div>
 
-    <div class="timeline">
+    <div class="timeline reveal">
       <div class="timeline-item">
         <span class="timeline-dot"></span>
         <div class="timeline-content">
-          <small>Current Academic Pursuit</small>
+          <small>Current</small>
           <h4>Studying at Chattogram Medical College, Dental Unit</h4>
-          <p class="muted">Rigorous clinical dental training, oral anatomy, pathology, pharmacology, restorative procedures, patient communication, and comprehensive medical science.</p>
+          <p class="muted">Dental education, clinical learning, medical knowledge and continuous skill development.</p>
         </div>
       </div>
 
@@ -628,8 +671,9 @@ body{font-size:16px}
           <small>Academic Milestone</small>
           <h4>HSC | Science | GPA 5.00</h4>
           <p class="muted">From Ramkrishnapur College</p>
-          <h4 style="margin-top:10px">SSC | Science | GPA 5.00</h4>
+		  <h4>SSC | Science | GPA 5.00</h4>
           <p class="muted">From Ramkrishnapur KKRK High School</p>
+		  
         </div>
       </div>
 
@@ -637,8 +681,8 @@ body{font-size:16px}
         <span class="timeline-dot"></span>
         <div class="timeline-content">
           <small>Learning Beyond Curriculum</small>
-          <h4>Technology, Web & Creative Digital Projects</h4>
-          <p class="muted">Self-learning in websites, digital tools, form automations, content creation and practical technology.</p>
+          <h4>Technology, Web & Creative Projects</h3>
+          <p class="muted">Self-learning in websites, digital tools, content creation and practical technology.</p>
         </div>
       </div>
     </div>
@@ -648,33 +692,15 @@ body{font-size:16px}
 <!-- ================= SKILLS ================= -->
 <section class="section" id="skills">
   <div class="container">
-    <div class="section-head">
+    <div class="section-head reveal">
       <span class="eyebrow">Skills & Interests</span>
       <h2>What I like to learn and build</h2>
-      <p>Bridging foundational healthcare with modern digital capabilities and content.</p>
     </div>
 
-    <div class="grid cards">
-      <article class="card">
-        <div class="card-icon">🦷</div>
-        <h3>Dental & Medical</h3>
-        <p>Study notes, tooth anatomy, oral physiology, dental materials, pharmacology, and clinical examination resources.</p>
-        <div class="tags"><span class="tag" onclick="openSearch('BDS')">BDS</span><span class="tag" onclick="openSearch('Medical Notes')">Medical Notes</span></div>
-      </article>
-
-      <article class="card">
-        <div class="card-icon">💻</div>
-        <h3>Web Development</h3>
-        <p>Personal and organizational websites, static architecture, hosting, DNS routing, GitHub Pages, and lightweight tools.</p>
-        <div class="tags"><span class="tag" onclick="openSearch('HTML')">HTML</span><span class="tag" onclick="openSearch('CSS')">CSS</span><span class="tag" onclick="openSearch('GitHub')">GitHub</span><span class="tag" onclick="openSearch('DNS')">DNS</span></div>
-      </article>
-
-      <article class="card">
-        <div class="card-icon">🎨</div>
-        <h3>Creative Content</h3>
-        <p>Digital content, social media conceptualization, graphics, video concepts, photography, and personal projects.</p>
-        <div class="tags"><span class="tag" onclick="openSearch('Content')">Content</span><span class="tag" onclick="openSearch('Design')">Design</span></div>
-      </article>
+    <div class="grid cards reveal">
+      <article class="card"><div class="card-icon">🦷</div><h4>Dental & Medical</h3><p>Study notes, anatomy, physiology, pharmacology, dentistry and educational resources.</p><div class="tags"><span class="tag">BDS</span><span class="tag">Medical Notes</span></div></article>
+      <article class="card"><div class="card-icon">💻</div><h3>Web Development</h3><p>Personal websites, static websites, hosting, DNS, GitHub Pages and practical web tools.</p><div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">GitHub</span></div></article>
+      <article class="card"><div class="card-icon">🎨</div><h3>Creative Content</h3><p>Digital content, social media ideas, graphics, video concepts and personal projects.</p><div class="tags"><span class="tag">Content</span><span class="tag">Design</span></div></article>
     </div>
   </div>
 </section>
@@ -682,56 +708,50 @@ body{font-size:16px}
 <!-- ================= PROJECTS ================= -->
 <section class="section" id="projects">
   <div class="container">
-    <div class="section-head">
+    <div class="section-head reveal">
       <span class="eyebrow">Portfolio</span>
       <h2>Selected projects</h2>
-      <p>Initiatives spanning educational mentorship, personal web engineering, and medical resources.</p>
+      <p>Replace these demo cards with your real projects, screenshots and links.</p>
     </div>
 
-    <div class="grid cards">
+    <div class="grid cards reveal">
       <article class="card">
-        <div class="card-icon">🎓</div>
-        <h3>Omega Tuition Media</h3>
-        <p>A specialized tuition media and educational digital initiative connecting dedicated tutors, passionate students, and guardians.</p>
-        <div class="tags"><span class="tag" onclick="openSearch('Education')">Education</span><span class="tag" onclick="openSearch('Media')">Media</span></div>
-        <a class="read-more" href="https://www.facebook.com/omega.tuition.media" target="_blank" rel="noopener">View project on Facebook →</a>
+        <div class="card-icon">🎓</div><h3>Omega Tuition Media</h3>
+        <p>A tuition media and education-focused digital project connecting students, teachers and guardians.</p>
+        <div class="tags"><span class="tag">Education</span><span class="tag">Media</span></div>
+        <a class="read-more" href="https://www.facebook.com/omega.tuition.media" target="_blank">View project →</a>
       </article>
 
       <article class="card">
-        <div class="card-icon">🌐</div>
-        <h3>Personal Website</h3>
-        <p>My personal digital identity, clinical study portal, article repository, and long-term knowledge hub built for high speed.</p>
-        <div class="tags"><span class="tag" onclick="openSearch('HTML')">HTML</span><span class="tag" onclick="openSearch('GitHub')">GitHub Pages</span><span class="tag" onclick="openSearch('DNS')">DNS</span></div>
-        <a class="read-more" href="https://www.fahimshahriar.com.bd" target="_blank" rel="noopener">Visit fahimshahriar.com.bd →</a>
+        <div class="card-icon">🌐</div><h3>Personal Website</h3>
+        <p>My personal digital identity, portfolio, blog and knowledge hub built for long-term use.</p>
+        <div class="tags"><span class="tag">HTML</span><span class="tag">GitHub Pages</span><span class="tag">DNS</span></div>
+        <a class="read-more" href="https://www.fahimshahriar.com.bd" target="_blank">View project →</a>
       </article>
 
       <article class="card">
-        <div class="card-icon">📚</div>
-        <h3>Medical / Dental Notes</h3>
-        <p>A growing collection of high-yield study notes and educational material organized for quick personal reference.</p>
-        <div class="tags"><span class="tag" onclick="openSearch('Dental')">Dental</span><span class="tag" onclick="openSearch('Research')">Research</span></div>
-        <a class="read-more" href="#blog">Read study articles →</a>
+        <div class="card-icon">📚</div><h3>Medical / Dental Notes</h3>
+        <p>A growing collection of study notes and educational material organized for quick personal reference.</p>
+        <div class="tags"><span class="tag">Dental</span><span class="tag">Research</span></div>
+        <a class="read-more" href="#blog">Read articles →</a>
       </article>
 
       <article class="card">
-        <div class="card-icon">⚙️</div>
-        <h3>Digital Tools & Automation</h3>
-        <p>Experiments with Google Apps Script, smart forms, automated data pipelines, and spreadsheets that streamline everyday work.</p>
-        <div class="tags"><span class="tag" onclick="openSearch('Automation')">Automation</span><span class="tag" onclick="openSearch('Google')">Google Tools</span></div>
+        <div class="card-icon">⚙️</div><h3>Digital Tools</h3>
+        <p>Experiments with forms, spreadsheets, websites, automation and useful everyday digital systems.</p>
+        <div class="tags"><span class="tag">Automation</span><span class="tag">Google Tools</span></div>
       </article>
 
       <article class="card">
-        <div class="card-icon">🧪</div>
-        <h3>Research Ideas</h3>
-        <p>A dedicated place to document future dental technologies, public oral health strategies, and literature reviews.</p>
-        <div class="tags"><span class="tag" onclick="openSearch('Research')">Research</span><span class="tag" onclick="openSearch('Ideas')">Ideas</span></div>
+        <div class="card-icon">🧪</div><h3>Research Ideas</h3>
+        <p>A dedicated place to document future research interests, questions, literature notes and projects.</p>
+        <div class="tags"><span class="tag">Research</span><span class="tag">Ideas</span></div>
       </article>
 
       <article class="card">
-        <div class="card-icon">✨</div>
-        <h3>Content Lab</h3>
-        <p>New creative experiments, short-form medical educational clips, campus life vlogs, and photography projects.</p>
-        <div class="tags"><span class="tag" onclick="openSearch('Future')">Future</span><span class="tag" onclick="openSearch('Creative')">Creative</span></div>
+        <div class="card-icon">✨</div><h3>More Coming</h3>
+        <p>New projects will be added here as they are completed. Keep this card or replace it anytime.</p>
+        <div class="tags"><span class="tag">Future</span><span class="tag">Projects</span></div>
       </article>
     </div>
   </div>
@@ -740,10 +760,10 @@ body{font-size:16px}
 <!-- ================= BLOG ================= -->
 <section class="section" id="blog">
   <div class="container">
-    <div class="section-head">
+    <div class="section-head reveal">
       <span class="eyebrow">Blog & Articles</span>
       <h2>My latest writing</h2>
-      <p>Medical notes, technology guides, personal stories, and everyday reflections.</p>
+      <p>Medical notes, technology guides, personal stories and everyday experiences.</p>
     </div>
 
     <!-- Blog category filter -->
@@ -756,15 +776,24 @@ body{font-size:16px}
     </div>
 
     <div class="grid blog-grid" id="blogGrid">
+
+      <!-- =========================================================
+           BLOG POST TEMPLATE
+           প্রতিদিন নতুন পোস্ট যোগ করতে এই article block copy করুন।
+           category: medical / tech / education / personal
+           ========================================================= -->
+
       <article class="card blog-card" data-category="medical">
+        <!-- POST IMAGE: শুধু URL পরিবর্তন করুন -->
         <img class="blog-cover"
           src="https://images.unsplash.com/photo-1559757175-0eb30cd8c063?auto=format&fit=crop&w=1000&q=85"
           alt="Dental study notes">
         <div class="blog-body">
           <div class="blog-meta"><span>Medical</span><span>Oct 03, 2026 · 4 min</span></div>
           <h3>Dental Study Notes — My Learning Journey</h3>
-          <p>Reflections on transitioning into clinical dentistry at Chattogram Medical College, mastering oral anatomy, and the discipline required for clinical excellence.</p>
-          <a class="read-more" onclick="openArticleModal('dental')">Read full article →</a>
+          <p>I’m Fahim Shahriar, a BDS student at Chittagong Medical College, Bangladesh. I’m interested in dentistry, healthcare, technology, education, and creativity. This is my personal space where I share my journey, thoughts, and experiences through photos, videos, articles, and other content. You can also learn about my studies, interests, skills, projects, and work here.
+</p>
+          <a class="read-more" href="#article1">Read article →</a>
         </div>
       </article>
 
@@ -775,8 +804,8 @@ body{font-size:16px}
         <div class="blog-body">
           <div class="blog-meta"><span>Technology</span><span>Oct 02, 2026 · 5 min</span></div>
           <h3>How I Built My Personal Website</h3>
-          <p>My experience configuring HTML, CSS, DNS records, GitHub Pages, and building a fast, sustainable personal digital identity independent of social algorithms.</p>
-          <a class="read-more" onclick="openArticleModal('tech')">Read full article →</a>
+          <p>My experience with HTML, GitHub Pages, DNS and creating a simple digital identity.</p>
+          <a class="read-more" href="#article2">Read article →</a>
         </div>
       </article>
 
@@ -787,37 +816,32 @@ body{font-size:16px}
         <div class="blog-body">
           <div class="blog-meta"><span>Personal</span><span>Oct 01, 2026 · 3 min</span></div>
           <h3>Life, College & Everyday Moments</h3>
-          <p>Balancing intense academic pressures with cooking, photography, tech hobbies, friendship, and the breezy hills of Chattogram.</p>
-          <a class="read-more" onclick="openArticleModal('life')">Read full article →</a>
+          <p>Personal experiences, small lessons, cooking, gaming, college memories and daily life.</p>
+          <a class="read-more" href="#article3">Read article →</a>
         </div>
       </article>
+
     </div>
-  </div>
+
 </section>
 
 <!-- ================= FEATURED VIDEO ================= -->
 <section class="section" id="videos">
   <div class="container">
-    <div class="section-head">
+    <div class="section-head reveal">
       <span class="eyebrow">Videos</span>
       <h2>Featured video</h2>
-      <p>Educational explainers, medical insights, tech reviews, and campus life.</p>
+      <p>My Videos Here</p>
     </div>
 
     <div class="panel" style="max-width:900px;margin:auto">
+      <!-- CHANGE YOUTUBE VIDEO ID HERE -->
       <div class="video-box">
         <iframe
-          src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0"
+          src="https://www.youtube.com"
           title="Featured video"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowfullscreen></iframe>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:16px">
-        <div>
-          <b>Fahim Shahriar YouTube Channel</b>
-          <p class="muted" style="font-size:0.85rem">Subscribe for upcoming medical and student tutorials.</p>
-        </div>
-        <a class="btn btn-primary" href="https://www.youtube.com/@fahim-shahriar-bd" target="_blank" rel="noopener">Subscribe on YouTube →</a>
       </div>
     </div>
   </div>
@@ -826,17 +850,16 @@ body{font-size:16px}
 <!-- ================= SERVICES ================= -->
 <section class="section" id="services">
   <div class="container">
-    <div class="section-head">
+    <div class="section-head reveal">
       <span class="eyebrow">Services</span>
       <h2>What I can help with</h2>
-      <p>Collaborating with students, guardians, educators, and creators on meaningful projects.</p>
     </div>
 
-    <div class="grid cards">
-      <article class="card"><div class="card-icon">🎓</div><h3>Tuition Media Management</h3><p>Education-focused digital promotion, teacher-student matching, mentorship coordination, and academic support frameworks.</p></article>
-      <article class="card"><div class="card-icon">💻</div><h3>Web Development Help</h3><p>Clean responsive website architecture, portfolio setup, DNS routing, GitHub Pages configuration, and performance optimization.</p></article>
-      <article class="card"><div class="card-icon">🦷</div><h3>Medical / Dental Guidance</h3><p>Curated study notes, entry-level guidance for dental and medical exams, anatomy tips, and clinical reference summaries.</p></article>
-      <article class="card"><div class="card-icon">🎬</div><h3>Creative Content</h3><p>Ideas, scripting, visual aesthetics, and execution strategies for educational and promotional digital content.</p></article>
+    <div class="grid cards reveal">
+      <article class="card"><div class="card-icon">🎓</div><h3>Tuition Media Management</h3><p>Education-focused digital promotion and tuition media support.</p></article>
+      <article class="card"><div class="card-icon">💻</div><h3>Web Development Help</h3><p>Basic website setup, static pages, DNS and hosting guidance.</p></article>
+      <article class="card"><div class="card-icon">🦷</div><h3>Medical / Dental Guidance</h3><p>Educational notes and student-focused medical/dental learning resources.</p></article>
+      <article class="card"><div class="card-icon">🎬</div><h3>Creative Content</h3><p>Ideas and support for digital content, visuals and online projects.</p></article>
     </div>
   </div>
 </section>
@@ -844,45 +867,22 @@ body{font-size:16px}
 <!-- ================= GALLERY ================= -->
 <section class="section" id="gallery">
   <div class="container">
-    <div class="section-head">
+    <div class="section-head reveal">
       <span class="eyebrow">Gallery</span>
       <h2>Photos & moments</h2>
-      <p>Campus life, clinical environments, digital projects, and personal snapshots.</p>
+      <p>Replace these demo images with your personal, dental, campus and project photos.</p>
     </div>
 
     <div class="grid gallery-grid">
-      <div class="gallery-item" onclick="openLightbox('https://i.postimg.cc/rFLt87HR/screenshot-7.png?auto=format&fit=crop&w=1200&q=85', 'Campus Morning — Chattogram Medical College')">
-        <img src="https://i.postimg.cc/rFLt87HR/screenshot-7.png?auto=format&fit=crop&w=800&q=85" alt="Campus">
-        <div class="gallery-caption">Campus</div>
-      </div>
-      <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=85', 'Clinical Environment — Equipment & Diagnostics')">
-        <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=85" alt="Medical">
-        <div class="gallery-caption">Medical</div>
-      </div>
-      <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=85', 'Technology — Late Evening Programming')">
-        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=85" alt="Technology">
-        <div class="gallery-caption">Technology</div>
-      </div>
-      <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1200&q=85', 'Projects — Collaborative Brainstorming')">
-        <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=800&q=85" alt="Team">
-        <div class="gallery-caption">Projects</div>
-      </div>
-      <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=85', 'Work — Digital Tools & Operations')">
-        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=85" alt="Work">
-        <div class="gallery-caption">Work</div>
-      </div>
-      <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1200&q=85', 'Writing — Drafting Clinical Notes')">
-        <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=85" alt="Writing">
-        <div class="gallery-caption">Writing</div>
-      </div>
-      <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1200&q=85', 'Learning — Medical Volumes & Literature')">
-        <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=800&q=85" alt="Books">
-        <div class="gallery-caption">Learning</div>
-      </div>
-      <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=85', 'Personal — Reflection & Everyday Moments')">
-        <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=85" alt="Personal">
-        <div class="gallery-caption">Personal</div>
-      </div>
+      <!-- Replace image URLs below -->
+      <div class="gallery-item"><img src="https://i.postimg.cc/rFLt87HR/screenshot-7.png?auto=format&fit=crop&w=800&q=85" alt="Campus"><div class="gallery-caption">Campus</div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=85" alt="Medical"><div class="gallery-caption">Medical</div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=85" alt="Technology"><div class="gallery-caption">Technology</div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=800&q=85" alt="Team"><div class="gallery-caption">Projects</div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=85" alt="Work"><div class="gallery-caption">Work</div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=85" alt="Writing"><div class="gallery-caption">Writing</div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=800&q=85" alt="Books"><div class="gallery-caption">Learning</div></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=85" alt="Personal"><div class="gallery-caption">Personal</div></div>
     </div>
   </div>
 </section>
@@ -890,30 +890,16 @@ body{font-size:16px}
 <!-- ================= ACHIEVEMENTS ================= -->
 <section class="section" id="achievements">
   <div class="container">
-    <div class="section-head">
+    <div class="section-head reveal">
       <span class="eyebrow">Achievements</span>
       <h2>Milestones & certificates</h2>
-      <p>Recognitions in board academics, competitive medical entrance, and community initiatives.</p>
+      <p>Add your academic achievements, certificates, awards and publications here.</p>
     </div>
 
-    <div class="grid cards">
-      <article class="card">
-        <div class="card-icon">🏆</div>
-        <h3>Academic Excellence</h3>
-        <p>HSC & SSC — Perfect GPA 5.00 in Science stream from Ramkrishnapur College & Ramkrishnapur KKRK High School.</p>
-      </article>
-
-      <article class="card">
-        <div class="card-icon">📜</div>
-        <h3>Chattogram Medical College Merit</h3>
-        <p>Secured government merit placement for the prestigious BDS (Bachelor of Dental Surgery) course at CMC Dental Unit.</p>
-      </article>
-
-      <article class="card">
-        <div class="card-icon">🔬</div>
-        <h3>Digital Portfolio & Platforms</h3>
-        <p>Founder and developer of Omega Tuition Media and digital study resources serving students and tutors.</p>
-      </article>
+    <div class="grid cards reveal">
+      <article class="card"><div class="card-icon">🏆</div><h3>Academic Achievement</h3><p>HSC — GPA 5.00. Replace with detailed achievement information.</p></article>
+      <article class="card"><div class="card-icon">📜</div><h3>Certificate</h3><p>Add course name, organization, date and certificate link.</p></article>
+      <article class="card"><div class="card-icon">🔬</div><h3>Research / Publication</h3><p>Add research projects, presentations, publications or future work.</p></article>
     </div>
   </div>
 </section>
@@ -921,35 +907,35 @@ body{font-size:16px}
 <!-- ================= TESTIMONIALS ================= -->
 <section class="section" id="testimonials">
   <div class="container">
-    <div class="section-head">
+    <div class="section-head reveal">
       <span class="eyebrow">Testimonials</span>
       <h2>What people say</h2>
-      <p>Feedback from students, peers, and collaborators across medical and digital projects.</p>
+      <p>Replace these examples with real feedback and permission-based testimonials.</p>
     </div>
 
     <div class="grid testimonial-grid">
       <article class="card">
         <div class="quote">“</div>
-        <p class="muted">Fahim's study notes and clear explanations simplified oral histology and anatomy for many of us. He has a gift for breaking down tough concepts into memorable outlines.</p>
+        <p class="muted">A sample testimonial. Replace this with genuine feedback from a student, colleague or project partner.</p>
         <div class="person">
-          <img class="avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Student">
-          <div><b>Dental Student</b><small>Academic Colleague, CMC</small></div>
+          <img class="avatar" src="https://i.pravatar.cc/100?img=12" alt="Person">
+          <div><b>Student / Client</b><small>Project feedback</small></div>
         </div>
       </article>
       <article class="card">
         <div class="quote">“</div>
-        <p class="muted">Omega Tuition Media solved our tutoring search within 24 hours. The professionalism and genuine care for students' learning pace sets Fahim apart.</p>
+        <p class="muted">A clean placeholder for feedback about your work, communication or project contribution.</p>
         <div class="person">
-          <img class="avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" alt="Guardian">
-          <div><b>Guardian & Parent</b><small>Chattogram Resident</small></div>
+          <img class="avatar" src="https://i.pravatar.cc/100?img=32" alt="Person">
+          <div><b>Colleague / Friend</b><small>Personal feedback</small></div>
         </div>
       </article>
       <article class="card">
         <div class="quote">“</div>
-        <p class="muted">Fahim blends clinical curiosity with a genuine grasp of web technology. His attention to detail on website setup, speed, and usability is remarkable.</p>
+        <p class="muted">Use short, authentic testimonials here rather than generic marketing statements.</p>
         <div class="person">
-          <img class="avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80" alt="Collaborator">
-          <div><b>Tech Collaborator</b><small>Digital Project Partner</small></div>
+          <img class="avatar" src="https://i.pravatar.cc/100?img=5" alt="Person">
+          <div><b>Project Partner</b><small>Project feedback</small></div>
         </div>
       </article>
     </div>
@@ -963,20 +949,19 @@ body{font-size:16px}
       <span class="eyebrow">Resume</span>
       <h2 style="margin:5px 0 10px">Want to know more?</h2>
       <p class="muted" style="max-width:650px;margin:auto">
-        Review my complete academic qualifications, clinical skills, and technical stack.
+        Add your CV PDF link here when you are ready.
       </p>
-      <div style="display:flex;justify-content:center;gap:12px;margin-top:20px;flex-wrap:wrap">
-        <button class="btn btn-primary" onclick="openCvModal()">View Curriculum Vitae (CV) ↓</button>
-        <button class="btn btn-secondary" onclick="window.print()">Print / Save PDF</button>
-      </div>
+      <!-- CHANGE CV LINK HERE -->
+      <a class="btn btn-primary" style="margin-top:20px" href="#" onclick="alert('Replace the # with your CV PDF link.');return false;">Download CV ↓</a>
     </div>
   </div>
 </section>
 
+
 <!-- ================= CONTENT LIBRARY ================= -->
 <section class="section" id="library">
   <div class="container">
-    <div class="section-head">
+    <div class="section-head reveal">
       <span class="eyebrow">Content Library</span>
       <h2>Everything in one place</h2>
       <p>Browse posts, projects, notes, skills and other content by category—or use the search above.</p>
@@ -1001,7 +986,7 @@ body{font-size:16px}
 <!-- ================= CONTACT ================= -->
 <section class="section" id="contact">
   <div class="container">
-    <div class="section-head">
+    <div class="section-head reveal">
       <span class="eyebrow">Contact</span>
       <h2>Let's connect</h2>
       <p>Have a question, idea or collaboration? Send a message.</p>
@@ -1010,20 +995,20 @@ body{font-size:16px}
     <div class="contact-grid">
       <div class="panel">
         <h3>Contact information</h3>
-        <p class="muted">Feel free to reach out directly via email or social platforms.</p>
+        <p class="muted">You can replace the demo details below with your real contact information.</p>
 
         <div class="contact-items">
-          <a class="contact-item" href="mailto:x.fahim.shahriar@gmail.com">
+          <a class="contact-item" href="mailto:fahimshahriar@gmail.com">
             <span class="info-icon">✉️</span>
-            <div><strong>Email</strong><span>x.fahim.shahriar@gmail.com</span></div>
+            <div><strong>Email</strong><span>fahimshahriar@gmail.com</span></div>
           </a>
-          <a class="contact-item" href="https://www.facebook.com/fahim.shahriar.cumilla/" target="_blank" rel="noopener">
+          <a class="contact-item" href="https://facebook.com/" target="_blank">
             <span class="info-icon">f</span>
-            <div><strong>Facebook</strong><span>facebook.com/fahim.shahriar.cumilla</span></div>
+            <div><strong>Facebook</strong><span>facebook.com/yourusername</span></div>
           </a>
-          <a class="contact-item" href="https://www.linkedin.com/in/drfahimshahriar/" target="_blank" rel="noopener">
+          <a class="contact-item" href="https://linkedin.com/" target="_blank">
             <span class="info-icon">in</span>
-            <div><strong>LinkedIn</strong><span>linkedin.com/in/drfahimshahriar</span></div>
+            <div><strong>LinkedIn</strong><span>linkedin.com/in/yourusername</span></div>
           </a>
           <div class="contact-item">
             <span class="info-icon">📍</span>
@@ -1033,36 +1018,78 @@ body{font-size:16px}
       </div>
 
       <div class="panel">
-        <h3>Send a message</h3>
-        <p class="muted" style="margin-bottom:20px">
-          This form sends messages directly to Fahim via Google Apps Script.
-        </p>
+  <h3>Send a message</h3>
 
-        <form id="contactForm">
-          <div class="form-grid">
-            <div class="field">
-              <label>Name *</label>
-              <input type="text" id="name" placeholder="Your name" required>
-            </div>
-            <div class="field">
-              <label>Email *</label>
-              <input type="email" id="email" placeholder="you@example.com" required>
-            </div>
-            <div class="field full">
-              <label>Subject</label>
-              <input type="text" id="subject" placeholder="What is this about?">
-            </div>
-            <div class="field full">
-              <label>Message *</label>
-              <textarea id="message" placeholder="Write your message..." required></textarea>
-            </div>
-            <div class="field full">
-              <button class="btn btn-primary" type="submit" id="submitBtn">Send Message →</button>
-            </div>
-          </div>
-          <div id="formStatus" style="display:none;margin-top:15px;text-align:center;font-size:14px;padding:12px;border-radius:12px"></div>
-        </form>
+  <p class="muted" style="margin-bottom:20px">
+    Have a question, idea, or collaboration in mind? Send me a message.
+  </p>
+
+  <form id="contactForm">
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label>Name</label>
+        <input
+          type="text"
+          id="name"
+          placeholder="Your name"
+          required
+        >
       </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input
+          type="email"
+          id="email"
+          placeholder="you@example.com"
+          required
+        >
+      </div>
+
+      <div class="field full">
+        <label>Subject</label>
+        <input
+          type="text"
+          id="subject"
+          placeholder="What is this about?"
+        >
+      </div>
+
+      <div class="field full">
+        <label>Message</label>
+        <textarea
+          id="message"
+          placeholder="Write your message..."
+          required
+        ></textarea>
+      </div>
+
+      <div class="field full">
+        <button
+          class="btn btn-primary"
+          type="submit"
+          id="submitBtn"
+        >
+          Send Message →
+        </button>
+      </div>
+
+    </div>
+
+    <div
+      id="formStatus"
+      style="
+        display:none;
+        margin-top:15px;
+		text-align:center;
+        font-size:14px;
+      "
+    ></div>
+
+  </form>
+</div>
     </div>
   </div>
 </section>
@@ -1075,107 +1102,15 @@ body{font-size:16px}
       <b>Fahim Shahriar</b>
       <p>Student · Learner · Creator</p>
     </div>
-    <p>© <span id="year">2026</span> Fahim Shahriar. All rights reserved.</p>
+    <p>© <span id="year"></span> Fahim Shahriar. All rights reserved.</p>
   </div>
 </footer>
 
 <button class="top-btn" id="topBtn" aria-label="Back to top">↑</button>
 
-<!-- ================= ARTICLE MODAL ================= -->
-<div class="modal-backdrop" id="articleModal" onclick="closeModals(event)">
-  <div class="modal-card" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <h3 id="modalArticleTitle" style="font-size:1.15rem">Article</h3>
-      <button class="modal-close" onclick="closeArticleModal()">×</button>
-    </div>
-    <div class="modal-body" id="modalArticleContent"></div>
-  </div>
-</div>
-
-<!-- ================= CV MODAL ================= -->
-<div class="modal-backdrop" id="cvModal" onclick="closeModals(event)">
-  <div class="modal-card" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <h3 style="font-size:1.15rem">Curriculum Vitae — Fahim Shahriar</h3>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-secondary" style="padding:6px 12px;font-size:0.8rem" onclick="window.print()">Print / PDF</button>
-        <button class="modal-close" onclick="closeCvModal()">×</button>
-      </div>
-    </div>
-    <div class="modal-body" style="font-size:0.95rem">
-      <h2 style="font-size:1.6rem;margin-bottom:4px">Fahim Shahriar</h2>
-      <p class="muted" style="font-weight:700;margin-bottom:18px">Medical Student (BDS) · Web Developer · Content Creator</p>
-      <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:20px;font-size:0.88rem" class="muted">
-        <span>📍 Chattogram, Bangladesh</span>
-        <span>✉️ x.fahim.shahriar@gmail.com</span>
-        <span>🌐 fahimshahriar.com.bd</span>
-      </div>
-      <hr style="border:0;border-top:1px solid var(--border);margin:16px 0">
-      <h4 style="color:var(--primary);margin-bottom:8px">ACADEMIC BACKGROUND</h4>
-      <p><strong>Bachelor of Dental Surgery (BDS)</strong> — Chattogram Medical College, Dental Unit (Current)</p>
-      <p style="margin-top:6px"><strong>HSC (Science)</strong> — Ramkrishnapur College | GPA 5.00 / 5.00</p>
-      <p style="margin-top:6px"><strong>SSC (Science)</strong> — Ramkrishnapur KKRK High School | GPA 5.00 / 5.00</p>
-      <hr style="border:0;border-top:1px solid var(--border);margin:16px 0">
-      <h4 style="color:var(--primary);margin-bottom:8px">SKILLS & COMPETENCIES</h4>
-      <p><strong>Clinical & Dental:</strong> Tooth morphology, oral physiology, pharmacology summaries, clinical observation, restorative procedures.</p>
-      <p style="margin-top:6px"><strong>Web & Technology:</strong> HTML5, CSS3, JavaScript, TypeScript, DNS routing, GitHub Pages, Google Apps Script automation.</p>
-      <hr style="border:0;border-top:1px solid var(--border);margin:16px 0">
-      <h4 style="color:var(--primary);margin-bottom:8px">KEY INITIATIVES</h4>
-      <p><strong>Omega Tuition Media:</strong> Educational platform bridging teachers, students, and parents across Chattogram.</p>
-      <p style="margin-top:6px"><strong>Personal Digital Hub:</strong> Independent personal portfolio & medical notes repository.</p>
-    </div>
-  </div>
-</div>
-
-<!-- ================= LIGHTBOX MODAL ================= -->
-<div class="modal-backdrop" id="lightboxModal" onclick="closeLightbox()">
-  <div style="max-width:900px;width:100%;text-align:center" onclick="event.stopPropagation()">
-    <img id="lightboxImg" src="" alt="Enlarged moment" style="border-radius:18px;max-height:80vh;margin:auto;box-shadow:var(--shadow)">
-    <p id="lightboxCaption" style="color:#fff;margin-top:12px;font-weight:700"></p>
-    <button class="btn btn-secondary" style="margin-top:12px;padding:8px 16px" onclick="closeLightbox()">Close ✕</button>
-  </div>
-</div>
-
 <script>
-/* Google Apps Script Integration */
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbztBbwboWpdr3xxAxlgau8aEB216GJ9cyQcFm1OOrxvjjXiXR5otElvwx3AyvZWnkgt3Q/exec";
-const contactForm = document.getElementById("contactForm");
-const submitBtn = document.getElementById("submitBtn");
-const formStatus = document.getElementById("formStatus");
 
-contactForm.addEventListener("submit", async function(e) {
-  e.preventDefault();
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Sending...";
-  formStatus.style.display = "none";
-  const data = {
-    name: document.getElementById("name").value.trim(),
-    email: document.getElementById("email").value.trim(),
-    subject: document.getElementById("subject").value.trim(),
-    message: document.getElementById("message").value.trim()
-  };
-  try {
-    await fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(data)
-    });
-    formStatus.style.display = "block";
-    formStatus.textContent = "✓ Message sent successfully. Thank you!";
-    formStatus.style.color = "#16a34a";
-    formStatus.style.background = "#dcfce7";
-    contactForm.reset();
-  } catch (error) {
-    formStatus.style.display = "block";
-    formStatus.textContent = "Something went wrong. Please try again.";
-    formStatus.style.color = "#dc2626";
-    formStatus.style.background = "#fee2e2";
-  }
-  submitBtn.disabled = false;
-  submitBtn.textContent = "Send Message →";
-});
-
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbztBbwboWpdr3xxAxlgau8aEB216GJ9cyQcFm1OOrxvjjXiXR5otElvwx3AyvZWnkgt3Q/exec"; const contactForm = document.getElementById("contactForm"); const submitBtn = document.getElementById("submitBtn"); const formStatus = document.getElementById("formStatus"); contactForm.addEventListener("submit", async function(e) { e.preventDefault(); submitBtn.disabled = true; submitBtn.textContent = "Sending..."; formStatus.style.display = "none"; const data = { name: document.getElementById("name").value.trim(), email: document.getElementById("email").value.trim(), subject: document.getElementById("subject").value.trim(), message: document.getElementById("message").value.trim() }; try { await fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data) }); formStatus.style.display = "block"; formStatus.textContent = "✓ Message sent successfully. Thank you!"; formStatus.style.color = "#16a34a"; contactForm.reset(); } catch (error) { formStatus.style.display = "block"; formStatus.textContent = "Something went wrong. Please try again."; formStatus.style.color = "#dc2626"; } submitBtn.disabled = false; submitBtn.textContent = "Send Message →"; });
 /* Mobile menu */
 const menuBtn=document.getElementById('menuBtn');
 const navLinks=document.getElementById('navLinks');
@@ -1193,9 +1128,8 @@ if(savedTheme){
 }
 themeBtn.addEventListener('click',()=>{
   const dark=document.documentElement.getAttribute('data-theme')==='dark';
-  const newTheme = dark ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', newTheme);
-  localStorage.setItem('fahim-theme', newTheme);
+  document.documentElement.setAttribute('data-theme',dark?'light':'dark');
+  localStorage.setItem('fahim-theme',dark?'light':'dark');
   themeBtn.textContent=dark?'☾':'☀';
 });
 
@@ -1213,6 +1147,13 @@ filterButtons.forEach(btn=>{
   });
 });
 
+/* Demo contact form */
+document.getElementById('contactForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  document.getElementById('formStatus').style.display='block';
+  this.reset();
+});
+
 /* Back to top */
 const topBtn=document.getElementById('topBtn');
 window.addEventListener('scroll',()=>{
@@ -1220,19 +1161,20 @@ window.addEventListener('scroll',()=>{
 });
 topBtn.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
 
-/* Search Index */
+/* Text remains static; interaction is handled through search and tags */
+/* Website search — tags + full-line highlighted content search */
 const searchBtn=document.getElementById('searchBtn');
 const searchBox=document.getElementById('searchBox');
 const closeSearch=document.getElementById('closeSearch');
 const siteSearch=document.getElementById('siteSearch');
 const searchResults=document.getElementById('searchResults');
-const searchItems=[];
 
+const searchItems=[];
 document.querySelectorAll('main section[id]').forEach(section=>{
   const sectionTitle=(section.querySelector('h1,h2,h3')?.textContent||section.id).trim();
   searchItems.push({id:section.id,title:sectionTitle,type:'Section',text:section.innerText.replace(/\s+/g,' ').trim(),element:section});
 
-  section.querySelectorAll('article, .card, .panel, .timeline-item').forEach((card,index)=>{
+  section.querySelectorAll('article, .card, .panel, .timeline-item, .skill-card, .project-card, .blog-card').forEach((card,index)=>{
     const title=(card.querySelector('h1,h2,h3,h4')?.textContent||'Content').trim();
     const text=card.innerText.replace(/\s+/g,' ').trim();
     if(text){
@@ -1319,14 +1261,18 @@ searchBtn.addEventListener('click',()=>searchBox.classList.contains('open')?sear
 closeSearch.addEventListener('click',()=>searchBox.classList.remove('open'));
 siteSearch.addEventListener('input',()=>renderSearch(siteSearch.value));
 
+/* Every content tag becomes a one-click search */
+document.querySelectorAll('.tag').forEach(tag=>{
+  tag.setAttribute('role','button');
+  tag.setAttribute('tabindex','0');
+  const runTagSearch=()=>openSearch(tag.textContent.trim());
+  tag.addEventListener('click',runTagSearch);
+  tag.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();runTagSearch();}});
+});
+
 document.addEventListener('keydown',(e)=>{
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openSearch();}
-  if(e.key==='Escape'){
-    searchBox.classList.remove('open');
-    closeArticleModal();
-    closeCvModal();
-    closeLightbox();
-  }
+  if(e.key==='Escape') searchBox.classList.remove('open');
 });
 document.addEventListener('click',(e)=>{
   if(!e.target.closest('.search-wrap')) searchBox.classList.remove('open');
@@ -1341,7 +1287,21 @@ const updateProgress=()=>{
 window.addEventListener('scroll',updateProgress,{passive:true});
 updateProgress();
 
-/* Content Library */
+/* Active navigation */
+const navSections=[...document.querySelectorAll('main section[id]')];
+const navObserver=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+      const link=document.querySelector('.nav-links a[href="#'+entry.target.id+'"]');
+      if(link) link.classList.add('active');
+    }
+  });
+},{rootMargin:'-35% 0px -55% 0px',threshold:0});
+navSections.forEach(section=>navObserver.observe(section));
+
+
+/* Content Library — automatically built from existing site content */
 const libraryGrid=document.getElementById('libraryGrid');
 const libraryCount=document.getElementById('libraryCount');
 const libraryFilters=document.querySelectorAll('.library-filter');
@@ -1395,59 +1355,8 @@ libraryFilters.forEach(btn=>{
 });
 renderLibrary();
 
-/* Article Modal Content */
-const articlesData = {
-  dental: {
-    title: "Dental Study Notes — My Learning Journey",
-    content: `<p>Entering dental school at Chattogram Medical College has been both intensely demanding and deeply rewarding. Dentistry is a unique field where medical knowledge, fine surgical craftsmanship, and patient psychology converge.</p><h4 style="margin:16px 0 8px">1. The Anatomy of Dental Education</h4><p>From dental anatomy and morphology to pharmacology and pathology, our curriculum lays down the groundwork before we pick up any handpiece. Every single groove, cusp, and pulp canal matters when preparing an effective restoration.</p><h4 style="margin:16px 0 8px">2. Clinical Observation & Hand Skills</h4><p>One of the most critical early lessons is that textbook knowledge must quickly translate into tactile precision. Practicing on phantom heads and observing senior clinicians teaches you that patience and attention to micro-details dictate procedural success.</p><h4 style="margin:16px 0 8px">3. Sharing Knowledge Openly</h4><p>I started writing down summarized study notes so that classmates and junior dental students can quickly review challenging concepts before clinical rounds. When you teach or write down a concept in plain language, your own retention multiplies significantly.</p>`
-  },
-  tech: {
-    title: "How I Built My Personal Website",
-    content: `<p>In an era where personal identity is often trapped within closed social media platforms, having an independent website is like owning your own plot of land on the internet.</p><h4 style="margin:16px 0 8px">Why Every Student Should Own a Domain</h4><p>A custom domain like <code>fahimshahriar.com.bd</code> represents your permanent digital portfolio. Whether applying for clinical electives, academic fellowships, or freelancing in digital media, a portfolio website gives you authority and trust.</p><h4 style="margin:16px 0 8px">The Architecture & Lessons</h4><p>1. <strong>Semantic HTML & Clean Styling</strong>: Fast load times matter, especially in areas with moderate mobile internet speeds. Keeping the structure lightweight makes this site load in under 400 milliseconds.<br>2. <strong>Instant Search Indexing</strong>: Rather than relying on external search engines, building client-side indexing lets visitors instantly search every note, project, and service card.<br>3. <strong>Google Apps Script Form Endpoint</strong>: You don't always need a paid backend to handle contact inquiries. A lightweight serverless Apps Script connects form inputs straight to Google Sheets with zero monthly cost.</p>`
-  },
-  life: {
-    title: "Life, College & Everyday Moments in Chattogram",
-    content: `<p>Medical school is a marathon, not a sprint. Without intentional breaks and creative hobbies, burnout is practically guaranteed.</p><h4 style="margin:16px 0 8px">Finding Balance Through Making Things</h4><p>Whenever clinical study sessions get overwhelming, shifting gears into cooking a hearty meal, tinkering with a web project, or walking around the campus with a camera resets my mental focus.</p><p>The hills and breezy coastlines of Chattogram provide an incredible backdrop for reflection. Every day presents an opportunity to learn something new—whether it is a clinical technique, a cleaner snippet of code, or simply being a more empathetic human.</p>`
-  }
-};
-
-function openArticleModal(key){
-  const art = articlesData[key];
-  if(!art) return;
-  document.getElementById('modalArticleTitle').textContent = art.title;
-  document.getElementById('modalArticleContent').innerHTML = art.content;
-  document.getElementById('articleModal').classList.add('open');
-}
-function closeArticleModal(){
-  document.getElementById('articleModal').classList.remove('open');
-}
-
-function openCvModal(){
-  document.getElementById('cvModal').classList.add('open');
-}
-function closeCvModal(){
-  document.getElementById('cvModal').classList.remove('open');
-}
-
-function openLightbox(src, caption){
-  document.getElementById('lightboxImg').src = src;
-  document.getElementById('lightboxCaption').textContent = caption;
-  document.getElementById('lightboxModal').classList.add('open');
-}
-function closeLightbox(){
-  document.getElementById('lightboxModal').classList.remove('open');
-}
-
-function closeModals(e){
-  if(e.target.classList.contains('modal-backdrop')){
-    closeArticleModal();
-    closeCvModal();
-    closeLightbox();
-  }
-}
-
 /* Current year */
-document.getElementById('year').textContent = new Date().getFullYear();
+document.getElementById('year').textContent=new Date().getFullYear();
 </script>
 
 </body>
