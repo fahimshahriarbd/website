@@ -1,0 +1,8 @@
+{
+  "name": "Fahim Shahriar Portfolio",
+  "description": "Personal portfolio, blog, dental study notes, web projects, and digital identity of Fahim Shahriar, Medical Student at Chattogram Medical College.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
