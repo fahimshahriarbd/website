@@ -118,6 +118,8 @@ button,input,textarea{font-size:16px}
 .socials a[data-brand="x"]{--social-color:#111827}
 [data-theme="dark"] .socials a[data-brand="x"]{--social-color:#fff}
 .socials a[data-brand="github"]{--social-color:#6e40c9}
+.socials a[data-brand="tiktok"]{--social-color:#000000}
+[data-theme="dark"] .socials a[data-brand="tiktok"]{--social-color:#fff}
 .scroll-progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--primary),#60a5fa);z-index:2000;box-shadow:0 0 12px rgba(37,99,235,.45)}
 .nav-links a.active{color:var(--primary);background:var(--surface2)}
 .hero-subtitle .typing{color:var(--primary)}
@@ -240,6 +242,8 @@ button,input,textarea{font-size:16px}
 .socials a[data-brand="linkedin"]{--social-color:#0a66c2}
 .socials a[data-brand="x"]{--social-color:#111827}
 .socials a[data-brand="github"]{--social-color:#24292f}
+.socials a[data-brand="tiktok"]{--social-color:#000000}
+[data-theme="dark"] .socials a[data-brand="tiktok"]{--social-color:#fff}
 @keyframes heroFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 @keyframes heroPulse{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.035);opacity:1}}
 @keyframes heroSpin{to{transform:rotate(360deg)}}
@@ -681,7 +685,7 @@ button,input,textarea{font-size:16px}
         <span class="timeline-dot"></span>
         <div class="timeline-content">
           <small>Learning Beyond Curriculum</small>
-          <h4>Technology, Web & Creative Projects</h3>
+          <h4>Technology, Web & Creative Projects</h4>
           <p class="muted">Self-learning in websites, digital tools, content creation and practical technology.</p>
         </div>
       </div>
@@ -698,7 +702,7 @@ button,input,textarea{font-size:16px}
     </div>
 
     <div class="grid cards reveal">
-      <article class="card"><div class="card-icon">🦷</div><h4>Dental & Medical</h3><p>Study notes, anatomy, physiology, pharmacology, dentistry and educational resources.</p><div class="tags"><span class="tag">BDS</span><span class="tag">Medical Notes</span></div></article>
+      <article class="card"><div class="card-icon">🦷</div><h3>Dental & Medical</h3><p>Study notes, anatomy, physiology, pharmacology, dentistry and educational resources.</p><div class="tags"><span class="tag">BDS</span><span class="tag">Medical Notes</span></div></article>
       <article class="card"><div class="card-icon">💻</div><h3>Web Development</h3><p>Personal websites, static websites, hosting, DNS, GitHub Pages and practical web tools.</p><div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">GitHub</span></div></article>
       <article class="card"><div class="card-icon">🎨</div><h3>Creative Content</h3><p>Digital content, social media ideas, graphics, video concepts and personal projects.</p><div class="tags"><span class="tag">Content</span><span class="tag">Design</span></div></article>
     </div>
@@ -822,7 +826,7 @@ button,input,textarea{font-size:16px}
       </article>
 
     </div>
-
+  </div>
 </section>
 
 <!-- ================= FEATURED VIDEO ================= -->
@@ -831,17 +835,19 @@ button,input,textarea{font-size:16px}
     <div class="section-head reveal">
       <span class="eyebrow">Videos</span>
       <h2>Featured video</h2>
-      <p>My Videos Here</p>
+      <p>🎸 Akibul Mannan (Rabby)-র গিটারের সুরে মাতোয়ারা চমেক অডিটোরিয়াম</p>
     </div>
 
     <div class="panel" style="max-width:900px;margin:auto">
-      <!-- CHANGE YOUTUBE VIDEO ID HERE -->
       <div class="video-box">
-        <iframe
-          src="https://www.youtube.com"
-          title="Featured video"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen></iframe>
+        <iframe 
+  src="https://www.youtube.com/embed/MjxVtyidnXM" 
+  title="Akibul Mannan (Rabby) Guitar Performance" 
+  frameborder="0" 
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+  referrerpolicy="strict-origin-when-cross-origin" 
+  allowfullscreen>
+</iframe>
       </div>
     </div>
   </div>
@@ -1145,13 +1151,6 @@ filterButtons.forEach(btn=>{
       post.style.display=(filter==='all'||post.dataset.category===filter)?'block':'none';
     });
   });
-});
-
-/* Demo contact form */
-document.getElementById('contactForm').addEventListener('submit',function(e){
-  e.preventDefault();
-  document.getElementById('formStatus').style.display='block';
-  this.reset();
 });
 
 /* Back to top */
