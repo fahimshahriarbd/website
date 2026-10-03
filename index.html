@@ -181,6 +181,28 @@ button,input,textarea{font:inherit;font-size:16px}
 [data-theme="dark"] .search-snippet mark{background:#facc15;color:#111827}
 .search-empty{padding:12px;color:var(--muted);font-size:.9rem;text-align:center}
 
+/* ================= CONTENT CMS / ARTICLE MODAL ================= */
+.content-modal{position:fixed;inset:0;background:rgba(15,23,42,.62);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:3000}
+.content-modal.open{display:flex}
+.content-modal-box{width:min(860px,100%);max-height:min(88vh,900px);overflow:auto;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.28);position:relative}
+.content-modal-close{position:sticky;top:14px;float:right;margin:14px 14px 0 0;width:40px;height:40px;border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:50%;font-size:25px;cursor:pointer;z-index:2}
+.content-modal-cover{width:100%;max-height:360px;object-fit:cover;display:block}
+.content-modal-body{padding:30px}
+.content-modal-meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:.82rem;font-weight:800;margin-bottom:10px}
+.content-modal-title{font-size:clamp(1.6rem,4vw,2.35rem);line-height:1.18;margin-bottom:18px}
+.content-modal-text{font-size:1rem;line-height:1.85;color:var(--muted)}
+.content-modal-text p{margin:0 0 18px}
+.content-modal-tags{margin-top:22px}
+.cms-loading,.cms-empty{grid-column:1/-1;text-align:center;padding:28px;color:var(--muted);border:1px dashed var(--border);border-radius:16px}
+.cms-card-image{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:14px;margin-bottom:17px}
+.blog-card .tags,.card .tags{cursor:default}
+@media(max-width:760px){
+  .content-modal{padding:10px}
+  .content-modal-box{max-height:92vh;border-radius:18px}
+  .content-modal-body{padding:22px}
+  .content-modal-title{padding-right:38px}
+}
+
 .scroll-progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--primary),#60a5fa);z-index:2000;box-shadow:0 0 12px rgba(37,99,235,.45)}
 
 /* Hero Section */
@@ -339,6 +361,11 @@ button,input,textarea{font:inherit;font-size:16px}
 .blog-card h3, .blog-card h4{font-size:1.15rem;margin-bottom:8px}
 .blog-card p{color:var(--muted);font-size:.9rem}
 .read-more{display:inline-flex;margin-top:16px;color:var(--primary);font-weight:900;font-size:.9rem}
+.about-more-content{display:none}
+.about-more-content.show{display:block}
+.about-see-more{border:0;background:none;color:var(--primary);font-weight:900;cursor:pointer;padding:4px 0;margin-top:2px;font-size:.92rem}
+.about-see-more:hover{text-decoration:underline}
+
 .video-box{margin-top:18px;border-radius:15px;overflow:hidden;aspect-ratio:16/9;background:#000}
 .video-box iframe{width:100%;height:100%;border:0}
 
@@ -589,22 +616,28 @@ button,input,textarea{font:inherit;font-size:16px}
   ideas, and practical work.
 </p>
 
-<p class="muted" style="text-align: justify; line-height: 1.8;">
-  I enjoy learning new things and turning ideas into something useful. In the
-  future, I hope to contribute to better dental healthcare in Bangladesh
-  through research, modern dental labs and hospitals, effective learning
-  systems, and useful digital platforms.
-</p>
+<div class="about-more-content" id="aboutMoreContent">
+  <p class="muted" style="text-align: justify; line-height: 1.8;">
+    I enjoy learning new things and turning ideas into something useful. In the
+    future, I hope to contribute to better dental healthcare in Bangladesh
+    through research, modern dental labs and hospitals, effective learning
+    systems, and useful digital platforms.
+  </p>
 
-<p class="muted" style="text-align: justify; line-height: 1.8;">
-  I want to keep learning, experimenting, and building things that can make a
-  meaningful difference in healthcare and education.
-</p>
+  <p class="muted" style="text-align: justify; line-height: 1.8;">
+    I want to keep learning, experimenting, and building things that can make a
+    meaningful difference in healthcare and education.
+  </p>
+</div>
+
+<button class="about-see-more" id="aboutSeeMore" type="button" aria-expanded="false">
+  See more →
+</button>
 
 
         <div class="info-list">
           <div class="info-row"><span class="info-icon">🎓</span><div><b>Education (BDS)</b><br><span class="muted">Studying at Chattogram Medical College, Dental Unit</span></div></div>
-          <div class="info-row"><span class="info-icon">📍</span><div><b>Location (Current)</b><br><span class="muted">CMC Main Boys Hostel, Chatteswari Road. Chawkbazar, Chittagong,</span></div></div>
+          <div class="info-row"><span class="info-icon">📍</span><div><b>Location (Current)</b><br><span class="muted">CMC Main Boys Hostel, Chatteswari Road. Chawkbazar, Chittagong</span></div></div>
         </div>
       </div>
 
@@ -674,7 +707,7 @@ button,input,textarea{font:inherit;font-size:16px}
       <h4>What I like to learn and build</h4>
     </div>
 
-    <div class="grid cards reveal">
+    <div class="grid cards reveal" id="projectsGrid">
       <article class="card">
         <div class="card-header">
           <div class="card-icon">🦷</div>
@@ -711,28 +744,53 @@ button,input,textarea{font:inherit;font-size:16px}
     <div class="section-head reveal">
       <span class="eyebrow">Portfolio</span>
       <h4>Selected projects</h4>
-      <p>Replace these demo cards with your real projects, screenshots and links.</p>
+      <p>My latest digital initiatives, websites, and community projects.</p>
     </div>
 
     <div class="grid cards reveal">
       <article class="card">
         <div class="card-header">
-          <div class="card-icon">🎓</div>
-          <h4>Omega Tuition Media</h4>
+          <div class="card-icon">🛒</div>
+          <h4>E-commerce Operations</h4>
         </div>
-        <p>A tuition media and education-focused digital project connecting students, teachers and guardians.</p>
-        <div class="tags"><span class="tag">Education</span><span class="tag">Media</span></div>
-        <a class="read-more" href="https://www.facebook.com/omega.tuition.media" target="_blank">View project →</a>
+        <p>Managed seller operations, product listings, and drop-off hub arrangements for Daraz.</p>
+        <div class="tags"><span class="tag">E-commerce</span><span class="tag">Daraz</span><span class="tag">Management</span></div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <div class="card-icon">📱</div>
+          <h4>Android App Development</h4>
+        </div>
+        <p>Generated and tested a demo Android application build using the Swing2App platform.</p>
+        <div class="tags"><span class="tag">Android</span><span class="tag">Swing2App</span><span class="tag">App Dev</span></div>
       </article>
 
       <article class="card">
         <div class="card-header">
           <div class="card-icon">🌐</div>
-          <h4>Personal Website</h4>
+          <h4>Domain & Hosting Management</h4>
         </div>
-        <p>My personal digital identity, portfolio, blog and knowledge hub built for long-term use.</p>
-        <div class="tags"><span class="tag">HTML</span><span class="tag">GitHub Pages</span><span class="tag">DNS</span></div>
-        <a class="read-more" href="https://www.fahimshahriar.com.bd" target="_blank">View project →</a>
+        <p>Successfully registered and managed .com.bd and .info.bd domains, along with DNS setup via BTCL.</p>
+        <div class="tags"><span class="tag">BTCL</span><span class="tag">DNS</span><span class="tag">Web Hosting</span></div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <div class="card-icon">🎓</div>
+          <h4>Tutoring & Mentorship</h4>
+        </div>
+        <p>Conducted active tutoring through Caretutors and participated as a candidate for the "Face of Caretutors" initiative.</p>
+        <div class="tags"><span class="tag">Education</span><span class="tag">Caretutors</span></div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <div class="card-icon">🗺️</div>
+          <h4>Google Maps Local Guide</h4>
+        </div>
+        <p>Actively submitted map edits and updates for local institutions and landmarks to improve regional navigation.</p>
+        <div class="tags"><span class="tag">Google Maps</span><span class="tag">Local Guide</span></div>
       </article>
 
       <article class="card">
@@ -743,33 +801,6 @@ button,input,textarea{font:inherit;font-size:16px}
         <p>A growing collection of study notes and educational material organized for quick personal reference.</p>
         <div class="tags"><span class="tag">Dental</span><span class="tag">Research</span></div>
         <a class="read-more" href="#blog">Read articles →</a>
-      </article>
-
-      <article class="card">
-        <div class="card-header">
-          <div class="card-icon">⚙️</div>
-          <h4>Digital Tools</h4>
-        </div>
-        <p>Experiments with forms, spreadsheets, websites, automation and useful everyday digital systems.</p>
-        <div class="tags"><span class="tag">Automation</span><span class="tag">Google Tools</span></div>
-      </article>
-
-      <article class="card">
-        <div class="card-header">
-          <div class="card-icon">🧪</div>
-          <h4>Research Ideas</h4>
-        </div>
-        <p>A dedicated place to document future research interests, questions, literature notes and projects.</p>
-        <div class="tags"><span class="tag">Research</span><span class="tag">Ideas</span></div>
-      </article>
-
-      <article class="card">
-        <div class="card-header">
-          <div class="card-icon">✨</div>
-          <h4>More Coming</h4>
-        </div>
-        <p>New projects will be added here as they are completed. Keep this card or replace it anytime.</p>
-        <div class="tags"><span class="tag">Future</span><span class="tag">Projects</span></div>
       </article>
     </div>
   </div>
@@ -824,8 +855,8 @@ button,input,textarea{font:inherit;font-size:16px}
           alt="Personal life">
         <div class="blog-body">
           <div class="blog-meta"><span>Personal</span><span>Oct 01, 2026 · 3 min</span></div>
-          <h4>Life, College & Everyday Moments</h4>
-          <p>Personal experiences, small lessons, cooking, gaming, college memories and daily life.</p>
+          <h4>The Struggle of Finding the Right Phone Case</h4>
+          <p>My exhausting but relatable quest to find a good quality back cover for the Tecno Camon 40 Pro 4G.</p>
           <a class="read-more" href="#article3">Read article →</a>
         </div>
       </article>
@@ -868,25 +899,25 @@ button,input,textarea{font:inherit;font-size:16px}
       <article class="card">
         <div class="card-header">
           <div class="card-icon">🎓</div>
-          <h4>Tuition Media Management</h4>
+          <h4>Tuition Media & Mentorship</h4>
         </div>
-        <p>Education-focused digital promotion and tuition media support.</p>
+        <p>Education-focused digital promotion, tutoring experience, and mentoring.</p>
       </article>
 
       <article class="card">
         <div class="card-header">
           <div class="card-icon">💻</div>
-          <h4>Web Development Help</h4>
+          <h4>Web Development & IT</h4>
         </div>
-        <p>Basic website setup, static pages, DNS and hosting guidance.</p>
+        <p>Basic website setup, static pages, DNS mapping, and BTCL domain guidance.</p>
       </article>
 
       <article class="card">
         <div class="card-header">
-          <div class="card-icon">🦷</div>
-          <h4>Medical / Dental Guidance</h4>
+          <div class="card-icon">🛒</div>
+          <h4>E-commerce Management</h4>
         </div>
-        <p>Educational notes and student-focused medical/dental learning resources.</p>
+        <p>Guidance on seller operations and logistics management based on Daraz experience.</p>
       </article>
 
       <article class="card">
@@ -928,32 +959,32 @@ button,input,textarea{font:inherit;font-size:16px}
     <div class="section-head reveal">
       <span class="eyebrow">Achievements</span>
       <h4>Milestones & certificates</h4>
-      <p>Add your academic achievements, certificates, awards and publications here.</p>
+      <p>Notable involvements and recognitions.</p>
     </div>
 
     <div class="grid cards reveal">
       <article class="card">
         <div class="card-header">
           <div class="card-icon">🏆</div>
-          <h4>Academic Achievement</h4>
+          <h4>Face of Caretutors</h4>
         </div>
-        <p>HSC — GPA 5.00. Replace with detailed achievement information.</p>
+        <p>Applied and actively participated in the "Become a Face of Caretutors" ambassador initiative.</p>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <div class="card-icon">📍</div>
+          <h4>Google Maps Contributor</h4>
+        </div>
+        <p>Consistent local guide, submitting accurate place edits for institutions and landmarks.</p>
       </article>
 
       <article class="card">
         <div class="card-header">
           <div class="card-icon">📜</div>
-          <h4>Certificate</h4>
+          <h4>Academic Excellence</h4>
         </div>
-        <p>Add course name, organization, date and certificate link.</p>
-      </article>
-
-      <article class="card">
-        <div class="card-header">
-          <div class="card-icon">🔬</div>
-          <h4>Research / Publication</h4>
-        </div>
-        <p>Add research projects, presentations, publications or future work.</p>
+        <p>Achieved GPA 5.00 in both SSC (Ramkrishnapur KKRK High School) and HSC (Ramkrishnapur College).</p>
       </article>
     </div>
   </div>
@@ -1100,6 +1131,20 @@ Have a question, suggestion, or feedback about the website? Send me a message. R
   </div>
 </section>
 
+<!-- ================= CONTENT READER MODAL ================= -->
+<div class="content-modal" id="contentModal" aria-hidden="true">
+  <div class="content-modal-box" role="dialog" aria-modal="true" aria-labelledby="contentModalTitle">
+    <button class="content-modal-close" id="contentModalClose" aria-label="Close">×</button>
+    <img id="contentModalCover" class="content-modal-cover" src="" alt="" style="display:none">
+    <div class="content-modal-body">
+      <div class="content-modal-meta" id="contentModalMeta"></div>
+      <h2 class="content-modal-title" id="contentModalTitle"></h2>
+      <div class="content-modal-text" id="contentModalText"></div>
+      <div class="content-modal-tags tags" id="contentModalTags"></div>
+    </div>
+  </div>
+</div>
+
 </main>
 
 <footer class="footer">
@@ -1189,28 +1234,174 @@ window.addEventListener('scroll',()=>{
 });
 topBtn.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
 
-/* Website search & tag clicking with content highlighting */
+/* ================= CONTENT CMS ================= */
+const CONTENT_API_URL = "PASTE_YOUR_CONTENT_APPS_SCRIPT_URL_HERE";
+const projectsGrid = document.getElementById('projectsGrid');
+const blogGrid = document.getElementById('blogGrid');
+const contentModal = document.getElementById('contentModal');
+const contentModalClose = document.getElementById('contentModalClose');
+const contentModalCover = document.getElementById('contentModalCover');
+const contentModalMeta = document.getElementById('contentModalMeta');
+const contentModalTitle = document.getElementById('contentModalTitle');
+const contentModalText = document.getElementById('contentModalText');
+const contentModalTags = document.getElementById('contentModalTags');
+
+let cmsItems = [];
+
+function safeUrl(url){
+  try{
+    const u=new URL(url,location.href);
+    return ['http:','https:'].includes(u.protocol)?u.href:'';
+  }catch{return '';}
+}
+
+function normalizeContentItem(row){
+  const clean=v=>String(v??'').trim();
+  return {
+    type:clean(row.Type||row.type||'Blog'),
+    title:clean(row.Title||row.title||'Untitled'),
+    category:clean(row.Category||row.category||'General'),
+    date:clean(row.Date||row.date||''),
+    readTime:clean(row.ReadTime||row.readTime||''),
+    summary:clean(row.Summary||row.summary||''),
+    content:clean(row.Content||row.content||''),
+    tags:clean(row.Tags||row.tags||'').split(',').map(x=>x.trim()).filter(Boolean),
+    image:safeUrl(clean(row.Image||row.image||'')),
+    icon:clean(row.Icon||row.icon||'📄'),
+    link:safeUrl(clean(row.Link||row.link||'')),
+    published:clean(row.Published||row.published||'Yes').toLowerCase()
+  };
+}
+
+function categoryKey(value){
+  return String(value||'').toLowerCase().replace(/[^a-z0-9]+/g,'').trim();
+}
+
+function renderTags(tags){
+  return tags.map(tag=>`<span class="tag" role="button" tabindex="0" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</span>`).join('');
+}
+
+function renderCMSCard(item, index){
+  const isProject=categoryKey(item.type)==='project' || item.type.toLowerCase().includes('project');
+  const id=`cms-${isProject?'project':'content'}-${index}`;
+  const categoryClass=categoryKey(item.category)||'general';
+  const meta=[item.category,item.date,item.readTime].filter(Boolean).map(escapeHtml).join(' · ');
+  const image=item.image ? `<img class="cms-card-image" src="${item.image}" alt="${escapeHtml(item.title)}" loading="lazy">` : '';
+  const icon=item.icon||'📄';
+  return `<article class="card ${isProject?'':'blog-card'}" id="${id}" data-category="${escapeHtml(categoryClass)}" data-cms-index="${index}" data-search-content="${escapeHtml(item.content+' '+item.tags.join(' '))}">
+    ${image}
+    <div class="card-header"><div class="card-icon">${escapeHtml(icon)}</div><h4>${escapeHtml(item.title)}</h4></div>
+    ${isProject?'':'<div class="blog-meta"><span>'+escapeHtml(item.category)+'</span><span>'+meta.replace(escapeHtml(item.category)+' · ','')+'</span></div>'}
+    <p>${escapeHtml(item.summary||item.content.slice(0,220))}${(item.content.length>220||item.summary.length>220)?'…':''}</p>
+    <div class="tags">${renderTags(item.tags)}</div>
+    <a href="#" class="read-more cms-read-more" data-cms-index="${index}">See more →</a>
+  </article>`;
+}
+
+function openContentModal(item){
+  contentModalTitle.textContent=item.title;
+  contentModalMeta.textContent=[item.category,item.date,item.readTime].filter(Boolean).join(' · ');
+  contentModalText.innerHTML='';
+  const paragraphs=item.content.split(/\n\s*\n|\n/).map(x=>x.trim()).filter(Boolean);
+  (paragraphs.length?paragraphs:[item.summary]).forEach(p=>{
+    const el=document.createElement('p'); el.textContent=p; contentModalText.appendChild(el);
+  });
+  contentModalTags.innerHTML=renderTags(item.tags);
+  if(item.image){contentModalCover.src=item.image;contentModalCover.alt=item.title;contentModalCover.style.display='block';}
+  else{contentModalCover.removeAttribute('src');contentModalCover.style.display='none';}
+  contentModal.classList.add('open');
+  contentModal.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+  bindTags(contentModalTags);
+}
+function closeContentModal(){contentModal.classList.remove('open');contentModal.setAttribute('aria-hidden','true');document.body.style.overflow='';}
+contentModalClose.addEventListener('click',closeContentModal);
+contentModal.addEventListener('click',e=>{if(e.target===contentModal)closeContentModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&contentModal.classList.contains('open'))closeContentModal();});
+
+function bindReadMore(){
+  document.querySelectorAll('.cms-read-more').forEach(a=>a.addEventListener('click',e=>{
+    e.preventDefault();
+    const item=cmsItems[Number(a.dataset.cmsIndex)];
+    if(item) openContentModal(item);
+  }));
+}
+
+function bindTags(scope=document){
+  scope.querySelectorAll('.tag').forEach(tag=>{
+    if(tag.dataset.bound==='1') return;
+    tag.dataset.bound='1';
+    tag.setAttribute('role','button');
+    tag.setAttribute('tabindex','0');
+
+    /* Keyboard support for tags. Mouse clicks are handled centrally below. */
+    tag.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key===' '){
+        e.preventDefault();
+        openSearch(tag.dataset.tag||tag.textContent.trim());
+      }
+    });
+  });
+}
+
+function applyBlogFilters(){
+  const active=document.querySelector('.filter-btn.active')?.dataset.filter||'all';
+  document.querySelectorAll('#blogGrid .blog-card').forEach(post=>{
+    const category=post.dataset.category||'';
+    post.style.display=(active==='all'||category===active||categoryKey(category)===categoryKey(active))?'block':'none';
+  });
+}
+
+function renderCMS(items){
+  cmsItems=items;
+  const projects=items.filter(x=>x.type.toLowerCase().includes('project'));
+  const blogs=items.filter(x=>!x.type.toLowerCase().includes('project'));
+  if(projects.length) projectsGrid.innerHTML=projects.map(x=>renderCMSCard(x,items.indexOf(x))).join('');
+  if(blogs.length) blogGrid.innerHTML=blogs.map(x=>renderCMSCard(x,items.indexOf(x))).join('');
+  bindReadMore(); bindTags(); applyBlogFilters();
+  buildSearchIndex();
+}
+
+async function loadWebsiteContent(){
+  if(!CONTENT_API_URL || CONTENT_API_URL.includes('PASTE_YOUR_CONTENT')) return;
+  try{
+    const response=await fetch(CONTENT_API_URL,{cache:'no-store'});
+    if(!response.ok) throw new Error('Content API error');
+    const data=await response.json();
+    const items=(Array.isArray(data)?data:(data.items||[])).map(normalizeContentItem)
+      .filter(x=>x.title && x.published!=='no' && x.published!=='false' && x.published!=='draft');
+    if(items.length) renderCMS(items);
+  }catch(error){
+    console.warn('Content sheet could not be loaded. Static website content remains active.',error);
+  }
+}
+
+/* ================= WEBSITE SEARCH ================= */
 const searchBtn=document.getElementById('searchBtn');
 const searchBox=document.getElementById('searchBox');
 const closeSearch=document.getElementById('closeSearch');
 const siteSearch=document.getElementById('siteSearch');
 const searchResults=document.getElementById('searchResults');
-
 const searchItems=[];
-document.querySelectorAll('main section[id]').forEach(section=>{
-  const sectionTitle=(section.querySelector('h1,h2,h3,h4')?.textContent||section.id).trim();
-  searchItems.push({id:section.id,title:sectionTitle,type:'Section',text:section.innerText.replace(/\s+/g,' ').trim(),element:section});
 
-  section.querySelectorAll('article, .card, .panel, .timeline-item, .skill-card, .project-card, .blog-card').forEach((card,index)=>{
-    const title=(card.querySelector('h1,h2,h3,h4')?.textContent||'Content').trim();
-    const text=card.innerText.replace(/\s+/g,' ').trim();
-    if(text){
-      const anchorId=card.id || `${section.id}-item-${index}`;
-      if(!card.id) card.id=anchorId;
-      searchItems.push({id:anchorId,title,type:sectionTitle,text,element:card});
-    }
+function buildSearchIndex(){
+  searchItems.length=0;
+  document.querySelectorAll('main section[id]').forEach(section=>{
+    const sectionTitle=(section.querySelector('h1,h2,h3,h4')?.textContent||section.id).trim();
+    searchItems.push({id:section.id,title:sectionTitle,type:'Section',text:section.innerText.replace(/\s+/g,' ').trim(),element:section});
+    section.querySelectorAll('article, .card, .panel, .timeline-item, .skill-card, .project-card, .blog-card').forEach((card,index)=>{
+      const title=(card.querySelector('h1,h2,h3,h4')?.textContent||'Content').trim();
+      const visibleText=card.innerText.replace(/\s+/g,' ').trim();
+      const extraText=card.dataset.searchContent||'';
+      const text=(visibleText+' '+extraText).replace(/\s+/g,' ').trim();
+      if(text){
+        const anchorId=card.id || `${section.id}-item-${index}`;
+        if(!card.id) card.id=anchorId;
+        searchItems.push({id:anchorId,title,type:sectionTitle,text,element:card});
+      }
+    });
   });
-});
+}
 
 function escapeHtml(value){
   return value.replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
@@ -1316,22 +1507,28 @@ siteSearch.addEventListener('input',()=>{
   }
 });
 
-/* Every content tag triggers search & page content highlighting */
-document.querySelectorAll('.tag').forEach(tag=>{
-  tag.setAttribute('role','button');
-  tag.setAttribute('tabindex','0');
-  const runTagSearch=()=>openSearch(tag.textContent.trim());
-  tag.addEventListener('click',runTagSearch);
-  tag.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();runTagSearch();}});
-});
-
 document.addEventListener('keydown',(e)=>{
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openSearch();}
   if(e.key==='Escape') searchBox.classList.remove('open');
 });
 document.addEventListener('click',(e)=>{
+  const tag=e.target.closest('.tag');
+
+  /* A tag click should open search and must not be immediately closed
+     by the outside-click handler. */
+  if(tag){
+    e.preventDefault();
+    e.stopPropagation();
+    openSearch(tag.dataset.tag || tag.textContent.trim());
+    return;
+  }
+
   if(!e.target.closest('.search-wrap')) searchBox.classList.remove('open');
 });
+
+buildSearchIndex();
+bindTags();
+loadWebsiteContent();
 
 /* Scroll progress */
 const scrollProgress=document.getElementById('scrollProgress');
