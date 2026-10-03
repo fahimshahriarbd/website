@@ -504,6 +504,118 @@ button,input,textarea{font:inherit;font-size:16px}
   .socials a{width:44px;min-width:44px;padding:0}
   .socials a span{display:none}
 }
+
+/* ================= MY FOCUS ================= */
+.focus-panel h4{
+  margin-bottom:12px;
+}
+
+.focus-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.focus-card{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:13px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:15px;
+  transition:.22s ease;
+}
+
+.focus-card:hover{
+  transform:translateY(-2px);
+  border-color:color-mix(in srgb,var(--primary) 28%,var(--border));
+}
+
+.focus-icon{
+  width:38px;
+  height:38px;
+  flex:none;
+  display:grid;
+  place-items:center;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:11px;
+  font-size:1.15rem;
+}
+
+.focus-card strong{
+  display:block;
+  font-size:.88rem;
+  line-height:1.25;
+  margin-bottom:3px;
+}
+
+.focus-card span:not(.focus-icon){
+  display:block;
+  color:var(--muted);
+  font-size:.72rem;
+  line-height:1.4;
+}
+
+.focus-interests{
+  margin-top:13px;
+  padding-top:11px;
+  border-top:1px solid var(--border);
+}
+
+.focus-label{
+  display:block;
+  color:var(--muted);
+  font-size:.72rem;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  margin-bottom:7px;
+}
+
+.focus-interests .tags{
+  margin-top:0;
+  gap:6px;
+}
+
+.focus-interests .tag{
+  padding:5px 9px;
+  font-size:.74rem;
+}
+
+@media(max-width:760px){
+  .focus-grid{
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+
+  .focus-card{
+    padding:11px;
+    gap:9px;
+  }
+
+  .focus-icon{
+    width:34px;
+    height:34px;
+    font-size:1rem;
+  }
+
+  .focus-card strong{
+    font-size:.82rem;
+  }
+
+  .focus-card span:not(.focus-icon){
+    font-size:.68rem;
+  }
+}
+
+@media(max-width:420px){
+  .focus-grid{
+    grid-template-columns:1fr;
+  }
+}
+
 </style>
 </head>
 
@@ -606,34 +718,15 @@ button,input,textarea{font:inherit;font-size:16px}
  
     </div>
 
-    <div class="about-grid reveal">
+<div class="about-grid reveal">
       <div class="panel">
 
         
-<p class="muted" style="text-align: justify; line-height: 1.8;">
+<p class="muted" style="max-width: 650px; margin: 0 auto; line-height: 1.8; text-align: left;">
   Assalamu Alaikum. I’m Fahim Shahriar, currently studying dentistry. Along with
   dentistry, I have a strong interest in technology, research, exploring new
   ideas, and practical work.
 </p>
-
-<div class="about-more-content" id="aboutMoreContent">
-  <p class="muted" style="text-align: justify; line-height: 1.8;">
-    I enjoy learning new things and turning ideas into something useful. In the
-    future, I hope to contribute to better dental healthcare in Bangladesh
-    through research, modern dental labs and hospitals, effective learning
-    systems, and useful digital platforms.
-  </p>
-
-  <p class="muted" style="text-align: justify; line-height: 1.8;">
-    I want to keep learning, experimenting, and building things that can make a
-    meaningful difference in healthcare and education.
-  </p>
-</div>
-
-<button class="about-see-more" id="aboutSeeMore" type="button" aria-expanded="false">
-  See more →
-</button>
-
 
         <div class="info-list">
           <div class="info-row"><span class="info-icon">🎓</span><div><b>Education (BDS)</b><br><span class="muted">Studying at Chattogram Medical College, Dental Unit</span></div></div>
@@ -641,19 +734,50 @@ button,input,textarea{font:inherit;font-size:16px}
         </div>
       </div>
 
-      <div class="panel">
+      <div class="panel focus-panel">
         <h4>My Focus</h4>
-        <div class="stats">
-          <div class="stat"><strong>15%</strong><span>Dental Learning</span></div>
-          <div class="stat"><strong>30%</strong><span>Digital Content</span></div>
-          <div class="stat"><strong>40%</strong><span>Playing Games</span></div>
-          <div class="stat"><strong>15%</strong><span>Creative Work</span></div>
+        <div class="focus-grid">
+          <div class="focus-card">
+            <span class="focus-icon">🦷</span>
+            <div>
+              <strong>Dental Learning</strong>
+              <span>Clinical knowledge & continuous learning</span>
+            </div>
+          </div>
+
+          <div class="focus-card">
+            <span class="focus-icon">💻</span>
+            <div>
+              <strong>Digital Content</strong>
+              <span>Web, technology & digital projects</span>
+            </div>
+          </div>
+
+          <div class="focus-card">
+            <span class="focus-icon">🎮</span>
+            <div>
+              <strong>Gaming & Relaxation</strong>
+              <span>Games and everyday entertainment</span>
+            </div>
+          </div>
+
+          <div class="focus-card">
+            <span class="focus-icon">✨</span>
+            <div>
+              <strong>Creative Work</strong>
+              <span>Writing, photography & new ideas</span>
+            </div>
+          </div>
         </div>
-        <div class="tags">
-          <span class="tag">Dentistry</span><span class="tag">Research</span>
-          <span class="tag">Cooking</span><span class="tag">Traveling</span>
-          <span class="tag">Writing</span><span class="tag">Photography</span>
-          <span class="tag">Education</span><span class="tag">Technology</span>
+
+        <div class="focus-interests">
+          <span class="focus-label">Interests</span>
+          <div class="tags">
+            <span class="tag">Dentistry</span><span class="tag">Research</span>
+            <span class="tag">Cooking</span><span class="tag">Traveling</span>
+            <span class="tag">Writing</span><span class="tag">Photography</span>
+            <span class="tag">Education</span><span class="tag">Technology</span>
+          </div>
         </div>
       </div>
     </div>
