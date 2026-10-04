@@ -10,7 +10,7 @@
       <div class="timeline-item">
         <div class="timeline-content">
           <small class="timeline-badge">◆ Present Education</small>
-          <h4>🦷 Bachelor of Dental Surgery (BDS)</h4>
+          <h4><span class="timeline-icon">🦷</span> Bachelor of Dental Surgery (BDS)</h4>
           <h5>Chittagong Medical College, Dental Unit</h5>
           <p class="muted timeline-date" style="font-size: 13px; font-weight: 500; margin-top: 6px;">
             21 March 2024 – Present
@@ -21,9 +21,9 @@
       <div class="timeline-item">
         <div class="timeline-content">
           <small class="timeline-badge">★ Academic Milestones</small>
-          
+
           <div class="academic-item">
-            <h4>🎓 Higher Secondary Certificate (HSC)</h4>
+            <h4><span class="timeline-icon">🎓</span> Higher Secondary Certificate (HSC)</h4>
             <h5>Ramkrishnapur College, Homna, Cumilla</h5>
             <p class="muted timeline-date" style="font-size: 13px; font-weight: 500; margin-top: 6px;">
               Science · GPA 5.00 | Passing Year: 2022
@@ -33,7 +33,7 @@
           <div class="academic-divider"></div>
 
           <div class="academic-item">
-            <h4>📚 Secondary School Certificate (SSC)</h4>
+            <h4><span class="timeline-icon">📚</span> Secondary School Certificate (SSC)</h4>
             <h5>Ramkrishnapur KKRK High School</h5>
             <p class="muted timeline-date" style="font-size: 13px; font-weight: 500; margin-top: 6px;">
               Science · GPA 5.00 | Passing Year: 2020
@@ -43,7 +43,7 @@
           <div class="academic-divider"></div>
 
           <div class="academic-item">
-            <h4>📘 Junior School Certificate (JSC)</h4>
+            <h4><span class="timeline-icon">📘</span> Junior School Certificate (JSC)</h4>
             <h5>Ramkrishnapur KKRK High School</h5>
             <p class="muted timeline-date" style="font-size: 13px; font-weight: 500; margin-top: 6px;">
               General · GPA 4.50 | Passing Year: 2017
@@ -53,25 +53,25 @@
           <div class="academic-divider"></div>
 
           <div class="academic-item">
-            <h4>✏️ Primary School Certificate (PSC)</h4>
+            <h4><span class="timeline-icon">✏️</span> Primary School Certificate (PSC)</h4>
             <h5>Sreenagar Govt. Primary School</h5>
             <p class="muted timeline-date" style="font-size: 13px; font-weight: 500; margin-top: 6px;">
               General · GPA 4.75 | Passing Year: 2014
             </p>
           </div>
-          
+
         </div>
       </div>
 
       <div class="timeline-item">
         <div class="timeline-content">
           <small class="timeline-badge">✓ Beyond Academics</small>
-          <h4>💻 Web, Technology & Digital Content</h4>
+          <h4><span class="timeline-icon">💻</span> Web, Technology & Digital Content</h4>
           <h5>Self-Learning & Personal Projects</h5>
           <p class="muted timeline-date" style="font-size: 13px; font-weight: 500; margin-top: 6px;">
-            Beyond my dental studies, I explore Web Development, 
-            Content Creation, Video Editing, System Management, Writing, 
-            Research, Cooking, Gaming, Reading, Tuition, Leadership, 
+            Beyond my dental studies, I explore Web Development,
+            Content Creation, Video Editing, System Management, Writing,
+            Research, Cooking, Gaming, Reading, Tuition, Leadership,
             Relationships, and Problem Solving.
           </p>
         </div>
@@ -80,13 +80,32 @@
   </div>
 
   <style>
+    .timeline-content h4 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    .timeline-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1em;
+      line-height: 1;
+      filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.1));
+      transform: translateY(-1px);
+    }
+
     .academic-item {
       position: relative;
     }
 
     .academic-divider {
       height: 1px;
-      background: linear-gradient(to right, transparent, rgba(128, 128, 128, 0.2), transparent);
+      background: linear-gradient(to right, transparent, rgba(128, 128, 128, 0.25), transparent);
       margin: 12px 0;
     }
   </style>
