@@ -6,6 +6,7 @@
       <p>Medical notes, technology guides, personal stories and everyday experiences.</p>
     </div>
 
+    <!-- Blog category filter -->
     <div class="blog-toolbar">
       <button class="filter-btn active" data-filter="all">All</button>
       <button class="filter-btn" data-filter="medical">Medical</button>
@@ -53,89 +54,3 @@
     </div>
   </div>
 </section>
-
-<script>
-  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxeUJ3bMyZVwymn9GafqECrAfc8BPwiYXH3eTXxl68Boql2gOImDhIZTEoS0dWbyxlHxg/exec';
-
-  const CATEGORY_MAP = {
-    medical: 'medical',
-    technology: 'tech',
-    tech: 'tech',
-    education: 'education',
-    personal: 'personal'
-  };
-
-  function esc(value) {
-    return String(value == null ? '' : value)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  function applyFilter(filter) {
-    document.querySelectorAll('#blogGrid .blog-card').forEach(card => {
-      const show = filter === 'all' || card.dataset.category === filter;
-      card.style.display = show ? '' : 'none';
-    });
-  }
-
-  function setupCategoryFilters() {
-    const btns = document.querySelectorAll('.filter-btn');
-    btns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        btns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        applyFilter(btn.dataset.filter);
-      });
-    });
-  }
-
-  function loadPosts() {
-    fetch(WEB_APP_URL)
-      .then(res => res.json())
-      .then(posts => {
-        const grid = document.getElementById('blogGrid');
-        const fragment = document.createDocumentFragment();
-
-        posts.forEach(post => {
-          const published = String(post.Published || '').trim().toLowerCase();
-          if (!['true', 'yes', '1'].includes(published)) return;
-
-          const rawCat = String(post.Catagory || post.Category || '').trim();
-          const key = rawCat.toLowerCase();
-          const category = CATEGORY_MAP[key] || key;
-
-          const article = document.createElement('article');
-          article.className = 'card blog-card';
-          article.dataset.category = category;
-          article.innerHTML = `
-            <img class="blog-cover" src="${esc(post.Image)}" alt="${esc(post.Title)}">
-            <div class="blog-body">
-              <div class="blog-meta">
-                <span>${esc(rawCat)}</span>
-                <span>${esc(post.Date)} · ${esc(post['Read Time'])}</span>
-              </div>
-              <h4>${esc(post.Title)}</h4>
-              <p>${esc(post.Description)}</p>
-              <a class="read-more" href="${esc(post.Link)}">Read article →</a>
-            </div>
-          `;
-          fragment.appendChild(article);
-        });
-
-        if (fragment.childNodes.length) {
-          grid.innerHTML = '';
-          grid.appendChild(fragment);
-          const active = document.querySelector('.filter-btn.active');
-          applyFilter(active ? active.dataset.filter : 'all');
-        }
-      })
-      .catch(err => console.error('Could not load posts from Google Sheet:', err));
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    setupCategoryFilters();
-    loadPosts();
-  });
-</script>
