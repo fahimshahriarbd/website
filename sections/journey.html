@@ -1,35 +1,35 @@
 <section class="section" id="journey" aria-labelledby="journey-title">
   <div class="container">
-    <div class="section-head reveal">
+    <header class="section-head reveal">
       <span class="eyebrow">My Journey</span>
       <h2 id="journey-title">Education & Growth</h2>
       <p>A timeline of my academic achievements and personal development</p>
-    </div>
+    </header>
 
-    <div class="timeline reveal" role="list">
-      <article class="timeline-item" role="listitem">
+    <ul class="timeline reveal" aria-label="Education and growth timeline">
+      <li class="timeline-item">
         <div class="timeline-marker">
-          <span class="timeline-icon">🦷</span>
-          <span class="timeline-dot"></span>
-          <span class="timeline-date">2024 — Present</span>
+          <span class="timeline-icon" aria-hidden="true">🦷</span>
+          <span class="timeline-dot" aria-hidden="true"></span>
+          <time class="timeline-date" datetime="2024">2024 — Present</time>
         </div>
         <div class="timeline-content">
           <h3>Dental Student</h3>
           <p class="institution">Chattogram Medical College, Dental Unit</p>
-          <p class="description">Advanced clinical training in dentistry with focus on patient care, diagnostic skills, and modern dental practices. Developing expertise in various dental procedures and medical knowledge.</p>
-          <div class="timeline-tags">
-            <span class="tag">Clinical Learning</span>
-            <span class="tag">Medical Science</span>
-            <span class="tag">Professional Development</span>
-          </div>
+          <p class="description">Advanced clinical training in dentistry with focus on patient care, diagnostic skills, and modern dental practices.</p>
+          <ul class="timeline-tags" aria-label="Dental student focus areas">
+            <li><span class="tag">Clinical Learning</span></li>
+            <li><span class="tag">Medical Science</span></li>
+            <li><span class="tag">Professional Development</span></li>
+          </ul>
         </div>
-      </article>
+      </li>
 
-      <article class="timeline-item" role="listitem">
+      <li class="timeline-item">
         <div class="timeline-marker">
-          <span class="timeline-icon">📚</span>
-          <span class="timeline-dot"></span>
-          <span class="timeline-date">2022 — 2024</span>
+          <span class="timeline-icon" aria-hidden="true">📚</span>
+          <span class="timeline-dot" aria-hidden="true"></span>
+          <time class="timeline-date" datetime="2022/2024">2022 — 2024</time>
         </div>
         <div class="timeline-content">
           <h3>Higher Secondary Certificate (HSC)</h3>
@@ -37,13 +37,13 @@
           <p class="achievement"><strong>Group:</strong> Science | <strong>GPA:</strong> 5.00</p>
           <p class="description">Completed advanced studies in Science stream with exceptional academic performance.</p>
         </div>
-      </article>
+      </li>
 
-      <article class="timeline-item" role="listitem">
+      <li class="timeline-item">
         <div class="timeline-marker">
-          <span class="timeline-icon">🎓</span>
-          <span class="timeline-dot"></span>
-          <span class="timeline-date">2019 — 2022</span>
+          <span class="timeline-icon" aria-hidden="true">🎓</span>
+          <span class="timeline-dot" aria-hidden="true"></span>
+          <time class="timeline-date" datetime="2019/2022">2019 — 2022</time>
         </div>
         <div class="timeline-content">
           <h3>Secondary School Certificate (SSC)</h3>
@@ -51,39 +51,45 @@
           <p class="achievement"><strong>Group:</strong> Science | <strong>GPA:</strong> 5.00</p>
           <p class="description">Strong foundation in science and mathematics with consistent academic excellence.</p>
         </div>
-      </article>
+      </li>
 
-      <article class="timeline-item" role="listitem">
+      <li class="timeline-item">
         <div class="timeline-marker">
-          <span class="timeline-icon">💡</span>
-          <span class="timeline-dot"></span>
+          <span class="timeline-icon" aria-hidden="true">💡</span>
+          <span class="timeline-dot" aria-hidden="true"></span>
           <span class="timeline-label">Continuous Learning</span>
         </div>
         <div class="timeline-content">
           <h3>Technology & Web Development</h3>
           <p class="description">Self-directed learning in web development, digital design, content creation, and emerging technologies. Building practical projects and staying updated with industry trends.</p>
-          <div class="timeline-tags">
-            <span class="tag">Web Development</span>
-            <span class="tag">UI/UX Design</span>
-            <span class="tag">Creative Projects</span>
-            <span class="tag">Digital Tools</span>
-          </div>
+          <ul class="timeline-tags" aria-label="Technology learning areas">
+            <li><span class="tag">Web Development</span></li>
+            <li><span class="tag">UI/UX Design</span></li>
+            <li><span class="tag">Creative Projects</span></li>
+            <li><span class="tag">Digital Tools</span></li>
+          </ul>
         </div>
-      </article>
-    </div>
+      </li>
+    </ul>
   </div>
 </section>
 
 <style>
+  :root {
+    --timeline-offset: 110px;
+  }
+
   .timeline {
     position: relative;
-    padding: 2rem 0;
+    list-style: none;
+    padding: 2rem 0 0;
+    margin: 0;
   }
 
   .timeline::before {
     content: '';
     position: absolute;
-    left: 40px;
+    left: calc(var(--timeline-offset) / 2 - 1px);
     top: 0;
     bottom: 0;
     width: 2px;
@@ -93,10 +99,11 @@
 
   .timeline-item {
     position: relative;
-    padding-left: 120px;
-    margin-bottom: 3rem;
+    display: grid;
+    grid-template-columns: var(--timeline-offset) minmax(0, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
     animation: fadeInUp 0.6s ease-out forwards;
-    opacity: 0;
   }
 
   .timeline-item:nth-child(1) { animation-delay: 0.1s; }
@@ -105,13 +112,11 @@
   .timeline-item:nth-child(4) { animation-delay: 0.4s; }
 
   .timeline-marker {
-    position: absolute;
-    left: 0;
-    top: 0;
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100px;
+    z-index: 1;
   }
 
   .timeline-icon {
@@ -133,7 +138,6 @@
     border: 3px solid var(--bg-color);
     box-shadow: 0 0 0 3px var(--primary-color);
     transition: all 0.3s ease;
-    cursor: pointer;
     margin: -18px 0;
   }
 
@@ -209,6 +213,12 @@
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-top: 1rem;
+    list-style: none;
+    padding: 0;
+  }
+
+  .timeline-tags li {
+    margin: 0;
   }
 
   .tag {
@@ -250,16 +260,12 @@
 
   @media (max-width: 768px) {
     .timeline::before {
-      left: 35px;
+      left: 40px;
     }
 
     .timeline-item {
-      padding-left: 100px;
-      margin-bottom: 2.5rem;
-    }
-
-    .timeline-marker {
-      width: 85px;
+      grid-template-columns: 85px minmax(0, 1fr);
+      gap: 1rem;
     }
 
     .timeline-icon {
@@ -301,16 +307,12 @@
     }
 
     .timeline::before {
-      left: 28px;
+      left: 32px;
     }
 
     .timeline-item {
-      padding-left: 80px;
-      margin-bottom: 2rem;
-    }
-
-    .timeline-marker {
-      width: 70px;
+      grid-template-columns: 70px minmax(0, 1fr);
+      gap: 0.75rem;
     }
 
     .timeline-icon {
@@ -359,6 +361,13 @@
     .tag {
       padding: 0.25rem 0.5rem;
       font-size: 0.7rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .timeline-item,
+    .timeline-icon {
+      animation: none !important;
     }
   }
 
