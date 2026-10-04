@@ -14,10 +14,102 @@
       <button class="filter-btn" data-filter="personal">Personal</button>
     </div>
 
-    <div class="grid blog-grid" id="blogGrid">
-      <div class="blog-loading" style="grid-column: 1 / -1; text-align: center; color: var(--muted, #64748b);">
-        Loading blog posts...
-      </div>
-    </div>
+    <div class="grid blog-grid" id="blogGrid"></div>
   </div>
 </section>
+
+<script>
+  const blogPosts = [
+    {
+      title: "ভিজিটের আগে কী জানা দরকার",
+      category: "medical",
+      date: "2026-10-01",
+      excerpt: "ডাক্তার দেখানোর আগে কিছু গুরুত্বপূর্ণ জিনিস দেখে নেওয়া উচিত, যাতে সময় বাঁচে এবং ভুল কম হয়।",
+      link: "#"
+    },
+    {
+      title: "ডিজিটাল স্বাস্থ্য রেকর্ড রাখার সহজ উপায়",
+      category: "tech",
+      date: "2026-09-20",
+      excerpt: "আমাদের মেডিকেল তথ্য নিরাপদে ও সহজে সংরক্ষণ করার জন্য কিছু কার্যকর কৌশল।",
+      link: "#"
+    },
+    {
+      title: "পড়াশোনায় ফোকাস ধরে রাখার 5 টিপস",
+      category: "education",
+      date: "2026-09-10",
+      excerpt: "সপ্তাহের ভিড়ে পড়াশোনা ঠিকঠাক রাখতে গেলে কিছু ছোট কিন্তু শক্তিশালী অভ্যাস দরকার।",
+      link: "#"
+    },
+    {
+      title: "একটি ছোট শহরের গল্প",
+      category: "personal",
+      date: "2026-08-28",
+      excerpt: "দৈনন্দিন জীবন, স্মৃতি আর ছোট ছোট অভিজ্ঞতার গল্প যা আমাদেরকে আবার ভাবতে শেখায়।",
+      link: "#"
+    },
+    {
+      title: "AI কীভাবে ডাক্তারি ও শিক্ষা বদলে দিচ্ছে",
+      category: "tech",
+      date: "2026-08-15",
+      excerpt: "স্বাস্থ্য ও শিক্ষা খাতে AI-র ব্যবহার নিয়ে কিছু চিন্তার খুঁটিনাটি ও সম্ভাবনা।",
+      link: "#"
+    },
+    {
+      title: "স্ট্রেস কমানোর কিছু সহজ অভ্যাস",
+      category: "medical",
+      date: "2026-07-10",
+      excerpt: "দৈনন্দিন জীবনে স্ট্রেস নিয়ন্ত্রণ��র জন্য যে ছোট অভ্যাসগুলো খুব কাজে লাগে।",
+      link: "#"
+    }
+  ];
+
+  const blogGrid = document.getElementById("blogGrid");
+  const filterButtons = document.querySelectorAll(".filter-btn");
+
+  function renderPosts(filter = "all") {
+    if (!blogGrid) return;
+
+    const filteredPosts = filter === "all"
+      ? blogPosts
+      : blogPosts.filter((post) => post.category === filter);
+
+    blogGrid.innerHTML = "";
+
+    if (filteredPosts.length === 0) {
+      blogGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; color: var(--muted, #64748b);">
+          No posts found.
+        </div>
+      `;
+      return;
+    }
+
+    filteredPosts.forEach((post) => {
+      const card = document.createElement("article");
+      card.className = "blog-card";
+      card.innerHTML = `
+        <div class="blog-card-inner">
+          <span class="blog-tag">${post.category}</span>
+          <h5>${post.title}</h5>
+          <p>${post.excerpt}</p>
+          <div class="blog-meta">
+            <span>${post.date}</span>
+            <a href="${post.link}">Read more</a>
+          </div>
+        </div>
+      `;
+      blogGrid.appendChild(card);
+    });
+  }
+
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      filterButtons.forEach((btn) => btn.classList.remove("active"));
+      button.classList.add("active");
+      renderPosts(button.dataset.filter);
+    });
+  });
+
+  renderPosts();
+</script>
