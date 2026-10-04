@@ -1,109 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#2563eb">
-<meta name="description" content="Fahim Shahriar — Medical Student, Web Developer and Content Creator. Personal portfolio, blog, projects, notes and digital identity.">
-<meta name="author" content="Fahim Shahriar">
-<meta property="og:title" content="Fahim Shahriar | Personal Portfolio">
-<meta property="og:description" content="Medical Student | Web Developer | Content Creator">
-<meta property="og:type" content="website">
-<link rel="icon" type="image/png" href="https://i.postimg.cc/3JFfY1zb/screenshot-5.png">
-<title>Fahim Shahriar | Dental Student</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta
+      name="description"
+      content="Fahim Shahriar — Medical Student, Web Developer, and Content Creator."
+    />
+    <meta name="author" content="Fahim Shahriar" />
+    <meta property="og:title" content="Fahim Shahriar | Personal Portfolio" />
+    <meta
+      property="og:description"
+      content="Medical Student | Web Developer | Content Creator"
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/3JFfY1zb/screenshot-5.png" />
+    <title>Fahim Shahriar | Medical Student</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="js/main.js" defer></script>
+  </head>
 
-<link rel="stylesheet" href="css/style.css">
-</head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
 
-<body>
-<div class="scroll-progress" id="scrollProgress"></div>
+    <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
-<header class="header">
-  <div class="container navbar">
-    <a href="#home" class="brand">
-      <img class="brand-photo" src="https://i.postimg.cc/3JFfY1zb/screenshot-5.png?auto=format&fit=crop&w=120&q=85" alt="Fahim Shahriar">
-      <span>Fahim Shahriar</span>
-    </a>
+    <header class="header">
+      <div class="container navbar">
+        <a href="#home" class="brand" aria-label="Fahim Shahriar home">
+          <img
+            class="brand-photo"
+            src="https://i.postimg.cc/3JFfY1zb/screenshot-5.png?auto=format&fit=crop&w=120&q=85"
+            alt="Fahim Shahriar"
+            width="120"
+            height="120"
+            loading="lazy"
+          />
+          <span>Fahim Shahriar</span>
+        </a>
 
-    <nav>
-      <ul class="nav-links" id="navLinks">
-        <li><a href="#home">Home</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#projects">Projects</a></li>
-        <li><a href="#blog">Blog</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#gallery">Gallery</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
+        <nav aria-label="Main navigation">
+          <ul class="nav-links" id="navLinks">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#blog">Blog</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </nav>
 
-    <div class="nav-actions">
-      <div class="search-wrap">
-        <button class="icon-btn search-btn" id="searchBtn" aria-label="Search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-        </button>
-        <div class="search-box" id="searchBox">
-          <div class="search-input-wrap">
-            <input type="search" id="siteSearch" placeholder="Search this website..." aria-label="Search this website">
-            <button id="closeSearch" aria-label="Close search">×</button>
+        <div class="nav-actions">
+          <div class="search-wrap">
+            <button class="icon-btn search-btn" id="searchBtn" aria-label="Search this website">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
+
+            <div class="search-box" id="searchBox" aria-live="polite">
+              <div class="search-input-wrap">
+                <input type="search" id="siteSearch" placeholder="Search this website..." aria-label="Search this website" />
+                <button id="closeSearch" aria-label="Close search">×</button>
+              </div>
+              <div class="search-results" id="searchResults"></div>
+            </div>
           </div>
-          <div class="search-results" id="searchResults"></div>
+
+          <button class="icon-btn" id="themeBtn" aria-label="Toggle dark mode">☾</button>
+          <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
         </div>
       </div>
-      <button class="icon-btn" id="themeBtn" aria-label="Toggle dark mode">☾</button>
-      <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+    </header>
+
+    <main id="main-content">
+      <section id="home" aria-label="Home section"></section>
+      <section id="about" aria-label="About section"></section>
+      <section id="journey" aria-label="Journey section"></section>
+      <section id="skills" aria-label="Skills section"></section>
+      <section id="projects" aria-label="Projects section"></section>
+      <section id="blog" aria-label="Blog section"></section>
+      <section id="featured-video" aria-label="Featured video section"></section>
+      <section id="services" aria-label="Services section"></section>
+      <section id="gallery" aria-label="Gallery section"></section>
+      <section id="achievements" aria-label="Achievements section"></section>
+      <section id="testimonials" aria-label="Testimonials section"></section>
+      <section id="cv" aria-label="CV section"></section>
+      <section id="contact" aria-label="Contact section"></section>
+    </main>
+
+    <div class="content-modal" id="contentModal" aria-hidden="true">
+      <div class="content-modal-box" role="dialog" aria-modal="true" aria-labelledby="contentModalTitle">
+        <button class="content-modal-close" id="contentModalClose" aria-label="Close content preview">×</button>
+        <img id="contentModalCover" class="content-modal-cover" src="" alt="" style="display:none" />
+        <div class="content-modal-body">
+          <div class="content-modal-meta" id="contentModalMeta"></div>
+          <h2 class="content-modal-title" id="contentModalTitle"></h2>
+          <div class="content-modal-text" id="contentModalText"></div>
+          <div class="content-modal-tags tags" id="contentModalTags"></div>
+        </div>
+      </div>
     </div>
-  </div>
-</header>
 
-<main>
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div>
+          <b>Fahim Shahriar</b>
+          <p>Student · Learner · Creator</p>
+        </div>
+        <p>© <span id="year"></span> Fahim Shahriar. All rights reserved.</p>
+      </div>
+    </footer>
 
-
-<main>
-  <div data-section="home"></div>
-  <div data-section="about"></div>
-  <div data-section="journey"></div>
-  <div data-section="skills"></div>
-  <div data-section="projects"></div>
-  <div data-section="blog"></div>
-  <div data-section="featured-video"></div>
-  <div data-section="services"></div>
-  <div data-section="gallery"></div>
-  <div data-section="achievements"></div>
-  <div data-section="testimonials"></div>
-  <div data-section="cv"></div>
-  <div data-section="contact"></div>
-
-<!-- ================= CONTENT READER MODAL ================= -->
-<div class="content-modal" id="contentModal" aria-hidden="true">
-  <div class="content-modal-box" role="dialog" aria-modal="true" aria-labelledby="contentModalTitle">
-    <button class="content-modal-close" id="contentModalClose" aria-label="Close">×</button>
-    <img id="contentModalCover" class="content-modal-cover" src="" alt="" style="display:none">
-    <div class="content-modal-body">
-      <div class="content-modal-meta" id="contentModalMeta"></div>
-      <h2 class="content-modal-title" id="contentModalTitle"></h2>
-      <div class="content-modal-text" id="contentModalText"></div>
-      <div class="content-modal-tags tags" id="contentModalTags"></div>
-    </div>
-  </div>
-</div>
-</main>
-
-<footer class="footer">
-  <div class="container footer-inner">
-    <div>
-      <b>Fahim Shahriar</b>
-      <p>Student · Learner · Creator</p>
-    </div>
-    <p>© <span id="year"></span> Fahim Shahriar. All rights reserved.</p>
-  </div>
-</footer>
-
-<button class="top-btn" id="topBtn" aria-label="Back to top">↑</button>
-
-<script src="js/main.js"></script>
-</body>
+    <button class="top-btn" id="topBtn" aria-label="Back to top">↑</button>
+  </body>
 </html>
