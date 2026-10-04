@@ -1,37 +1,296 @@
-<section class="section" id="journey">
+<section class="section" id="journey" aria-labelledby="journey-title">
   <div class="container">
     <div class="section-head reveal">
       <span class="eyebrow">My Journey</span>
-      <h4>Education & Growth</h4>
-      <p>Successfully Completed This Website</p>
+      <h2 id="journey-title">Education & Growth</h2>
+      <p>A timeline of my academic achievements and personal development</p>
     </div>
 
-    <div class="timeline reveal">
-      <div class="timeline-item">
-        <div class="timeline-content">
-          <small>• Current</small>
-          <h4>Studying at Chattogram Medical College, Dental Unit</h4>
-          <p class="muted">Dental education, clinical learning, medical knowledge and continuous skill development.</p>
+    <div class="timeline reveal" role="list">
+      <!-- Current Studies -->
+      <article class="timeline-item" role="listitem">
+        <div class="timeline-marker">
+          <span class="timeline-dot"></span>
+          <span class="timeline-date">2024 — Present</span>
         </div>
-      </div>
+        <div class="timeline-content">
+          <h3>Dental Student</h3>
+          <p class="institution">Chattogram Medical College, Dental Unit</p>
+          <p class="description">Advanced clinical training in dentistry with focus on patient care, diagnostic skills, and modern dental practices. Developing expertise in various dental procedures and medical knowledge.</p>
+          <div class="timeline-tags">
+            <span class="tag">Clinical Learning</span>
+            <span class="tag">Medical Science</span>
+            <span class="tag">Professional Development</span>
+          </div>
+        </div>
+      </article>
 
-      <div class="timeline-item">
-        <div class="timeline-content">
-          <small>• Academic Milestone</small>
-          <h4>HSC | Science | GPA 5.00</h4>
-          <p class="muted">From Ramkrishnapur College</p>
-          <h4>SSC | Science | GPA 5.00</h4>
-          <p class="muted">From Ramkrishnapur KKRK High School</p>
+      <!-- HSC -->
+      <article class="timeline-item" role="listitem">
+        <div class="timeline-marker">
+          <span class="timeline-dot"></span>
+          <span class="timeline-date">2022 — 2024</span>
         </div>
-      </div>
+        <div class="timeline-content">
+          <h3>Higher Secondary Certificate (HSC)</h3>
+          <p class="institution">Ramkrishnapur College</p>
+          <p class="achievement">
+            <strong>Group:</strong> Science | <strong>GPA:</strong> 5.00
+          </p>
+          <p class="description">Completed advanced studies in Science stream with exceptional academic performance.</p>
+        </div>
+      </article>
 
-      <div class="timeline-item">
-        <div class="timeline-content">
-          <small>• Learning Beyond Curriculum</small>
-          <h4>Technology, Web & Creative Projects</h4>
-          <p class="muted">Self-learning in websites, digital tools, content creation and practical technology.</p>
+      <!-- SSC -->
+      <article class="timeline-item" role="listitem">
+        <div class="timeline-marker">
+          <span class="timeline-dot"></span>
+          <span class="timeline-date">2019 — 2022</span>
         </div>
-      </div>
+        <div class="timeline-content">
+          <h3>Secondary School Certificate (SSC)</h3>
+          <p class="institution">Ramkrishnapur KKRK High School</p>
+          <p class="achievement">
+            <strong>Group:</strong> Science | <strong>GPA:</strong> 5.00
+          </p>
+          <p class="description">Strong foundation in science and mathematics with consistent academic excellence.</p>
+        </div>
+      </article>
+
+      <!-- Self Learning -->
+      <article class="timeline-item" role="listitem">
+        <div class="timeline-marker">
+          <span class="timeline-dot"></span>
+          <span class="timeline-label">Continuous Learning</span>
+        </div>
+        <div class="timeline-content">
+          <h3>Technology & Web Development</h3>
+          <p class="description">Self-directed learning in web development, digital design, content creation, and emerging technologies. Building practical projects and staying updated with industry trends.</p>
+          <div class="timeline-tags">
+            <span class="tag">Web Development</span>
+            <span class="tag">UI/UX Design</span>
+            <span class="tag">Creative Projects</span>
+            <span class="tag">Digital Tools</span>
+          </div>
+        </div>
+      </article>
     </div>
   </div>
 </section>
+
+<style>
+  .timeline {
+    position: relative;
+    padding: 2rem 0;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+    opacity: 0.3;
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-left: 80px;
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+  .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+  .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+  .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+
+  .timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .timeline-dot {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    border: 3px solid var(--bg-color);
+    box-shadow: 0 0 0 3px var(--primary-color);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .timeline-item:hover .timeline-dot {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 8px rgba(var(--primary-rgb), 0.1);
+  }
+
+  .timeline-date {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-top: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .timeline-label {
+    font-size: 0.85rem;
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .timeline-content {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 3px solid var(--primary-color);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .timeline-item:hover .timeline-content {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+  }
+
+  .timeline-content h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.3rem;
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+
+  .timeline-content .institution {
+    margin: 0.25rem 0 0.75rem 0;
+    font-size: 0.95rem;
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+
+  .timeline-content .achievement {
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .timeline-content .description {
+    margin: 0.75rem 0 0 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .timeline-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    background: rgba(var(--primary-rgb), 0.1);
+    color: var(--primary-color);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .timeline-item:hover .tag {
+    background: var(--primary-color);
+    color: white;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .timeline::before {
+      left: 12px;
+    }
+
+    .timeline-item {
+      padding-left: 60px;
+    }
+
+    .timeline-dot {
+      width: 32px;
+      height: 32px;
+      box-shadow: 0 0 0 2px var(--primary-color);
+    }
+
+    .timeline-item:hover .timeline-dot {
+      box-shadow: 0 0 0 5px rgba(var(--primary-rgb), 0.1);
+    }
+
+    .timeline-content {
+      padding: 1.25rem;
+      border-radius: 6px;
+    }
+
+    .timeline-content h3 {
+      font-size: 1.1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .timeline {
+      padding: 1rem 0;
+    }
+
+    .timeline-item {
+      padding-left: 50px;
+      margin-bottom: 2rem;
+    }
+
+    .timeline-date {
+      font-size: 0.75rem;
+    }
+
+    .timeline-content {
+      padding: 1rem;
+    }
+
+    .timeline-content h3 {
+      font-size: 1rem;
+    }
+
+    .timeline-tags {
+      gap: 0.35rem;
+    }
+
+    .tag {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.75rem;
+    }
+  }
+
+  /* Animation */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Reveal class for scroll animation */
+  .reveal {
+    opacity: 1;
+  }
+</style>
