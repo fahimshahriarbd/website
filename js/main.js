@@ -903,7 +903,7 @@ async function loadWebsiteContent(){
           color:var(--muted);
         ">
 
-          No published blog posts found in Google Sheets.
+          No published blog posts found
 
         </div>
 
