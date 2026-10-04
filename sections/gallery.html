@@ -3,18 +3,87 @@
     <div class="section-head reveal">
       <span class="eyebrow">Gallery</span>
       <h4>Photos & moments</h4>
-      <p>Replace these demo images with your personal, dental, campus and project photos.</p>
+      <p>Memorable moments, campus memories, dental studies and creative initiatives.</p>
     </div>
 
-    <div class="grid gallery-grid">
-      <div class="gallery-item"><img src="https://i.postimg.cc/rFLt87HR/screenshot-7.png?auto=format&fit=crop&w=800&q=85" alt="Campus"><div class="gallery-caption">Campus</div></div>
-      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=85" alt="Medical"><div class="gallery-caption">Medical</div></div>
-      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=85" alt="Technology"><div class="gallery-caption">Technology</div></div>
-      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=800&q=85" alt="Team"><div class="gallery-caption">Projects</div></div>
-      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=85" alt="Work"><div class="gallery-caption">Work</div></div>
-      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=85" alt="Writing"><div class="gallery-caption">Writing</div></div>
-      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=800&q=85" alt="Books"><div class="gallery-caption">Learning</div></div>
-      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=85" alt="Personal"><div class="gallery-caption">Personal</div></div>
+    <!-- Gallery Category Filter Toolbar -->
+    <div class="gallery-toolbar" id="galleryToolbar">
+      <button class="filter-btn active" data-gallery-filter="all">All</button>
+    </div>
+
+    <!-- Gallery Photos Grid -->
+    <div class="grid gallery-grid" id="galleryGrid">
+      <div class="gallery-item" data-category="Campus" data-index="0" role="button" tabindex="0">
+        <img src="https://i.postimg.cc/rFLt87HR/screenshot-7.png?auto=format&fit=crop&w=800&q=85" alt="Campus" loading="lazy" />
+        <span class="gallery-badge">Campus</span>
+        <div class="gallery-overlay">
+          <span class="gallery-zoom-icon">🔍</span>
+          <span class="gallery-caption">Campus</span>
+        </div>
+      </div>
+      <div class="gallery-item" data-category="Medical" data-index="1" role="button" tabindex="0">
+        <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=85" alt="Medical" loading="lazy" />
+        <span class="gallery-badge">Medical</span>
+        <div class="gallery-overlay">
+          <span class="gallery-zoom-icon">🔍</span>
+          <span class="gallery-caption">Medical</span>
+        </div>
+      </div>
+      <div class="gallery-item" data-category="Technology" data-index="2" role="button" tabindex="0">
+        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=85" alt="Technology" loading="lazy" />
+        <span class="gallery-badge">Technology</span>
+        <div class="gallery-overlay">
+          <span class="gallery-zoom-icon">🔍</span>
+          <span class="gallery-caption">Technology</span>
+        </div>
+      </div>
+      <div class="gallery-item" data-category="Projects" data-index="3" role="button" tabindex="0">
+        <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=800&q=85" alt="Projects" loading="lazy" />
+        <span class="gallery-badge">Projects</span>
+        <div class="gallery-overlay">
+          <span class="gallery-zoom-icon">🔍</span>
+          <span class="gallery-caption">Projects</span>
+        </div>
+      </div>
+      <div class="gallery-item" data-category="Work" data-index="4" role="button" tabindex="0">
+        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=85" alt="Work" loading="lazy" />
+        <span class="gallery-badge">Work</span>
+        <div class="gallery-overlay">
+          <span class="gallery-zoom-icon">🔍</span>
+          <span class="gallery-caption">Work</span>
+        </div>
+      </div>
+      <div class="gallery-item" data-category="Writing" data-index="5" role="button" tabindex="0">
+        <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=85" alt="Writing" loading="lazy" />
+        <span class="gallery-badge">Writing</span>
+        <div class="gallery-overlay">
+          <span class="gallery-zoom-icon">🔍</span>
+          <span class="gallery-caption">Writing</span>
+        </div>
+      </div>
+      <div class="gallery-item" data-category="Learning" data-index="6" role="button" tabindex="0">
+        <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=800&q=85" alt="Learning" loading="lazy" />
+        <span class="gallery-badge">Learning</span>
+        <div class="gallery-overlay">
+          <span class="gallery-zoom-icon">🔍</span>
+          <span class="gallery-caption">Learning</span>
+        </div>
+      </div>
+      <div class="gallery-item" data-category="Personal" data-index="7" role="button" tabindex="0">
+        <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=85" alt="Personal" loading="lazy" />
+        <span class="gallery-badge">Personal</span>
+        <div class="gallery-overlay">
+          <span class="gallery-zoom-icon">🔍</span>
+          <span class="gallery-caption">Personal</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- See More Button -->
+    <div class="see-more-wrap" id="gallerySeeMoreWrap" style="display:none">
+      <button class="see-more-btn" id="gallerySeeMoreBtn">
+        See More Photos ↓
+      </button>
     </div>
   </div>
 </section>

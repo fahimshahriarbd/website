@@ -11,6 +11,61 @@ function escapeHtml(value){
   );
 }
 
+function formatDateValue(val, formatted){
+  if(!val && !formatted) return 'Today';
+  const str = String(val || '').trim();
+
+  // 1. Google Visualization Date(YYYY, M, D)
+  const gvizMatch = str.match(/Date\((\d+),\s*(\d+),\s*(\d+)/i);
+  if(gvizMatch){
+    const y = gvizMatch[1];
+    // Month is 0-indexed in Date(Y, M, D)
+    const m = String(parseInt(gvizMatch[2], 10) + 1).padStart(2, '0');
+    const d = String(parseInt(gvizMatch[3], 10)).padStart(2, '0');
+    return `${d}-${m}-${y}`;
+  }
+
+  // 2. YYYY-MM-DD
+  const isoMatch = str.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+  if(isoMatch){
+    const y = isoMatch[1];
+    const m = String(parseInt(isoMatch[2], 10)).padStart(2, '0');
+    const d = String(parseInt(isoMatch[3], 10)).padStart(2, '0');
+    return `${d}-${m}-${y}`;
+  }
+
+  // 3. DD-MM-YYYY
+  const dmyMatch = str.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
+  if(dmyMatch){
+    const d = String(parseInt(dmyMatch[1], 10)).padStart(2, '0');
+    const m = String(parseInt(dmyMatch[2], 10)).padStart(2, '0');
+    const y = dmyMatch[3];
+    return `${d}-${m}-${y}`;
+  }
+
+  // 4. Formatted string fallback
+  if(formatted && typeof formatted === 'string'){
+    const fGviz = formatted.match(/Date\((\d+),\s*(\d+),\s*(\d+)/i);
+    if(fGviz){
+      const y = fGviz[1];
+      const m = String(parseInt(fGviz[2], 10) + 1).padStart(2, '0');
+      const d = String(parseInt(fGviz[3], 10)).padStart(2, '0');
+      return `${d}-${m}-${y}`;
+    }
+  }
+
+  // 5. Native Date fallback
+  const parsed = new Date(str);
+  if(!isNaN(parsed.getTime()) && parsed.getFullYear() > 1990){
+    const d = String(parsed.getDate()).padStart(2, '0');
+    const m = String(parsed.getMonth() + 1).padStart(2, '0');
+    const y = parsed.getFullYear();
+    return `${d}-${m}-${y}`;
+  }
+
+  return str.replace(/Date\((.*?)\)/gi, '$1');
+}
+
 async function loadSections(){
   const slots=[...document.querySelectorAll('[data-section]')];
 
@@ -272,27 +327,55 @@ async function initSite(){
 
       // Journey items
       if (secId === 'journey') {
-        section.querySelectorAll('.timeline-item, .academic-item').forEach(tl => {
+        section.querySelectorAll('.info-row').forEach(row => {
           counter++;
-          if (!tl.id) {
-            tl.id = `journey-item-${counter}`;
-          }
-          const badge = tl.querySelector('.timeline-badge')?.textContent.trim() || '';
-          const title = tl.querySelector('h4')?.textContent.trim() || '';
-          const subtitle = tl.querySelector('h5')?.textContent.trim() || '';
-          const text = tl.querySelector('p')?.textContent.trim() || '';
-
+          if (!row.id) row.id = `journey-row-${counter}`;
+          const title = row.querySelector('b')?.textContent.trim() || '';
+          const text = row.querySelector('.muted, span')?.textContent.trim() || '';
           if (title || text) {
             items.push({
-              id: tl.id,
-              title: title,
-              text: (subtitle ? subtitle + ' · ' : '') + text,
-              meta: 'Journey · ' + (badge || 'Academic Milestone'),
-              tags: ['Education', 'Journey', 'Academic', 'BDS', 'Dentistry', 'HSC', 'SSC'],
+              id: row.id,
+              title: title || 'Academic Milestone',
+              text: text,
+              meta: 'Journey · Education',
+              tags: ['Education', 'Journey', 'Academic', 'BDS', 'Dentistry', 'HSC', 'SSC', 'CMC'],
               sectionId: 'journey'
             });
           }
         });
+
+        section.querySelectorAll('.focus-card').forEach(fc => {
+          counter++;
+          if (!fc.id) fc.id = `journey-focus-${counter}`;
+          const title = fc.querySelector('strong')?.textContent.trim() || '';
+          const text = fc.querySelector('span')?.textContent.trim() || '';
+          if (title) {
+            items.push({
+              id: fc.id,
+              title: title,
+              text: text,
+              meta: 'Journey · Experience',
+              tags: ['Journey', 'Experience', 'Daraz', 'IT', 'Caretutors', 'Local Guide', title],
+              sectionId: 'journey'
+            });
+          }
+        });
+      }
+
+      // CV Section
+      if (secId === 'cv') {
+        const cvPanel = section.querySelector('.panel');
+        if (cvPanel) {
+          if (!cvPanel.id) cvPanel.id = 'cv-download-panel';
+          items.push({
+            id: cvPanel.id,
+            title: 'Curriculum Vitae (CV) Download',
+            text: 'Download Fahim Shahriar complete resume and academic credentials in PDF format.',
+            meta: 'Resume / CV',
+            tags: ['CV', 'Resume', 'Download', 'PDF', 'Credentials'],
+            sectionId: 'cv'
+          });
+        }
       }
 
       // About section
@@ -366,6 +449,22 @@ async function initSite(){
           sectionId: 'blog'
         });
       }
+    });
+
+    // Gallery photos
+    document.querySelectorAll('#galleryGrid .gallery-item').forEach(item => {
+      counter++;
+      if (!item.id) item.id = `gallery-item-${counter}`;
+      const caption = item.querySelector('.gallery-caption')?.textContent.trim() || '';
+      const category = item.dataset.category || 'Moments';
+      items.push({
+        id: item.id,
+        title: caption || `${category} Photo`,
+        text: `Gallery photo in category ${category}`,
+        meta: `Gallery · ${category}`,
+        tags: [category, 'Gallery', 'Photos', 'Moments'],
+        sectionId: 'gallery'
+      });
     });
 
     // Ensure all tags have accessibility attributes
@@ -533,6 +632,11 @@ async function initSite(){
           if (allBtn) allBtn.click();
         }
 
+        if (targetEl.classList.contains('gallery-item')) {
+          const allGalleryBtn = document.querySelector('.filter-btn[data-gallery-filter="all"]');
+          if (allGalleryBtn) allGalleryBtn.click();
+        }
+
         targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         targetEl.classList.remove('search-hit');
         void targetEl.offsetWidth;
@@ -680,9 +784,12 @@ async function initSite(){
   }
 
 
-  /* LOAD GOOGLE SHEET BLOG */
+  /* LOAD GOOGLE SHEET CONTENT (BLOG & GALLERY) */
 
-  await loadWebsiteContent();
+  await Promise.allSettled([
+    loadWebsiteContent(),
+    loadGalleryContent()
+  ]);
 }
 
 
@@ -755,6 +862,94 @@ async function loadWebsiteContent(){
 
     return key;
   };
+
+  let allBlogPosts = [];
+  let activeFilteredBlog = [];
+  const BLOG_PAGE_SIZE = 6;
+  let blogVisibleCount = 6;
+  let blogSeeMoreInitialized = false;
+
+  function createBlogCardHtml(post) {
+    const category = String(post.Category || 'Blog').trim();
+    const categoryKeyValue = categoryKey(category);
+    const image = String(post.Image || '').trim() ||
+      'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=1000&q=85';
+    const title = String(post.Title || 'Untitled').trim();
+    const date = formatDateValue(post.Date, post.Date_formatted);
+    const readTime = String(post.ReadTime || '5').trim();
+    const summary = String(post.Summary || post.Content || '...').trim();
+    const link = String(post.Link || '#').trim();
+
+    return `
+      <article class="card blog-card" data-category="${escapeHtml(categoryKeyValue)}">
+        <img class="blog-cover" src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy">
+        <div class="blog-body">
+          <div class="blog-meta">
+            <span>${escapeHtml(category)}</span>
+            <span>${escapeHtml(date)} · ${escapeHtml(readTime)} min</span>
+          </div>
+          <h4>${escapeHtml(title)}</h4>
+          <p>${escapeHtml(summary)}</p>
+          <a class="read-more" href="${escapeHtml(link)}">Read article →</a>
+        </div>
+      </article>
+    `;
+  }
+
+  function renderBlogCards(append = false) {
+    const seeMoreWrap = document.getElementById('blogSeeMoreWrap');
+    const seeMoreBtn = document.getElementById('blogSeeMoreBtn');
+    if (!blogGrid) return;
+
+    if (!activeFilteredBlog.length) {
+      blogGrid.innerHTML = `
+        <div style="grid-column:1/-1;padding:30px;text-align:center;color:var(--muted)">
+          No published blog posts found in Google Sheets.
+        </div>
+      `;
+      if (seeMoreWrap) seeMoreWrap.style.display = 'none';
+      return;
+    }
+
+    const visiblePosts = activeFilteredBlog.slice(0, blogVisibleCount);
+
+    if (!append) {
+      blogGrid.innerHTML = visiblePosts.map(post => createBlogCardHtml(post)).join('');
+    } else {
+      const startIndex = blogVisibleCount - BLOG_PAGE_SIZE;
+      const newPosts = activeFilteredBlog.slice(startIndex, blogVisibleCount);
+      const newHtml = newPosts.map(post => createBlogCardHtml(post)).join('');
+      blogGrid.insertAdjacentHTML('beforeend', newHtml);
+    }
+
+    if (seeMoreWrap) {
+      if (blogVisibleCount < activeFilteredBlog.length) {
+        seeMoreWrap.style.display = 'flex';
+        const remaining = activeFilteredBlog.length - blogVisibleCount;
+        if (seeMoreBtn) {
+          seeMoreBtn.innerHTML = `See More (${remaining} remaining) ↓`;
+        }
+      } else {
+        seeMoreWrap.style.display = 'none';
+      }
+    }
+
+    if (typeof window.updateSearchIndex === 'function') {
+      window.updateSearchIndex();
+    }
+  }
+
+  function initBlogSeeMore() {
+    if (blogSeeMoreInitialized) return;
+    const seeMoreBtn = document.getElementById('blogSeeMoreBtn');
+    if (!seeMoreBtn) return;
+    blogSeeMoreInitialized = true;
+
+    seeMoreBtn.addEventListener('click', () => {
+      blogVisibleCount += BLOG_PAGE_SIZE;
+      renderBlogCards(true);
+    });
+  }
 
 
   try{
@@ -849,12 +1044,11 @@ async function loadWebsiteContent(){
 
         columns.forEach(
           (column,index)=>{
-
-            obj[column]=
-              cells[index] &&
-              typeof cells[index].v!=='undefined'
-                ? String(cells[index].v)
-                : '';
+            const cell = cells[index];
+            obj[column] = cell && typeof cell.v !== 'undefined' ? String(cell.v) : '';
+            if (cell && typeof cell.f !== 'undefined') {
+              obj[column + '_formatted'] = String(cell.f);
+            }
           }
         );
 
@@ -909,212 +1103,46 @@ async function loadWebsiteContent(){
 
       `;
 
+      const seeMoreWrap = document.getElementById('blogSeeMoreWrap');
+      if (seeMoreWrap) seeMoreWrap.style.display = 'none';
       return;
     }
 
+    allBlogPosts = posts;
+    activeFilteredBlog = [...allBlogPosts];
+    blogVisibleCount = BLOG_PAGE_SIZE;
 
-    /* Blog Card তৈরি */
+    const blogToolbar = document.getElementById('blogToolbar') || document.querySelector('.blog-toolbar');
+    if (blogToolbar) {
+      const categories = [...new Set(allBlogPosts.map(p => (p.Category || 'Blog').trim()).filter(Boolean))];
+      blogToolbar.innerHTML = `
+        <button class="filter-btn active" data-filter="all">All (${allBlogPosts.length})</button>
+        ${categories.map(cat => {
+          const count = allBlogPosts.filter(p => (p.Category || '').trim().toLowerCase() === cat.toLowerCase()).length;
+          return `<button class="filter-btn" data-filter="${escapeHtml(cat)}">${escapeHtml(cat)} (${count})</button>`;
+        }).join('')}
+      `;
 
-    blogGrid.innerHTML=
-      posts
-      .map(post=>{
+      blogToolbar.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          blogToolbar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
 
-        const category=
-          String(
-            post.Category||
-            'Blog'
-          ).trim();
+          const filter = btn.dataset.filter || 'all';
+          if (!filter || filter === 'all') {
+            activeFilteredBlog = [...allBlogPosts];
+          } else {
+            activeFilteredBlog = allBlogPosts.filter(p => (p.Category || '').trim().toLowerCase() === filter.toLowerCase());
+          }
 
-
-        const categoryKeyValue=
-          categoryKey(category);
-
-
-        const image=
-          String(
-            post.Image||''
-          ).trim() ||
-
-          'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=1000&q=85';
-
-
-        const title=
-          String(
-            post.Title||
-            'Untitled'
-          ).trim();
-
-
-        const date=
-          String(
-            post.Date||
-            'Today'
-          ).trim();
-
-
-        const readTime=
-          String(
-            post.ReadTime||
-            '5'
-          ).trim();
-
-
-        const summary=
-          String(
-            post.Summary||
-            post.Content||
-            '...'
-          ).trim();
-
-
-        const link=
-          String(
-            post.Link||
-            '#'
-          ).trim();
-
-
-        return `
-
-          <article
-            class="card blog-card"
-            data-category="${escapeHtml(categoryKeyValue)}"
-          >
-
-            <img
-              class="blog-cover"
-              src="${escapeHtml(image)}"
-              alt="${escapeHtml(title)}"
-              loading="lazy"
-            >
-
-
-            <div class="blog-body">
-
-              <div class="blog-meta">
-
-                <span>
-                  ${escapeHtml(category)}
-                </span>
-
-                <span>
-                  ${escapeHtml(date)}
-                  ·
-                  ${escapeHtml(readTime)}
-                  min
-                </span>
-
-              </div>
-
-
-              <h4>
-                ${escapeHtml(title)}
-              </h4>
-
-
-              <p>
-                ${escapeHtml(summary)}
-              </p>
-
-
-              <a
-                class="read-more"
-                href="${escapeHtml(link)}"
-              >
-                Read article →
-              </a>
-
-            </div>
-
-          </article>
-
-        `;
-
-      })
-      .join('');
-
-
-    /* Filter buttons */
-
-    const filterButtons=
-      document.querySelectorAll(
-        '.filter-btn'
-      );
-
-
-    const applyFilter=filter=>{
-
-      const selected=
-        categoryKey(filter);
-
-
-      blogGrid
-        .querySelectorAll(
-          '.blog-card'
-        )
-        .forEach(card=>{
-
-          const category=
-            categoryKey(
-              card.dataset.category||''
-            );
-
-
-          card.style.display=
-            (
-              selected==='all' ||
-              category===selected
-            )
-              ? 'block'
-              : 'none';
-
+          blogVisibleCount = BLOG_PAGE_SIZE;
+          renderBlogCards();
         });
-    };
-
-
-    /* Button click */
-
-    filterButtons.forEach(btn=>{
-
-      btn.addEventListener(
-        'click',
-        ()=>{
-
-          filterButtons.forEach(b=>{
-            b.classList.remove(
-              'active'
-            );
-          });
-
-
-          btn.classList.add(
-            'active'
-          );
-
-
-          applyFilter(
-            btn.dataset.filter||
-            'all'
-          );
-
-        }
-      );
-
-    });
-
-
-    /* প্রথমে All দেখাবে */
-
-    applyFilter(
-      document.querySelector(
-        '.filter-btn.active'
-      )?.dataset.filter||
-      'all'
-    );
-
-    if(typeof window.updateSearchIndex==='function'){
-      window.updateSearchIndex();
+      });
     }
+
+    initBlogSeeMore();
+    renderBlogCards();
 
   }catch(error){
 
@@ -1159,6 +1187,448 @@ async function loadWebsiteContent(){
 
 
 /* =========================================================
+   GOOGLE SHEETS GALLERY SYSTEM & LIGHTBOX VIEWER
+   ========================================================= */
+
+const DEFAULT_GALLERY_PHOTOS = [
+  {
+    category: 'Campus',
+    image: 'https://i.postimg.cc/rFLt87HR/screenshot-7.png?auto=format&fit=crop&w=1200&q=85',
+    caption: 'Campus Life & CMC Dental Unit'
+  },
+  {
+    category: 'Medical',
+    image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=85',
+    caption: 'Dental Surgery & Clinical Study'
+  },
+  {
+    category: 'Technology',
+    image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=85',
+    caption: 'Web Development & IT Systems'
+  },
+  {
+    category: 'Projects',
+    image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1200&q=85',
+    caption: 'Digital Projects & Team Collaboration'
+  },
+  {
+    category: 'Work',
+    image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=85',
+    caption: 'Operations & Management Experience'
+  },
+  {
+    category: 'Writing',
+    image: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1200&q=85',
+    caption: 'Content Creation & Educational Notes'
+  },
+  {
+    category: 'Learning',
+    image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1200&q=85',
+    caption: 'Continuous Reading & Research'
+  },
+  {
+    category: 'Personal',
+    image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=85',
+    caption: 'Personal Life & Interests'
+  }
+];
+
+let allGalleryPhotos = [...DEFAULT_GALLERY_PHOTOS];
+let activeFilteredGallery = [...DEFAULT_GALLERY_PHOTOS];
+let currentLightboxIndex = 0;
+
+async function loadGalleryContent() {
+  const GALLERY_API_URL =
+    "https://docs.google.com/spreadsheets/d/1FPDlW0ugDgBLds5AD86sTo-Arw0r9T4cJZ8b4Vl5s5w/gviz/tq?tqx=out:json&sheet=Photos%26Moments";
+
+  const galleryGrid = document.getElementById('galleryGrid');
+  if (!galleryGrid) return;
+
+  try {
+    const response = await fetch(GALLERY_API_URL, { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`Google Sheet returned HTTP ${response.status}`);
+    }
+
+    const rawText = await response.text();
+    const firstBrace = rawText.indexOf('{');
+    const lastBrace = rawText.lastIndexOf('}');
+
+    if (firstBrace === -1 || lastBrace <= firstBrace) {
+      throw new Error('Google Sheet response did not contain valid JSON.');
+    }
+
+    const data = JSON.parse(rawText.slice(firstBrace, lastBrace + 1));
+    const cols = data.table?.cols || [];
+    const rows = data.table?.rows || [];
+
+    const isCatName = str => /^(catagory|category|type|tag|group)$/i.test(String(str || '').trim());
+    const isImgName = str => /^(imagelink|image|photo|link|url|img|photolink)$/i.test(String(str || '').trim());
+    const isCapName = str => /^(caption|title|name|description)$/i.test(String(str || '').trim());
+
+    let catColIdx = -1;
+    let imgColIdx = -1;
+    let capColIdx = -1;
+    let headerRowIdx = -1;
+
+    // Check cols labels first
+    cols.forEach((col, idx) => {
+      const lbl = String(col.label || col.id || '').trim();
+      if (isCatName(lbl)) catColIdx = idx;
+      if (isImgName(lbl)) imgColIdx = idx;
+      if (isCapName(lbl)) capColIdx = idx;
+    });
+
+    // Check rows[0] if headers are in the data row
+    if ((catColIdx === -1 || imgColIdx === -1) && rows.length > 0) {
+      const firstRowCells = rows[0]?.c || [];
+      firstRowCells.forEach((cell, idx) => {
+        const val = String(cell?.v || '').trim();
+        if (isCatName(val)) { catColIdx = idx; headerRowIdx = 0; }
+        if (isImgName(val)) { imgColIdx = idx; headerRowIdx = 0; }
+        if (isCapName(val)) { capColIdx = idx; headerRowIdx = 0; }
+      });
+    }
+
+    // Default indices if not detected
+    if (catColIdx === -1) catColIdx = 0;
+    if (imgColIdx === -1) imgColIdx = 1;
+
+    const parsedPhotos = [];
+    const startRow = headerRowIdx >= 0 ? headerRowIdx + 1 : 0;
+
+    for (let i = startRow; i < rows.length; i++) {
+      const cells = rows[i]?.c || [];
+      const catVal = String(cells[catColIdx]?.v || '').trim();
+      const imgVal = String(cells[imgColIdx]?.v || '').trim();
+      const capVal = capColIdx >= 0 ? String(cells[capColIdx]?.v || '').trim() : '';
+
+      // Validate image link and avoid re-parsing headers
+      if (
+        imgVal &&
+        !isImgName(imgVal) &&
+        !isCatName(catVal) &&
+        (imgVal.startsWith('http://') || imgVal.startsWith('https://') || imgVal.startsWith('data:') || imgVal.startsWith('//'))
+      ) {
+        parsedPhotos.push({
+          category: catVal || 'Moments',
+          image: imgVal,
+          caption: capVal || catVal || 'Moments'
+        });
+      }
+    }
+
+    if (parsedPhotos.length > 0) {
+      allGalleryPhotos = parsedPhotos;
+    }
+  } catch (error) {
+    console.warn('Photos&Moments could not be fetched, using default gallery:', error);
+  }
+
+  renderGallerySection();
+  initGalleryLightbox();
+
+  if (typeof window.updateSearchIndex === 'function') {
+    window.updateSearchIndex();
+  }
+}
+
+const GALLERY_PAGE_SIZE = 6;
+let galleryVisibleCount = 6;
+let gallerySeeMoreInitialized = false;
+
+function renderGallerySection() {
+  const galleryToolbar = document.getElementById('galleryToolbar');
+  activeFilteredGallery = [...allGalleryPhotos];
+  galleryVisibleCount = GALLERY_PAGE_SIZE;
+
+  if (galleryToolbar) {
+    const categories = [...new Set(allGalleryPhotos.map(p => p.category.trim()).filter(Boolean))];
+    galleryToolbar.innerHTML = `
+      <button class="filter-btn active" data-gallery-filter="all">All (${allGalleryPhotos.length})</button>
+      ${categories.map(cat => {
+        const count = allGalleryPhotos.filter(p => p.category.trim().toLowerCase() === cat.toLowerCase()).length;
+        return `<button class="filter-btn" data-gallery-filter="${escapeHtml(cat)}">${escapeHtml(cat)} (${count})</button>`;
+      }).join('')}
+    `;
+
+    galleryToolbar.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        galleryToolbar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.dataset.galleryFilter;
+        if (!filter || filter === 'all') {
+          activeFilteredGallery = [...allGalleryPhotos];
+        } else {
+          activeFilteredGallery = allGalleryPhotos.filter(p => p.category.trim().toLowerCase() === filter.toLowerCase());
+        }
+
+        galleryVisibleCount = GALLERY_PAGE_SIZE;
+        renderGalleryCards();
+      });
+    });
+  }
+
+  initGallerySeeMore();
+  renderGalleryCards();
+}
+
+function createGalleryItemHtml(photo, index) {
+  return `
+    <div class="gallery-item" data-category="${escapeHtml(photo.category)}" data-index="${index}" role="button" tabindex="0" title="Click to view full screen">
+      <img src="${escapeHtml(photo.image)}" alt="${escapeHtml(photo.caption || photo.category)}" loading="lazy" />
+      <span class="gallery-badge">${escapeHtml(photo.category)}</span>
+      <div class="gallery-overlay">
+        <span class="gallery-zoom-icon">🔍</span>
+        <span class="gallery-caption">${escapeHtml(photo.caption || photo.category)}</span>
+      </div>
+    </div>
+  `;
+}
+
+function attachGalleryEvents() {
+  const galleryGrid = document.getElementById('galleryGrid');
+  if (!galleryGrid) return;
+  galleryGrid.querySelectorAll('.gallery-item').forEach(item => {
+    if (item.dataset.hasListener) return;
+    item.dataset.hasListener = 'true';
+
+    item.addEventListener('click', () => {
+      const idx = parseInt(item.dataset.index, 10);
+      openLightbox(idx);
+    });
+
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const idx = parseInt(item.dataset.index, 10);
+        openLightbox(idx);
+      }
+    });
+  });
+}
+
+function renderGalleryCards(append = false) {
+  const galleryGrid = document.getElementById('galleryGrid');
+  const seeMoreWrap = document.getElementById('gallerySeeMoreWrap');
+  const seeMoreBtn = document.getElementById('gallerySeeMoreBtn');
+  if (!galleryGrid) return;
+
+  if (activeFilteredGallery.length === 0) {
+    galleryGrid.innerHTML = `
+      <div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">
+        No photos found in this category.
+      </div>
+    `;
+    if (seeMoreWrap) seeMoreWrap.style.display = 'none';
+    return;
+  }
+
+  const visiblePhotos = activeFilteredGallery.slice(0, galleryVisibleCount);
+
+  if (!append) {
+    galleryGrid.innerHTML = visiblePhotos.map((photo, index) => createGalleryItemHtml(photo, index)).join('');
+  } else {
+    const startIndex = galleryVisibleCount - GALLERY_PAGE_SIZE;
+    const newPhotos = activeFilteredGallery.slice(startIndex, galleryVisibleCount);
+    const newHtml = newPhotos.map((photo, i) => createGalleryItemHtml(photo, startIndex + i)).join('');
+    galleryGrid.insertAdjacentHTML('beforeend', newHtml);
+  }
+
+  attachGalleryEvents();
+
+  if (seeMoreWrap) {
+    if (galleryVisibleCount < activeFilteredGallery.length) {
+      seeMoreWrap.style.display = 'flex';
+      const remaining = activeFilteredGallery.length - galleryVisibleCount;
+      if (seeMoreBtn) {
+        seeMoreBtn.innerHTML = `See More (${remaining} remaining) ↓`;
+      }
+    } else {
+      seeMoreWrap.style.display = 'none';
+    }
+  }
+}
+
+function initGallerySeeMore() {
+  if (gallerySeeMoreInitialized) return;
+  const seeMoreBtn = document.getElementById('gallerySeeMoreBtn');
+  if (!seeMoreBtn) return;
+  gallerySeeMoreInitialized = true;
+
+  seeMoreBtn.addEventListener('click', () => {
+    galleryVisibleCount += GALLERY_PAGE_SIZE;
+    renderGalleryCards(true);
+  });
+}
+
+function initGalleryLightbox() {
+  const lightbox = document.getElementById('galleryLightbox');
+  const closeBtn = document.getElementById('lightboxClose');
+  const overlay = document.getElementById('lightboxOverlay');
+  const prevBtn = document.getElementById('lightboxPrev');
+  const nextBtn = document.getElementById('lightboxNext');
+  const downloadBtn = document.getElementById('lightboxDownload');
+
+  if (!lightbox) return;
+
+  if (closeBtn) closeBtn.onclick = closeLightbox;
+  if (overlay) overlay.onclick = closeLightbox;
+  if (prevBtn) prevBtn.onclick = prevLightboxImage;
+  if (nextBtn) nextBtn.onclick = nextLightboxImage;
+
+  if (downloadBtn) {
+    downloadBtn.onclick = () => {
+      const current = activeFilteredGallery[currentLightboxIndex];
+      if (!current) return;
+      downloadImage(current.image, `fahim-${(current.category || 'photo').toLowerCase()}-${currentLightboxIndex + 1}.jpg`);
+    };
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') prevLightboxImage();
+    if (e.key === 'ArrowRight') nextLightboxImage();
+  });
+
+  // Touch swipe support
+  let touchStartX = 0;
+  lightbox.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  lightbox.addEventListener('touchend', (e) => {
+    const touchEndX = e.changedTouches[0].screenX;
+    if (touchEndX < touchStartX - 50) nextLightboxImage();
+    if (touchEndX > touchStartX + 50) prevLightboxImage();
+  }, { passive: true });
+}
+
+function openLightbox(index) {
+  const lightbox = document.getElementById('galleryLightbox');
+  if (!lightbox || activeFilteredGallery.length === 0) return;
+
+  currentLightboxIndex = (index + activeFilteredGallery.length) % activeFilteredGallery.length;
+  updateLightboxView();
+
+  lightbox.classList.add('open');
+  lightbox.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  const lightbox = document.getElementById('galleryLightbox');
+  if (!lightbox) return;
+  lightbox.classList.remove('open');
+  lightbox.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+
+function prevLightboxImage() {
+  if (activeFilteredGallery.length === 0) return;
+  currentLightboxIndex = (currentLightboxIndex - 1 + activeFilteredGallery.length) % activeFilteredGallery.length;
+  updateLightboxView();
+}
+
+function nextLightboxImage() {
+  if (activeFilteredGallery.length === 0) return;
+  currentLightboxIndex = (currentLightboxIndex + 1) % activeFilteredGallery.length;
+  updateLightboxView();
+}
+
+function updateLightboxView() {
+  const imgEl = document.getElementById('lightboxImg');
+  const catEl = document.getElementById('lightboxCategory');
+  const counterEl = document.getElementById('lightboxCounter');
+  const capEl = document.getElementById('lightboxCaption');
+
+  const photo = activeFilteredGallery[currentLightboxIndex];
+  if (!photo) return;
+
+  if (imgEl) {
+    imgEl.classList.add('switching');
+    setTimeout(() => {
+      imgEl.src = photo.image;
+      imgEl.alt = photo.caption || photo.category;
+      imgEl.classList.remove('switching');
+    }, 150);
+  }
+
+  if (catEl) catEl.textContent = photo.category;
+  if (counterEl) counterEl.textContent = `${currentLightboxIndex + 1} / ${activeFilteredGallery.length}`;
+  if (capEl) capEl.textContent = photo.caption || photo.category;
+}
+
+async function downloadImage(url, filename) {
+  try {
+    const res = await fetch(url, { mode: 'cors' });
+    if (!res.ok) throw new Error();
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename || 'photo.jpg';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
+  } catch {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.download = filename || 'photo.jpg';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+}
+
+
+
+/* =========================================================
+   BACKGROUND MUSIC SYSTEM (NO VISIBLE CONTROLS)
+   ========================================================= */
+
+function initBackgroundAudio() {
+  const audio = document.getElementById('bgMusic') || new Audio('audio/background.mp3');
+  audio.loop = true;
+  audio.volume = 0.45;
+
+  let started = false;
+
+  const tryPlay = () => {
+    if (started) return;
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          started = true;
+          ['click', 'touchstart', 'scroll', 'keydown'].forEach(evt => {
+            window.removeEventListener(evt, tryPlay);
+            document.removeEventListener(evt, tryPlay);
+          });
+        })
+        .catch(() => {
+          // Waiting for first user gesture per browser autoplay policies
+        });
+    }
+  };
+
+  // Immediate attempt
+  tryPlay();
+
+  // Play upon first user interaction if autoplay was constrained
+  ['click', 'touchstart', 'scroll', 'keydown'].forEach(evt => {
+    window.addEventListener(evt, tryPlay, { passive: true });
+    document.addEventListener(evt, tryPlay, { passive: true });
+  });
+}
+
+
+
+/* =========================================================
    START WEBSITE
    ========================================================= */
 
@@ -1167,6 +1637,8 @@ window.addEventListener(
   async()=>{
 
     try{
+
+      initBackgroundAudio();
 
       await loadSections();
 
