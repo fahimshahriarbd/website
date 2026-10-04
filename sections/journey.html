@@ -7,9 +7,9 @@
     </div>
 
     <div class="timeline reveal" role="list">
-      <!-- Current Studies -->
       <article class="timeline-item" role="listitem">
         <div class="timeline-marker">
+          <span class="timeline-icon">🦷</span>
           <span class="timeline-dot"></span>
           <span class="timeline-date">2024 — Present</span>
         </div>
@@ -25,41 +25,37 @@
         </div>
       </article>
 
-      <!-- HSC -->
       <article class="timeline-item" role="listitem">
         <div class="timeline-marker">
+          <span class="timeline-icon">📚</span>
           <span class="timeline-dot"></span>
           <span class="timeline-date">2022 — 2024</span>
         </div>
         <div class="timeline-content">
           <h3>Higher Secondary Certificate (HSC)</h3>
           <p class="institution">Ramkrishnapur College</p>
-          <p class="achievement">
-            <strong>Group:</strong> Science | <strong>GPA:</strong> 5.00
-          </p>
+          <p class="achievement"><strong>Group:</strong> Science | <strong>GPA:</strong> 5.00</p>
           <p class="description">Completed advanced studies in Science stream with exceptional academic performance.</p>
         </div>
       </article>
 
-      <!-- SSC -->
       <article class="timeline-item" role="listitem">
         <div class="timeline-marker">
+          <span class="timeline-icon">🎓</span>
           <span class="timeline-dot"></span>
           <span class="timeline-date">2019 — 2022</span>
         </div>
         <div class="timeline-content">
           <h3>Secondary School Certificate (SSC)</h3>
           <p class="institution">Ramkrishnapur KKRK High School</p>
-          <p class="achievement">
-            <strong>Group:</strong> Science | <strong>GPA:</strong> 5.00
-          </p>
+          <p class="achievement"><strong>Group:</strong> Science | <strong>GPA:</strong> 5.00</p>
           <p class="description">Strong foundation in science and mathematics with consistent academic excellence.</p>
         </div>
       </article>
 
-      <!-- Self Learning -->
       <article class="timeline-item" role="listitem">
         <div class="timeline-marker">
+          <span class="timeline-icon">💡</span>
           <span class="timeline-dot"></span>
           <span class="timeline-label">Continuous Learning</span>
         </div>
@@ -117,6 +113,17 @@
     align-items: center;
   }
 
+  .timeline-icon {
+    font-size: 1.8rem;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .timeline-item:nth-child(2) .timeline-icon { animation-delay: 0.5s; }
+  .timeline-item:nth-child(3) .timeline-icon { animation-delay: 1s; }
+  .timeline-item:nth-child(4) .timeline-icon { animation-delay: 1.5s; }
+
   .timeline-dot {
     width: 40px;
     height: 40px;
@@ -126,6 +133,7 @@
     box-shadow: 0 0 0 3px var(--primary-color);
     transition: all 0.3s ease;
     cursor: pointer;
+    margin: -18px 0;
   }
 
   .timeline-item:hover .timeline-dot {
@@ -134,15 +142,16 @@
   }
 
   .timeline-date {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
     font-weight: 600;
     margin-top: 0.5rem;
     white-space: nowrap;
+    letter-spacing: -0.02em;
   }
 
   .timeline-label {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--primary-color);
     font-weight: 700;
     margin-top: 0.5rem;
@@ -208,6 +217,7 @@
     font-size: 0.8rem;
     font-weight: 600;
     transition: all 0.3s ease;
+    white-space: nowrap;
   }
 
   .timeline-item:hover .tag {
@@ -215,20 +225,44 @@
     color: white;
   }
 
-  /* Responsive Design */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
   @media (max-width: 768px) {
     .timeline::before {
       left: 12px;
     }
 
     .timeline-item {
-      padding-left: 60px;
+      padding-left: 65px;
+      margin-bottom: 2.5rem;
+    }
+
+    .timeline-icon {
+      font-size: 1.5rem;
     }
 
     .timeline-dot {
-      width: 32px;
-      height: 32px;
-      box-shadow: 0 0 0 2px var(--primary-color);
+      width: 36px;
+      height: 36px;
+      margin: -16px 0;
     }
 
     .timeline-item:hover .timeline-dot {
@@ -243,32 +277,9 @@
     .timeline-content h3 {
       font-size: 1.1rem;
     }
-  }
-
-  @media (max-width: 480px) {
-    .timeline {
-      padding: 1rem 0;
-    }
-
-    .timeline-item {
-      padding-left: 50px;
-      margin-bottom: 2rem;
-    }
 
     .timeline-date {
       font-size: 0.75rem;
-    }
-
-    .timeline-content {
-      padding: 1rem;
-    }
-
-    .timeline-content h3 {
-      font-size: 1rem;
-    }
-
-    .timeline-tags {
-      gap: 0.35rem;
     }
 
     .tag {
@@ -277,19 +288,65 @@
     }
   }
 
-  /* Animation */
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
+  @media (max-width: 480px) {
+    .timeline {
+      padding: 1rem 0;
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
+
+    .timeline-item {
+      padding-left: 55px;
+      margin-bottom: 2rem;
+    }
+
+    .timeline-icon {
+      font-size: 1.3rem;
+      margin-bottom: 0.1rem;
+    }
+
+    .timeline-dot {
+      width: 32px;
+      height: 32px;
+      box-shadow: 0 0 0 2px var(--primary-color);
+      margin: -14px 0;
+    }
+
+    .timeline-date {
+      font-size: 0.7rem;
+      white-space: normal;
+      line-height: 1.3;
+      max-width: 45px;
+      text-align: center;
+      margin-top: 0.35rem;
+    }
+
+    .timeline-content {
+      padding: 1rem;
+    }
+
+    .timeline-content h3 {
+      font-size: 1rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .timeline-content .institution {
+      font-size: 0.9rem;
+    }
+
+    .timeline-content .description {
+      font-size: 0.9rem;
+    }
+
+    .timeline-tags {
+      gap: 0.35rem;
+      margin-top: 0.75rem;
+    }
+
+    .tag {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.7rem;
     }
   }
 
-  /* Reveal class for scroll animation */
   .reveal {
     opacity: 1;
   }
