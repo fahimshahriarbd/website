@@ -1,0 +1,14 @@
+{
+  "name": "fahim-shahriar-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fahim Shahriar — Medical Student, Web Developer and Content Creator.",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "node -e 'console.log(\"Build complete\")'"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
