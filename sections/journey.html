@@ -11,7 +11,7 @@
         <div class="timeline-content">
           <small class="timeline-badge">◆ Present Education</small>
           <h4>🎓 Bachelor of Dental Surgery (BDS)</h4>
-          <h5>Chittagong Medical College Dental Unit</h5>
+          <h5>Chittagong Medical College, Dental Unit</h5>
           <p class="muted">
             After an unsuccessful first attempt in 2023, 
             I returned stronger and secured admission to the 
@@ -45,3 +45,219 @@
     </div>
   </div>
 </section>
+<!-- ================= ACADEMIC BACKGROUND ================= -->
+<section class="section" id="education">
+  <div class="container">
+
+    <div class="section-head reveal">
+      <span class="eyebrow">Education</span>
+      <h2>Academic Background</h2>
+      <p class="muted">
+        My educational journey and academic background.
+      </p>
+    </div>
+
+    <div class="education-list">
+
+      <!-- BDS -->
+      <div class="education-card reveal">
+        <div class="education-icon">🦷</div>
+        <div class="education-content">
+          <span class="education-year">2024 – Present</span>
+          <h3>Bachelor of Dental Surgery (BDS)</h3>
+          <p class="education-institute">
+            Dental Unit, Chittagong Medical College
+          </p>
+          <p class="muted">
+            Currently pursuing undergraduate studies in Dentistry.
+          </p>
+        </div>
+      </div>
+
+      <!-- HSC -->
+      <div class="education-card reveal">
+        <div class="education-icon">🎓</div>
+        <div class="education-content">
+          <span class="education-year">2023</span>
+          <h3>Higher Secondary Certificate (HSC)</h3>
+          <p class="education-institute">
+            Ramkrishnapur College
+          </p>
+          <p class="muted">
+            Science Group · <strong>GPA 5.00</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- SSC -->
+      <div class="education-card reveal">
+        <div class="education-icon">📚</div>
+        <div class="education-content">
+          <span class="education-year">2021</span>
+          <h3>Secondary School Certificate (SSC)</h3>
+          <p class="education-institute">
+            [School Name]
+          </p>
+          <p class="muted">
+            Science Group · <strong>GPA 5.00</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- JSC -->
+      <div class="education-card reveal">
+        <div class="education-icon">📖</div>
+        <div class="education-content">
+          <span class="education-year">2018</span>
+          <h3>Junior School Certificate (JSC)</h3>
+          <p class="education-institute">
+            [School Name]
+          </p>
+          <p class="muted">
+            <strong>GPA 5.00</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- PSC -->
+      <div class="education-card reveal">
+        <div class="education-icon">✏️</div>
+        <div class="education-content">
+          <span class="education-year">2015</span>
+          <h3>Primary Education / PSC</h3>
+          <p class="education-institute">
+            [Primary School Name]
+          </p>
+          <p class="muted">
+            <strong>GPA 5.00</strong>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+এর সাথে এই CSS দিলে modern vertical timeline/card style হবে:
+
+/* ================= EDUCATION ================= */
+
+.education-list {
+  max-width: 850px;
+  margin: 40px auto 0;
+  position: relative;
+}
+
+.education-list::before {
+  content: "";
+  position: absolute;
+  left: 27px;
+  top: 20px;
+  bottom: 20px;
+  width: 2px;
+  background: var(--border);
+}
+
+.education-card {
+  position: relative;
+  display: flex;
+  gap: 22px;
+  padding: 24px 26px;
+  margin-bottom: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.education-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.07);
+}
+
+.education-icon {
+  position: relative;
+  z-index: 2;
+  min-width: 54px;
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 23px;
+}
+
+.education-content {
+  flex: 1;
+}
+
+.education-year {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.education-content h3 {
+  margin: 0 0 7px;
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.education-institute {
+  margin: 0 0 7px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.education-content .muted {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+
+  .education-list {
+    margin-top: 30px;
+  }
+
+  .education-list::before {
+    left: 22px;
+  }
+
+  .education-card {
+    gap: 16px;
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .education-icon {
+    min-width: 44px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    font-size: 19px;
+  }
+
+  .education-content h3 {
+    font-size: 17px;
+  }
+
+  .education-institute {
+    font-size: 14px;
+  }
+
+  .education-content .muted {
+    font-size: 13px;
+  }
+
+  .education-year {
+    font-size: 12px;
+  }
+}
