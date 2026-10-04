@@ -8,7 +8,107 @@
     </div>
 
     <!-- Blog category filter -->
+    <div class="blog-toolbar"><section class="section" id="blog">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Blog & Articles</span>
+      <h4>My latest writing</h4>
+      <p>Medical notes, technology guides, personal stories and everyday experiences.</p>
+    </div>
+
+    <!-- Blog category filter -->
     <div class="blog-toolbar">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="medical">Medical</button>
+      <button class="filter-btn" data-filter="tech">Technology</button>
+      <button class="filter-btn" data-filter="education">Education</button>
+      <button class="filter-btn" data-filter="personal">Personal</button>
+    </div>
+
+    <!-- গুগল শিট থেকে ডাটা এসে এই খালি ডিভ-এর ভেতরে বসে যাবে -->
+    <div class="grid blog-grid" id="blogGrid">
+      
+    </div>
+  </div>
+</section>
+
+<!-- গুগল শিট থেকে ডাটা ফেচ করে দেখানোর স্ক্রিপ্ট -->
+<script>
+  // আপনার দেওয়া ওয়েব অ্যাপ লিংকটি এখানে বসানো হয়েছে
+  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxeUJ3bMyZVwymn9GafqECrAfc8BPwiYXH3eTXxl68Boql2gOImDhIZTEoS0dWbyxlHxg/exec';
+
+  // পেজ লোড হওয়ার সাথে সাথে গুগল শিট থেকে ডাটা নিয়ে আসার ফাংশন
+  document.addEventListener("DOMContentLoaded", () => {
+    fetch(WEB_APP_URL)
+      .then(res => res.json())
+      .then(posts => {
+        const grid = document.getElementById('blogGrid');
+        grid.innerHTML = ''; // সুরক্ষার জন্য ভেতরের সবকিছু ক্লিয়ার করে নেওয়া
+        
+        posts.forEach(post => {
+          // গুগল শিটে Published কলামে 'TRUE', 'yes' বা '1' থাকলে তবেই পোস্টটি শো করবে
+          const isPublished = String(post.Published || '').trim().toLowerCase();
+          if (isPublished === 'true' || isPublished === 'yes' || isPublished === '1') {
+            
+            // ক্যাটাগরি ফিল্টার ঠিকমতো কাজ করার জন্য ক্যাটাগরির নামটিকে ছোট হাতের অক্ষরে করে নেওয়া (যেমন: 'medical')
+            const categoryLower = String(post.Catagory || '').toLowerCase().trim();
+            
+            // নতুন একটি আর্টিকেল ট্যাগ তৈরি করা
+            const article = document.createElement('article');
+            article.className = 'card blog-card';
+            article.setAttribute('data-category', categoryLower);
+            
+            // গুগল শিটের ডাটা দিয়ে ডাইনামিক HTML তৈরি করা
+            article.innerHTML = `
+              <img class="blog-cover" src="${post.Image}" alt="${post.Title}">
+              <div class="blog-body">
+                <div class="blog-meta">
+                  <span>${post.Catagory}</span>
+                  <span>${post.Date} · ${post['Read Time']}</span>
+                </div>
+                <h4>${post.Title}</h4>
+                <p>${post.Description}</p>
+                <a class="read-more" href="${post.Link}">Read article →</a>
+              </div>
+            `;
+            
+            // তৈরি করা আর্টিকেলটি গ্রিডের ভেতর ঢুকিয়ে দেওয়া
+            grid.appendChild(article);
+          }
+        });
+
+        // ডাটা লোড হয়ে যাওয়ার পর ফিল্টার বাটনগুলো সেটআপ করা
+        setupCategoryFilters();
+      })
+      .catch(err => console.error('গুগল শিট থেকে ডাটা আনতে সমস্যা হয়েছে:', err));
+  });
+
+  // ফিল্টার বাটনে ক্লিক করলে ক্যাটাগরি অনুযায়ী পোস্ট দেখানোর ফাংশন
+  function setupCategoryFilters() {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // সব বাটন থেকে 'active' ক্লাস রিমুভ করা
+        filterBtns.forEach(b => b.classList.remove('active'));
+        // যে বাটনে ক্লিক করা হয়েছে সেটিতে 'active' ক্লাস যুক্ত করা
+        btn.classList.add('active');
+
+        const filter = btn.getAttribute('data-filter');
+
+        // ফিল্টার অনুযায়ী কার্ডগুলো দেখানো বা লুকানো
+        document.querySelectorAll('.blog-card').forEach(card => {
+          const category = card.getAttribute('data-category');
+          if (filter === 'all' || category === filter) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  }
+</script>
       <button class="filter-btn active" data-filter="all">All</button>
       <button class="filter-btn" data-filter="medical">Medical</button>
       <button class="filter-btn" data-filter="tech">Technology</button>
