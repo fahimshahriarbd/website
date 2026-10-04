@@ -634,3 +634,12 @@ button,input,textarea{font:inherit;font-size:16px}
   font-weight:500;
   line-height:1.45;
 }
+
+.timeline-badge {
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  color: #your-brand-color;
+  display: block;
+  margin-bottom: 8px;
+}
