@@ -93,8 +93,8 @@ function toggleCardDesc(btn, evt) {
 }
 window.toggleCardDesc = toggleCardDesc;
 
-/* 10 Words Limit + See More Truncation Helper */
-function formatTruncatedDesc(text, maxWords = 10) {
+/* 20-25 Words Limit + See More Truncation Helper */
+function formatTruncatedDesc(text, maxWords = 22) {
   const str = String(text || '').trim();
   if (!str) return '';
   const words = str.split(/\s+/).filter(Boolean);
@@ -1041,7 +1041,7 @@ async function loadWebsiteContent(){
             <span>${escapeHtml(date)} · ${escapeHtml(readTime)} min</span>
           </div>
           <h4>${escapeHtml(title)}</h4>
-          ${formatTruncatedDesc(summary, 10)}
+          ${formatTruncatedDesc(summary, 22)}
           <a class="read-more" href="${escapeHtml(link)}">Read article →</a>
         </div>
       </article>
@@ -1829,7 +1829,7 @@ function createServiceCardHtml(service) {
           <div class="card-icon">${iconMarkup}</div>
           <h4>${escapeHtml(service.title)}</h4>
         </div>
-        ${formatTruncatedDesc(service.description, 10)}
+        ${formatTruncatedDesc(service.description, 22)}
       </div>
       <div class="service-footer">
         <div class="service-price-block">
@@ -2059,7 +2059,7 @@ function createAchievementCardHtml(item) {
         <div class="card-icon">${iconMarkup}</div>
         <h4>${escapeHtml(item.title)}</h4>
       </div>
-      ${formatTruncatedDesc(item.description, 10)}
+      ${formatTruncatedDesc(item.description, 22)}
       ${tagsMarkup ? `<div class="tags" style="margin-top:14px;">${tagsMarkup}</div>` : ''}
     </article>
   `;
@@ -2081,80 +2081,9 @@ function initAchievementsSeeMore() {
    PROJECTS SYSTEM (PORTFOLIO, CATEGORIES, MODAL & GOOGLE SHEET)
    ========================================================= */
 
-const DEFAULT_PROJECTS = [
-  {
-    icon: '🛒',
-    title: 'E-commerce Operations',
-    category: 'Commerce',
-    description: 'Managed seller operations, product listings, and drop-off hub arrangements for Daraz.',
-    details: 'Streamlined fulfillment processes, product quality checks, inventory handling, and daily courier handovers at regional Daraz drop-off stations.',
-    tags: ['E-commerce', 'Daraz', 'Management'],
-    link: 'https://aistudio.google.com/u/7/apps/70e40eec-355b-4568-afc0-f96d7a507937?showAssistant=true&showPreview=true&appParams=contact',
-    published: 'yes'
-  },
-  {
-    icon: '🔬',
-    title: 'Bengali Handwritten Dataset',
-    category: 'Research',
-    description: 'A curated dataset of handwritten Bengali numerals and characters for machine learning and optical character recognition experiments.',
-    details: 'Collaborated on data acquisition, preprocessing, normalization, and annotation pipelines to support regional NLP and OCR research initiatives.',
-    tags: ['Machine Learning', 'Dataset', 'OCR', 'Research'],
-    link: '#projects',
-    published: 'yes'
-  },
-  {
-    icon: '📱',
-    title: 'Android App Development',
-    category: 'Technology',
-    description: 'Generated and tested a demo Android application build using the Swing2App platform.',
-    details: 'Customized web-to-app conversion workflows, push notification triggers, responsive UI webview optimization, and APK signing.',
-    tags: ['Android', 'Swing2App', 'App Dev'],
-    link: '#projects',
-    published: 'yes'
-  },
-  {
-    icon: '🌐',
-    title: 'Domain & Hosting Management',
-    category: 'Technology',
-    description: 'Successfully registered and managed .com.bd and .info.bd domains, along with DNS setup via BTCL.',
-    details: 'Configured NS records, A/CNAME mappings, SSL certificate installations, and custom email routing for institutional web presences.',
-    tags: ['BTCL', 'DNS', 'Web Hosting'],
-    link: '#services',
-    published: 'yes'
-  },
-  {
-    icon: '🎓',
-    title: 'Tutoring & Mentorship',
-    category: 'Education',
-    description: 'Conducted active tutoring through Caretutors and participated as a candidate for the "Face of Caretutors" initiative.',
-    details: 'Guided secondary and higher secondary science students in Biology, Chemistry, and ICT with personalized study plans and assessment tracking.',
-    tags: ['Education', 'Caretutors', 'Mentorship'],
-    link: '#services',
-    published: 'yes'
-  },
-  {
-    icon: '🗺️',
-    title: 'Google Maps Local Guide',
-    category: 'Community',
-    description: 'Actively submitted map edits and updates for local institutions and landmarks to improve regional navigation.',
-    details: 'Level-contributor verified place details, operating hours, road corrections, and photo contributions across Chattogram and Cumilla regions.',
-    tags: ['Google Maps', 'Local Guide'],
-    link: 'https://maps.app.goo.gl/HGjXCdkwxR2FPkSF9',
-    published: 'yes'
-  },
-  {
-    icon: '📚',
-    title: 'Medical / Dental Notes',
-    category: 'Medical',
-    description: 'A growing collection of study notes and educational material organized for quick personal reference.',
-    details: 'Curated clinical summaries, anatomy illustrations, pharmacology charts, and dental surgical procedures prepared during CMC BDS coursework.',
-    tags: ['Dental', 'Research', 'Medical'],
-    link: '#blog',
-    published: 'yes'
-  }
-];
+const DEFAULT_PROJECTS = [];
 
-let allProjects = [...DEFAULT_PROJECTS];
+let allProjects = [];
 let currentProjectsCategory = 'All';
 const PROJECTS_PAGE_SIZE = 6;
 let projectsVisibleCount = 6;
@@ -2162,7 +2091,7 @@ let projectsSeeMoreInitialized = false;
 let projectModalInitialized = false;
 
 function formatCategoryName(cat) {
-  if (!cat) return 'Portfolio';
+  if (!cat) return 'General';
   const str = String(cat).trim();
   if (str.toLowerCase() === 'commerce' || str.toLowerCase() === 'ecommerce' || str.toLowerCase() === 'e-commerce') {
     return 'Commerce';
@@ -2188,27 +2117,46 @@ async function loadProjectsContent() {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
         data.forEach(item => {
-          const title = item.Title || item.title || item.Project || item.project || item.Name || item.name;
-          if (!title) return;
           const pub = String(item.Published || item.published || item.Active || item.active || item.Status || item.status || 'yes').trim().toLowerCase();
           if (pub === 'no' || pub === 'off' || pub === 'false' || pub === '0' || pub === 'hide' || pub === 'inactive') return;
 
-          const rawCat = item.Category || item.category || item.Catagory || item.catagory || item.Type || item.type || 'Portfolio';
+          const rawCat = item.Catagory || item.catagory || item.Category || item.category || item.Type || item.type || 'Commerce';
           const cat = formatCategoryName(rawCat);
+
           const rawTags = item.Tags || item.tags || item.Tag || item.tag || item.TechStack || item.techstack || item.Stack || item.stack || '';
           const tags = Array.isArray(rawTags)
             ? rawTags
             : String(rawTags).split(',').map(t => t.trim()).filter(Boolean);
 
+          let title = String(item.Title || item.title || item.Project || item.project || item.Name || item.name || '').trim();
+          if (!title) {
+            // When user does not have a separate Title column (Catagory, Description, Details, Link, Icon, Tags, Published)
+            if (tags.length > 0) {
+              title = tags[0];
+            } else if (cat) {
+              title = `${cat} Project`;
+            } else {
+              title = 'Featured Project';
+            }
+          }
+
+          const desc = String(item.Description || item.description || item.Summary || item.summary || item.Desc || item.desc || '').trim();
+          const details = String(item.Details || item.details || item.LongDescription || item.longdescription || item.Impact || item.impact || desc).trim();
+          const link = String(item.Link || item.link || item.Url || item.url || item.Website || item.website || '').trim();
+          const icon = String(item.Icon || item.icon || item.Emoji || item.emoji || '🚀').trim() || '🚀';
+          const image = String(item.Image || item.image || item.Photo || item.photo || item.Banner || item.banner || '').trim();
+
+          if (!desc && !details && !title) return;
+
           loaded.push({
-            icon: item.Icon || item.icon || item.Emoji || item.emoji || '🚀',
-            title: String(title).trim(),
+            icon: icon,
+            title: title,
             category: cat,
-            description: String(item.Description || item.description || item.Summary || item.summary || item.Desc || item.desc || '').trim(),
-            details: String(item.Details || item.details || item.LongDescription || item.longdescription || item.Impact || item.impact || item.Description || item.description || '').trim(),
-            image: String(item.Image || item.image || item.Photo || item.photo || item.Banner || item.banner || '').trim(),
+            description: desc || details,
+            details: details || desc,
+            image: image,
             tags: tags.length ? tags : [cat],
-            link: String(item.Link || item.link || item.Url || item.url || item.Website || item.website || '').trim(),
+            link: link,
             published: pub
           });
         });
@@ -2247,29 +2195,33 @@ async function loadProjectsContent() {
 
           for (let i = 0; i < rows.length; i++) {
             const cells = rows[i]?.c || [];
-            const titleVal = String(cells[titleCol]?.v || '').trim();
-            if (!titleVal || titleVal.toLowerCase() === 'title') continue;
-
             const pubVal = pubCol >= 0 ? String(cells[pubCol]?.v || '').trim().toLowerCase() : 'yes';
-            if (pubVal === 'no' || pubVal === 'off' || pubVal === 'false' || pubVal === '0') continue;
+            if (pubVal === 'no' || pubVal === 'off' || pubVal === 'false' || pubVal === '0' || pubVal === 'hide') continue;
 
             const iconVal = iconCol >= 0 ? (String(cells[iconCol]?.v || '').trim() || '🚀') : '🚀';
-            const catVal = catCol >= 0 ? (String(cells[catCol]?.v || '').trim() || 'Portfolio') : 'Portfolio';
+            const catVal = catCol >= 0 ? (String(cells[catCol]?.v || '').trim() || 'General') : 'General';
             const descVal = descCol >= 0 ? String(cells[descCol]?.v || '').trim() : '';
             const detailsVal = detailsCol >= 0 ? String(cells[detailsCol]?.v || '').trim() : descVal;
             const imgVal = imgCol >= 0 ? String(cells[imgCol]?.v || '').trim() : '';
             const linkVal = linkCol >= 0 ? String(cells[linkCol]?.v || '').trim() : '';
             const rawTags = tagsCol >= 0 ? String(cells[tagsCol]?.v || '').trim() : '';
-            const tags = rawTags ? rawTags.split(',').map(t => t.trim()).filter(Boolean) : [formatCategoryName(catVal)];
+            const tags = rawTags ? rawTags.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+            let titleVal = titleCol >= 0 ? String(cells[titleCol]?.v || '').trim() : '';
+            if (!titleVal || titleVal.toLowerCase() === 'title') {
+              titleVal = tags.length ? tags[0] : formatCategoryName(catVal);
+            }
+
+            if (!descVal && !detailsVal && !titleVal) continue;
 
             loaded.push({
               icon: iconVal,
               title: titleVal,
               category: formatCategoryName(catVal),
-              description: descVal,
-              details: detailsVal,
+              description: descVal || detailsVal,
+              details: detailsVal || descVal,
               image: imgVal,
-              tags: tags,
+              tags: tags.length ? tags : [formatCategoryName(catVal)],
               link: linkVal,
               published: pubVal
             });
@@ -2281,15 +2233,8 @@ async function loadProjectsContent() {
     }
   }
 
-  if (loaded.length > 0) {
-    // Put Google Sheets projects at top, then append default projects that are not duplicates
-    const uniqueDefaults = DEFAULT_PROJECTS.filter(d =>
-      !loaded.some(l => l.title.trim().toLowerCase() === d.title.trim().toLowerCase())
-    );
-    allProjects = [...loaded, ...uniqueDefaults];
-  } else {
-    allProjects = [...DEFAULT_PROJECTS];
-  }
+  // Strictly use Google Sheets rows (do not show fake or default 7 items)
+  allProjects = loaded;
 
   renderProjectsFilterTabs();
   projectsVisibleCount = PROJECTS_PAGE_SIZE;
@@ -2349,6 +2294,18 @@ function renderProjectsCards(append = false) {
   if (!grid) return;
 
   const filtered = getFilteredProjects();
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--muted);">
+        <p style="font-size: 1.05rem; margin-bottom: 6px;">No projects found in Google Sheets.</p>
+        <p style="font-size: 0.88rem;">Add projects to the <strong>Projects</strong> tab in your Google Sheet to display them here.</p>
+      </div>
+    `;
+    if (seeMoreWrap) seeMoreWrap.style.display = 'none';
+    return;
+  }
+
   const visible = filtered.slice(0, projectsVisibleCount);
 
   if (!append) {
@@ -2385,22 +2342,30 @@ function createProjectCardHtml(item, index) {
     .join('');
 
   const hasLink = item.link && item.link.trim() !== '' && item.link !== '#';
+  const targetAttr = hasLink && !item.link.startsWith('#') ? '_blank' : '_self';
+  const relAttr = targetAttr === '_blank' ? 'rel="noopener noreferrer"' : '';
+  const hrefAttr = hasLink ? escapeHtml(item.link) : '#';
 
   return `
-    <article class="card project-card" data-project-index="${index}">
+    <article class="card project-card" data-project-index="${index}" data-project-link="${hasLink ? escapeHtml(item.link) : ''}">
       <div>
         <div class="card-header">
           <div class="card-icon">${iconMarkup}</div>
           <h4>${escapeHtml(item.title)}</h4>
         </div>
-        ${formatTruncatedDesc(item.description, 10)}
+        ${formatTruncatedDesc(item.description, 22)}
         ${tagsMarkup ? `<div class="tags" style="margin-top:14px;">${tagsMarkup}</div>` : ''}
       </div>
       <div class="project-card-footer">
-        <button type="button" class="project-view-details-btn" data-project-index="${index}">
-          View details →
-        </button>
-        ${hasLink ? `<a href="${escapeHtml(item.link)}" target="${item.link.startsWith('#') ? '_self' : '_blank'}" rel="noopener noreferrer" class="read-more" style="font-size:0.82rem;margin:0;" onclick="event.stopPropagation();">Visit ↗</a>` : ''}
+        ${hasLink ? `
+          <a href="${hrefAttr}" target="${targetAttr}" ${relAttr} class="project-view-details-btn">
+            View details →
+          </a>
+        ` : `
+          <span class="project-view-details-btn" style="opacity:0.6;cursor:default;">
+            View details →
+          </span>
+        `}
       </div>
     </article>
   `;
@@ -2412,18 +2377,25 @@ function attachProjectCardEvents() {
   grid.dataset.hasProjectDelegation = 'true';
 
   grid.addEventListener('click', (e) => {
-    // If clicking directly on a tag, an external link, or description toggle, don't open modal!
-    if (e.target.closest('.tag') || e.target.closest('a') || e.target.closest('.desc-toggle-btn')) {
+    // If clicking directly on a tag or description toggle, don't trigger navigation
+    if (e.target.closest('.tag') || e.target.closest('.desc-toggle-btn')) {
       return;
     }
+    // If clicking directly on an <a> link, allow natural browser navigation
+    if (e.target.closest('a')) {
+      return;
+    }
+
     const card = e.target.closest('.project-card');
     if (!card) return;
 
-    const index = parseInt(card.dataset.projectIndex, 10);
-    const filtered = getFilteredProjects();
-    const project = filtered[index];
-    if (project) {
-      openProjectModal(project);
+    const link = card.dataset.projectLink;
+    if (link && link.trim() !== '' && link !== '#') {
+      if (link.startsWith('#')) {
+        window.location.hash = link;
+      } else {
+        window.open(link, '_blank', 'noopener,noreferrer');
+      }
     }
   });
 }
@@ -2933,7 +2905,7 @@ function createTestimonialCardHtml(item) {
         </div>
       </div>
       <div class="testimonial-content">
-        ${formatTruncatedDesc(cleanFeedback, 10)}
+        ${formatTruncatedDesc(cleanFeedback, 22)}
       </div>
     </article>
   `;
