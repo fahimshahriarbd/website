@@ -354,14 +354,14 @@ button,input,textarea{font:inherit;font-size:16px}
   display:flex;align-items:center;justify-content:space-between;width:100%;
 }
 .service-price-label{
-  font-size:0.9rem;
-  font-weight:400;
-  color:var(--muted);
+  font-size:0.92rem;
+  font-weight:700;
+  color:var(--text);
 }
 .service-price-value{
-  font-size:0.9rem;
-  font-weight:500;
-  color:var(--text);
+  font-size:0.92rem;
+  font-weight:700;
+  color:var(--primary);
   line-height:1.4;
   white-space:nowrap;
   margin-left:auto;
@@ -544,11 +544,14 @@ button,input,textarea{font:inherit;font-size:16px}
 .service-payment-summary-box .summary-line.highlight-price{
   padding-top:6px;border-top:1px dashed color-mix(in srgb,var(--primary) 25%,var(--border));
 }
+.service-payment-summary-box .summary-charge-label{
+  color:var(--text);font-weight:700;font-size:0.92rem;
+}
 .summary-price-badge{
-  font-size:1.05rem;font-weight:900;color:var(--primary);
-  background:color-mix(in srgb,var(--primary) 14%,var(--surface));
-  padding:3px 10px;border-radius:6px;letter-spacing:0.3px;
-  border:1px solid color-mix(in srgb,var(--primary) 25%,transparent);
+  font-size:0.92rem;font-weight:700;color:var(--primary);
+  background:color-mix(in srgb,var(--primary) 12%,var(--surface));
+  padding:4px 10px;border-radius:8px;letter-spacing:0.2px;
+  border:1px solid color-mix(in srgb,var(--primary) 22%,transparent);
 }
 
 /* Payment Gateways */
@@ -565,8 +568,10 @@ button,input,textarea{font:inherit;font-size:16px}
 }
 .gateway-icon-badge{
   width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;overflow:hidden;
+  flex-shrink:0;overflow:hidden;background:#ffffff;padding:2px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.08);
 }
+.gateway-icon-badge img{width:100%;height:100%;object-fit:contain;display:block;border-radius:8px}
 .gateway-icon-badge svg{width:100%;height:100%;display:block}
 .gateway-name{font-size:.84rem;font-weight:700;color:var(--text)}
 
@@ -580,12 +585,15 @@ button,input,textarea{font:inherit;font-size:16px}
 .personal-number-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
 .personal-number-text{font-family:monospace;font-size:1.25rem;font-weight:800;color:var(--primary);letter-spacing:1px}
 .copy-number-btn{
-  display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;
-  border:1px solid var(--primary);background:var(--primary);color:#fff;font-size:.78rem;
-  font-weight:700;cursor:pointer;transition:all .2s ease;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;padding:0;border-radius:10px;
+  border:1px solid color-mix(in srgb,var(--primary) 30%,var(--border));
+  background:color-mix(in srgb,var(--primary) 12%,var(--surface));
+  color:var(--primary);cursor:pointer;transition:all .2s ease;
+  flex-shrink:0;
 }
-.copy-number-btn:hover{background:var(--primary2)}
-.copy-number-btn.copied{background:#16a34a;border-color:#16a34a}
+.copy-number-btn:hover{background:var(--primary);color:#fff;transform:scale(1.05)}
+.copy-number-btn.copied{background:#16a34a;border-color:#16a34a;color:#fff;transform:scale(1.05)}
 .personal-number-desc{font-size:.82rem;color:var(--muted);line-height:1.5;margin:0}
 .personal-number-desc .instruct-price{color:var(--primary);font-weight:800;text-decoration:underline}
 .service-modal-actions{display:flex;gap:10px;margin-top:6px}

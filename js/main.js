@@ -575,7 +575,7 @@ async function initSite(){
       items.push({
         id: card.id,
         title: title || 'Service',
-        text: `${text} (Fee: ${fee})`,
+        text: `${text} (Charge: ${fee})`,
         meta: `Services · ${fee}`,
         tags: ['Services', title],
         sectionId: 'services'
@@ -1331,8 +1331,8 @@ async function loadGalleryContent() {
   }
 }
 
-const GALLERY_PAGE_SIZE = 6;
-let galleryVisibleCount = 6;
+const GALLERY_PAGE_SIZE = 8;
+let galleryVisibleCount = 8;
 let gallerySeeMoreInitialized = false;
 
 function renderGallerySection() {
@@ -1609,6 +1609,14 @@ let currentSelectedServicePrice = '1,000 BDT';
 let currentSelectedGateway = 'bKash';
 const PERSONAL_NUMBER = '01316831199';
 
+function getGatewayNumber(gw) {
+  const g = String(gw || '').toLowerCase();
+  if (g.includes('rocket')) {
+    return '013168311990';
+  }
+  return '01316831199';
+}
+
 function getDefaultPriceForService(title) {
   const match = DEFAULT_SERVICES.find(s => s.title.toLowerCase().trim() === String(title || '').toLowerCase().trim());
   if (match && match.price) return match.price;
@@ -1833,7 +1841,7 @@ function createServiceCardHtml(service) {
       </div>
       <div class="service-footer">
         <div class="service-price-block">
-          <span class="service-price-label">Fee:</span>
+          <span class="service-price-label">Charge:</span>
           <span class="service-price-value">${escapeHtml(displayFee)}</span>
         </div>
         <button type="button" class="service-request-btn" data-service-title="${escapeHtml(service.title)}" data-service-price="${escapeHtml(displayFee)}">
@@ -2531,7 +2539,7 @@ function openServiceBookingModal(serviceTitle, servicePrice) {
   currentSelectedServicePrice = servicePrice || getDefaultPriceForService(serviceTitle);
 
   if (titleDisplay) {
-    titleDisplay.innerHTML = `📌 <strong>${escapeHtml(serviceTitle)}</strong> <span class="service-modal-price-pill">Fee: ${escapeHtml(currentSelectedServicePrice)}</span>`;
+    titleDisplay.innerHTML = `📌 <strong>${escapeHtml(serviceTitle)}</strong> <span class="service-modal-price-pill">Charge: ${escapeHtml(currentSelectedServicePrice)}</span>`;
   }
   if (summaryTitle) {
     summaryTitle.textContent = serviceTitle;
@@ -2649,50 +2657,60 @@ function initServiceModal() {
     const label = document.getElementById('gatewaySelectedLabel');
     const desc = document.getElementById('gatewayInstructions');
     const descName = document.getElementById('gatewayNameInDesc');
+    const numEl = document.getElementById('personalNumberText');
     const gwName = currentSelectedGateway || 'bKash';
+    const activeNumber = getGatewayNumber(gwName);
 
     if (label) label.textContent = `${gwName} Personal Number:`;
+    if (numEl) numEl.textContent = activeNumber;
     if (descName) descName.textContent = gwName;
     if (desc) {
-      desc.innerHTML = `Send Money <span class="instruct-price">${escapeHtml(currentSelectedServicePrice)}</span> to the personal number <strong>${PERSONAL_NUMBER}</strong> from your <strong>${gwName}</strong> account. After sending, enter your sender mobile number below.`;
+      desc.innerHTML = `Send Money <span class="instruct-price">${escapeHtml(currentSelectedServicePrice)}</span> to the personal number <strong>${activeNumber}</strong> from your <strong>${gwName}</strong> account. After sending, enter your sender mobile number below.`;
     }
   }
 
   // Copy Number Button
   if (copyNumberBtn) {
     copyNumberBtn.onclick = () => {
+      const activeNumber = getGatewayNumber(currentSelectedGateway);
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(PERSONAL_NUMBER).then(() => {
+        navigator.clipboard.writeText(activeNumber).then(() => {
           showCopySuccess();
         }).catch(() => {
-          fallbackCopy();
+          fallbackCopy(activeNumber);
         });
       } else {
-        fallbackCopy();
+        fallbackCopy(activeNumber);
       }
     };
   }
 
   function showCopySuccess() {
     copyNumberBtn.classList.add('copied');
-    const textSpan = document.getElementById('copyBtnText');
-    if (textSpan) textSpan.textContent = '✓ Copied!';
+    const defaultIcon = document.getElementById('copyIconDefault');
+    const successIcon = document.getElementById('copyIconSuccess');
+    if (defaultIcon) defaultIcon.style.display = 'none';
+    if (successIcon) successIcon.style.display = 'block';
+    copyNumberBtn.setAttribute('title', 'Copied!');
     setTimeout(() => {
       copyNumberBtn.classList.remove('copied');
-      if (textSpan) textSpan.textContent = 'Copy Number';
-    }, 2200);
+      if (defaultIcon) defaultIcon.style.display = 'block';
+      if (successIcon) successIcon.style.display = 'none';
+      copyNumberBtn.setAttribute('title', 'Copy Number');
+    }, 2000);
   }
 
-  function fallbackCopy() {
+  function fallbackCopy(targetNumber) {
+    const activeNumber = targetNumber || getGatewayNumber(currentSelectedGateway);
     const tempInput = document.createElement('input');
-    tempInput.value = PERSONAL_NUMBER;
+    tempInput.value = activeNumber;
     document.body.appendChild(tempInput);
     tempInput.select();
     try {
       document.execCommand('copy');
       showCopySuccess();
     } catch {
-      prompt('Copy personal number:', PERSONAL_NUMBER);
+      prompt('Copy personal number:', activeNumber);
     }
     document.body.removeChild(tempInput);
   }
@@ -2776,7 +2794,7 @@ function initServiceModal() {
 
         const successMsg = document.getElementById('serviceSuccessMsg');
         if (successMsg) {
-          successMsg.innerHTML = `Thank you <strong>${escapeHtml(name)}</strong>! Your request for "<strong>${escapeHtml(currentSelectedService)}</strong>" (Fee: <strong>${escapeHtml(currentSelectedServicePrice)}</strong>) and payment details (<strong>${escapeHtml(currentSelectedGateway)}: ${escapeHtml(paymentNumber)}</strong>) have been successfully saved to our Google Sheet. We will reach out to you shortly.`;
+          successMsg.innerHTML = `Thank you <strong>${escapeHtml(name)}</strong>! Your request for "<strong>${escapeHtml(currentSelectedService)}</strong>" (Charge: <strong>${escapeHtml(currentSelectedServicePrice)}</strong>) and payment details (<strong>${escapeHtml(currentSelectedGateway)}: ${escapeHtml(paymentNumber)}</strong>) have been successfully saved to our Google Sheet. We will reach out to you shortly.`;
         }
 
         // Reset forms
