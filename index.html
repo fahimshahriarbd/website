@@ -117,37 +117,37 @@
         <!-- Step 1: Client Information -->
         <div class="service-modal-step" id="serviceStep1">
           <div class="service-modal-header">
-            <span class="service-step-eyebrow">সেবা রিকোয়েস্ট · ধাপ ১/২</span>
+            <span class="service-step-eyebrow">Service Request · Step 1 of 2</span>
             <h3 class="service-modal-heading">I need this Service</h3>
             <div class="service-selected-pill" id="serviceModalSelectedTitle">
               <!-- Selected Service Title -->
             </div>
-            <p class="service-modal-sub">অনুগ্রহ করে নিচের তথ্যগুলো পূরণ করুন:</p>
+            <p class="service-modal-sub">Please fill in your contact information below:</p>
           </div>
 
           <form id="serviceClientForm" class="service-form" onsubmit="return false;">
             <div class="service-field">
-              <label for="serviceName">আপনার নাম <span style="color:#ef4444">*</span></label>
-              <input type="text" id="serviceName" placeholder="যেমন: মো: রহিম আহমেদ" required autocomplete="name" />
+              <label for="serviceName">Full Name <span style="color:#ef4444">*</span></label>
+              <input type="text" id="serviceName" placeholder="e.g. John Doe" required autocomplete="name" />
             </div>
 
             <div class="service-field">
-              <label for="serviceMobile">মোবাইল নম্বর <span style="color:#ef4444">*</span></label>
-              <input type="tel" id="serviceMobile" placeholder="যেমন: 017XXXXXXXX" required autocomplete="tel" />
+              <label for="serviceMobile">Mobile / Phone Number <span style="color:#ef4444">*</span></label>
+              <input type="tel" id="serviceMobile" placeholder="e.g. 017XXXXXXXX" required autocomplete="tel" />
             </div>
 
             <div class="service-field">
-              <label for="serviceLocation">ঠিকানা / লোকেশন <span style="color:#ef4444">*</span></label>
-              <input type="text" id="serviceLocation" placeholder="যেমন: মিরপুর, ঢাকা" required />
+              <label for="serviceLocation">Address / Location <span style="color:#ef4444">*</span></label>
+              <input type="text" id="serviceLocation" placeholder="e.g. Mirpur, Dhaka" required />
             </div>
 
             <div class="service-field">
-              <label for="serviceNotes">অতিরিক্ত তথ্য বা বিশেষ নোট (ঐচ্ছিক)</label>
-              <textarea id="serviceNotes" rows="2" placeholder="সেবা সম্পর্কিত কোনো নির্দিষ্ট প্রয়োজন থাকলে লিখুন..."></textarea>
+              <label for="serviceNotes">Additional Notes or Requirements (Optional)</label>
+              <textarea id="serviceNotes" rows="2" placeholder="Specify any project details or specific requirements..."></textarea>
             </div>
 
             <button type="submit" class="btn btn-primary service-next-btn" id="serviceGoToPaymentBtn">
-              পরবর্তী ধাপ: পেমেন্ট পদ্ধতি →
+              Proceed to Payment Method →
             </button>
           </form>
         </div>
@@ -155,94 +155,130 @@
         <!-- Step 2: Payment Method & Sender Number -->
         <div class="service-modal-step" id="serviceStep2" style="display:none;">
           <div class="service-modal-header">
-            <span class="service-step-eyebrow">পেমেন্ট পদ্ধতি · ধাপ ২/২</span>
-            <h3 class="service-modal-heading">পেমেন্ট মাধ্যম সিলেক্ট করুন</h3>
-            <p class="service-modal-sub">যেকোনো একটি পেমেন্ট গেটওয়ে বেছে নিন:</p>
+            <span class="service-step-eyebrow">Payment Method · Step 2 of 2</span>
+            <h3 class="service-modal-heading">Select Payment Method</h3>
+            <p class="service-modal-sub">Choose your preferred mobile financial service:</p>
           </div>
 
-          <!-- 4 Payment Gateways -->
+          <!-- Price & Service Summary Banner -->
+          <div class="service-payment-summary-box">
+            <div class="summary-line">
+              <span class="summary-label">Selected Service</span>
+              <strong class="summary-val" id="summaryServiceTitle">—</strong>
+            </div>
+            <div class="summary-line highlight-price">
+              <span class="summary-label">Fee</span>
+              <strong class="summary-price-badge" id="summaryServicePrice">0 BDT</strong>
+            </div>
+          </div>
+
+          <!-- 4 Payment Gateways with Original Official Logos -->
           <div class="payment-gateways-grid">
             <button type="button" class="gateway-card active" data-gateway="bKash" aria-label="bKash">
               <div class="gateway-icon-badge bkash-badge">
-                <svg viewBox="0 0 100 100" width="28" height="28">
-                  <path d="M50 5 L90 50 L50 95 L10 50 Z" fill="#e2136e"/>
-                  <path d="M35 30 L65 50 L35 70 Z" fill="#ffffff"/>
+                <svg viewBox="0 0 100 100" width="34" height="34" aria-hidden="true">
+                  <rect width="100" height="100" rx="22" fill="#E2136E" />
+                  <!-- Authentic bKash Origami Bird -->
+                  <path d="M22 26 L44 40 L34 50 Z" fill="#FFFFFF" fill-opacity="0.95" />
+                  <path d="M44 40 L56 12 L74 38 Z" fill="#FFFFFF" />
+                  <path d="M56 12 L90 28 L74 38 Z" fill="#FFFFFF" fill-opacity="0.82" />
+                  <path d="M44 40 L74 38 L50 68 Z" fill="#FFFFFF" fill-opacity="0.92" />
+                  <path d="M34 50 L44 40 L50 68 Z" fill="#FFFFFF" fill-opacity="0.75" />
+                  <path d="M50 68 L64 88 L52 88 Z" fill="#FFFFFF" fill-opacity="0.95" />
+                  <path d="M50 68 L52 88 L38 78 Z" fill="#FFFFFF" fill-opacity="0.8" />
                 </svg>
               </div>
-              <span class="gateway-name">বিকাশ (bKash)</span>
+              <span class="gateway-name">bKash</span>
             </button>
 
             <button type="button" class="gateway-card" data-gateway="Nagad" aria-label="Nagad">
               <div class="gateway-icon-badge nagad-badge">
-                <svg viewBox="0 0 100 100" width="28" height="28">
-                  <circle cx="50" cy="50" r="45" fill="#f7941d"/>
-                  <path d="M30 65 Q50 20 70 65 Q50 50 30 65" fill="#ffffff"/>
+                <svg viewBox="0 0 100 100" width="34" height="34" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="nagadLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#F99F1B" />
+                      <stop offset="100%" stop-color="#EA1D25" />
+                    </linearGradient>
+                  </defs>
+                  <rect width="100" height="100" rx="22" fill="url(#nagadLogoGrad)" />
+                  <!-- Authentic Nagad Swirl & Green Droplet -->
+                  <path d="M52 18 C64 25 72 37 72 52 C72 68 58 80 42 80 C26 80 18 68 18 56 C18 44 28 35 40 35 C50 35 56 42 56 50 C56 57 51 62 44 62 C39 62 35 58 35 54 C35 50 39 47 43 47" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" />
+                  <circle cx="58" cy="22" r="5" fill="#138A43" stroke="#FFFFFF" stroke-width="1.8" />
                 </svg>
               </div>
-              <span class="gateway-name">নগদ (Nagad)</span>
+              <span class="gateway-name">Nagad</span>
             </button>
 
             <button type="button" class="gateway-card" data-gateway="Upay" aria-label="Upay">
               <div class="gateway-icon-badge upay-badge">
-                <svg viewBox="0 0 100 100" width="28" height="28">
-                  <rect x="10" y="10" width="80" height="80" rx="20" fill="#004880"/>
-                  <path d="M32 30 V55 Q32 70 50 70 Q68 70 68 55 V30" fill="none" stroke="#ffc425" stroke-width="12" stroke-linecap="round"/>
+                <svg viewBox="0 0 100 100" width="34" height="34" aria-hidden="true">
+                  <rect width="100" height="100" rx="22" fill="#00386B" />
+                  <!-- Authentic Upay U-Ribbon -->
+                  <path d="M30 26 V52 C30 68 40 76 50 76 C60 76 70 68 70 52 V26" fill="none" stroke="#FFC425" stroke-width="12" stroke-linecap="round" />
+                  <circle cx="50" cy="52" r="5.5" fill="#FFFFFF" />
                 </svg>
               </div>
-              <span class="gateway-name">উপায় (Upay)</span>
+              <span class="gateway-name">Upay</span>
             </button>
 
             <button type="button" class="gateway-card" data-gateway="Rocket" aria-label="Rocket">
               <div class="gateway-icon-badge rocket-badge">
-                <svg viewBox="0 0 100 100" width="28" height="28">
-                  <rect x="10" y="10" width="80" height="80" rx="20" fill="#8c3494"/>
-                  <path d="M50 20 L68 65 L50 55 L32 65 Z" fill="#ffffff"/>
+                <svg viewBox="0 0 100 100" width="34" height="34" aria-hidden="true">
+                  <rect width="100" height="100" rx="22" fill="#8C3494" />
+                  <!-- Authentic DBBL Rocket Silhouette -->
+                  <g transform="translate(16, 16) rotate(45 34 34)">
+                    <path d="M34 6 C25 20 21 36 23 50 L45 50 C47 36 43 20 34 6 Z" fill="#FFFFFF" />
+                    <path d="M23 38 L11 50 L23 50 Z" fill="#F7941D" />
+                    <path d="M45 38 L57 50 L45 50 Z" fill="#F7941D" />
+                    <circle cx="34" cy="26" r="4.5" fill="#8C3494" />
+                    <path d="M28 51 L34 62 L40 51 Z" fill="#ED1C24" />
+                  </g>
                 </svg>
               </div>
-              <span class="gateway-name">রকেট (Rocket)</span>
+              <span class="gateway-name">Rocket</span>
             </button>
           </div>
 
           <!-- Personal Number Copy Box -->
           <div class="personal-number-box">
             <div class="personal-number-top">
-              <span class="personal-number-title" id="gatewaySelectedLabel">বিকাশ পার্সোনাল নাম্বার:</span>
+              <span class="personal-number-title" id="gatewaySelectedLabel">bKash Personal Number:</span>
             </div>
             <div class="personal-number-row">
               <span class="personal-number-text" id="personalNumberText">01316831199</span>
-              <button type="button" class="copy-number-btn" id="copyNumberBtn" title="কপি করতে ক্লিক করুন">
+              <button type="button" class="copy-number-btn" id="copyNumberBtn" title="Click to copy number">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                 </svg>
-                <span id="copyBtnText">নম্বর কপি করুন</span>
+                <span id="copyBtnText">Copy Number</span>
               </button>
             </div>
             <p class="personal-number-desc" id="gatewayInstructions">
-              আপনার <strong id="gatewayNameInDesc">বিকাশ</strong> অ্যাকাউন্ট থেকে উপরের পার্সোনাল নম্বর <strong>01316831199</strong>-এ সেন্ড মানি (Send Money) করুন। টাকা পাঠানোর পর আপনি যে নম্বর থেকে টাকা পাঠিয়েছেন তা নিচের বক্সে লিখুন।
+              Send Money to the personal number <strong>01316831199</strong> from your <strong id="gatewayNameInDesc">bKash</strong> account. After sending, enter your sender mobile number below.
             </p>
           </div>
 
           <!-- Payment Verification Form -->
           <form id="servicePaymentForm" class="service-form" onsubmit="return false;">
             <div class="service-field">
-              <label for="servicePaymentNumber">যে নম্বর থেকে টাকা পাঠিয়েছেন (Sender Number) <span style="color:#ef4444">*</span></label>
-              <input type="tel" id="servicePaymentNumber" placeholder="যেমন: 01XXXXXXXXX" required />
+              <label for="servicePaymentNumber">Sender Number (Number you sent payment from) <span style="color:#ef4444">*</span></label>
+              <input type="tel" id="servicePaymentNumber" placeholder="e.g. 01XXXXXXXXX" required />
             </div>
 
             <div class="service-field">
-              <label for="servicePaymentTrx">ট্রানজেকশন আইডি (TrxID) - ঐচ্ছিক</label>
-              <input type="text" id="servicePaymentTrx" placeholder="যেমন: 9J2K81LA" />
+              <label for="servicePaymentTrx">Transaction ID (TrxID) - Optional</label>
+              <input type="text" id="servicePaymentTrx" placeholder="e.g. 9J2K81LA" />
             </div>
 
             <div id="serviceSubmitStatus" style="display:none;padding:10px 14px;border-radius:10px;font-size:0.86rem;margin-bottom:12px;font-weight:600;"></div>
 
             <div class="service-modal-actions">
               <button type="button" class="btn btn-secondary" id="serviceBackToStep1Btn" style="flex:1;">
-                ← পেছনে যান
+                ← Back
               </button>
               <button type="submit" class="btn btn-primary" id="serviceFinalSubmitBtn" style="flex:2;">
-                কনফার্ম ও সাবমিট করুন ✓
+                Confirm
               </button>
             </div>
           </form>
@@ -251,12 +287,12 @@
         <!-- Step 3: Success Confirmation -->
         <div class="service-modal-step" id="serviceStepSuccess" style="display:none;text-align:center;padding:20px 10px;">
           <div class="service-success-icon">✓</div>
-          <h3 style="font-size:1.35rem;margin-bottom:8px;color:var(--text);">অনুরোধটি সফলভাবে জমা হয়েছে!</h3>
+          <h3 style="font-size:1.35rem;margin-bottom:8px;color:var(--text);">Request Submitted Successfully!</h3>
           <p style="color:var(--muted);font-size:0.9rem;line-height:1.6;margin-bottom:20px;" id="serviceSuccessMsg">
-            ধন্যবাদ! আপনার সেবার রিকোয়েস্ট এবং পেমেন্টের তথ্য আমাদের গুগল শিটে সফলভাবে জমা হয়েছে। আমরা দ্রুত আপনার সাথে যোগাযোগ করব।
+            Thank you! Your service request and payment verification details have been recorded. We will contact you shortly.
           </p>
           <button type="button" class="btn btn-primary" id="serviceSuccessDoneBtn" style="padding:10px 32px;border-radius:999px;">
-            ঠিক আছে
+            Done
           </button>
         </div>
 

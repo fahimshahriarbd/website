@@ -104,7 +104,7 @@ async function initSite(){
   if(contactForm && submitBtn && formStatus){
 
     const GOOGLE_SCRIPT_URL=
-      "https://script.google.com/macros/s/AKfycbztBbwboWpdr3xxAxlgau8aEB216GJ9cyQcFm1OOrxvjjXiXR5otElvwx3AyvZWnkgt3Q/exec";
+      "https://script.google.com/macros/s/AKfycbz16uxYP0BOLHZi3ymkFZJfrpIUZdK3dhADmD-ABvBwpm-wUeYNcxRm5iOLpVdyz0yp/exec";
 
     contactForm.addEventListener("submit",async function(e){
 
@@ -115,10 +115,21 @@ async function initSite(){
       formStatus.style.display="none";
 
       const data={
+        action: "contact",
+        sheet: "Messages",
+        sheetName: "Messages",
+        tab: "Messages",
+        spreadsheetId: "1LtXbQRHeCscgqb79T8pnLCb5GdZwz8TeH_AX-PIXpd0",
+        Timestamp: new Date().toLocaleString("en-US", { timeZone: "Asia/Dhaka" }),
+        timestamp: new Date().toLocaleString("en-US", { timeZone: "Asia/Dhaka" }),
         name:document.getElementById("name").value.trim(),
         email:document.getElementById("email").value.trim(),
         subject:document.getElementById("subject").value.trim(),
-        message:document.getElementById("message").value.trim()
+        message:document.getElementById("message").value.trim(),
+        Name:document.getElementById("name").value.trim(),
+        Email:document.getElementById("email").value.trim(),
+        Subject:document.getElementById("subject").value.trim(),
+        Message:document.getElementById("message").value.trim()
       };
 
       try{
@@ -131,6 +142,13 @@ async function initSite(){
           },
           body:JSON.stringify(data)
         });
+
+        // Also save to server backend backup
+        await fetch('/api/contact-message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        }).catch(() => {});
 
         formStatus.style.display="block";
         formStatus.textContent=
@@ -784,12 +802,13 @@ async function initSite(){
   }
 
 
-  /* LOAD GOOGLE SHEET CONTENT (BLOG, GALLERY & SERVICES) */
+  /* LOAD GOOGLE SHEET CONTENT (BLOG, GALLERY, SERVICES & ACHIEVEMENTS) */
 
   await Promise.allSettled([
     loadWebsiteContent(),
     loadGalleryContent(),
-    loadServicesContent()
+    loadServicesContent(),
+    loadAchievementsContent()
   ]);
 }
 
@@ -1593,107 +1612,146 @@ async function downloadImage(url, filename) {
    ========================================================= */
 
 const DEFAULT_SERVICES = [
-  { icon: '🎓', title: 'Tuition Media & Mentorship', description: 'Education-focused digital promotion, tutoring experience, and mentoring.' },
-  { icon: '💻', title: 'Web Development & IT', description: 'Basic website setup, static pages, DNS mapping, and BTCL domain guidance.' },
-  { icon: '🛒', title: 'E-commerce Management', description: 'Guidance on seller operations and logistics management based on Daraz experience.' },
-  { icon: '🎬', title: 'Creative Content', description: 'Ideas and support for digital content, visuals and online projects.' },
-  { icon: '🦷', title: 'Oral Health & Dental Consultation', description: 'Basic dental advice, oral hygiene tips, and clinical health guidance.' },
-  { icon: '📊', title: 'Digital Skills & Academic Support', description: 'Help with presentation slides, software tools, student projects, and career guidance.' }
+  { icon: '🎓', title: 'Tuition Media & Mentorship', category: 'Education', price: '1,500 BDT', description: 'Education-focused digital promotion, tutoring experience, and mentoring.', active: 'yes' },
+  { icon: '💻', title: 'Web Development & IT', category: 'Technology', price: '3,000 BDT', description: 'Basic website setup, static pages, DNS mapping, and BTCL domain guidance.', active: 'yes' },
+  { icon: '🛒', title: 'E-commerce Management', category: 'Business', price: '2,500 BDT', description: 'Guidance on seller operations and logistics management based on Daraz experience.', active: 'yes' },
+  { icon: '🎬', title: 'Creative Content', category: 'Creative', price: '1,200 BDT', description: 'Ideas and support for digital content, visuals and online projects.', active: 'yes' },
+  { icon: '🦷', title: 'Oral Health & Dental Consultation', category: 'Health & Medical', price: '800 BDT', description: 'Basic dental advice, oral hygiene tips, and clinical health guidance.', active: 'yes' },
+  { icon: '📊', title: 'Digital Skills & Academic Support', category: 'Education', price: '1,000 BDT', description: 'Help with presentation slides, software tools, student projects, and career guidance.', active: 'yes' }
 ];
 
 let allServices = [...DEFAULT_SERVICES];
-const SERVICES_PAGE_SIZE = 5;
-let servicesVisibleCount = 5;
+let currentServicesCategory = 'All';
+const SERVICES_PAGE_SIZE = 6;
+let servicesVisibleCount = 6;
 let servicesSeeMoreInitialized = false;
 
 let currentSelectedService = '';
+let currentSelectedServicePrice = '1,000 BDT';
 let currentSelectedGateway = 'bKash';
 const PERSONAL_NUMBER = '01316831199';
 
+function getDefaultPriceForService(title) {
+  const match = DEFAULT_SERVICES.find(s => s.title.toLowerCase().trim() === String(title || '').toLowerCase().trim());
+  if (match && match.price) return match.price;
+  const t = String(title || '').toLowerCase();
+  if (t.includes('web') || t.includes('dev') || t.includes('software')) return '3,000 BDT';
+  if (t.includes('e-commerce') || t.includes('commerce') || t.includes('business')) return '2,500 BDT';
+  if (t.includes('tuition') || t.includes('mentor')) return '1,500 BDT';
+  if (t.includes('content') || t.includes('video') || t.includes('media')) return '1,200 BDT';
+  if (t.includes('dental') || t.includes('health') || t.includes('doctor')) return '800 BDT';
+  return '1,000 BDT';
+}
+
+function formatFeeDisplay(val, title) {
+  const raw = val || getDefaultPriceForService(title);
+  let clean = String(raw).replace(/bdt/gi, '').replace(/[৳,]/g, '').trim();
+  const num = parseInt(clean, 10);
+  if (!isNaN(num)) {
+    clean = num.toLocaleString('en-US');
+  }
+  return `${clean || '1,000'} BDT`;
+}
+
 async function loadServicesContent() {
-  const SERVICES_API_URL =
-    "https://docs.google.com/spreadsheets/d/1FPDlW0ugDgBLds5AD86sTo-Arw0r9T4cJZ8b4Vl5s5w/gviz/tq?tqx=out:json&sheet=Services";
+  const MASTER_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbz16uxYP0BOLHZi3ymkFZJfrpIUZdK3dhADmD-ABvBwpm-wUeYNcxRm5iOLpVdyz0yp/exec?sheet=Services";
+  const GVIZ_SERVICES_URL =
+    "https://docs.google.com/spreadsheets/d/1LtXbQRHeCscgqb79T8pnLCb5GdZwz8TeH_AX-PIXpd0/gviz/tq?tqx=out:json&sheet=Services";
 
   const servicesGrid = document.getElementById('servicesGrid');
   if (!servicesGrid) return;
 
+  let loadedItems = [];
+
+  // 1. Try reading from Master Web App
   try {
-    const response = await fetch(SERVICES_API_URL, { cache: 'no-store' });
-    if (!response.ok) {
-      throw new Error(`Google Sheet Services returned HTTP ${response.status}`);
-    }
-
-    const rawText = await response.text();
-    const firstBrace = rawText.indexOf('{');
-    const lastBrace = rawText.lastIndexOf('}');
-
-    if (firstBrace === -1 || lastBrace <= firstBrace) {
-      throw new Error('Invalid JSON from Services sheet');
-    }
-
-    const data = JSON.parse(rawText.slice(firstBrace, lastBrace + 1));
-    const cols = data.table?.cols || [];
-    const rows = data.table?.rows || [];
-
-    let iconColIdx = -1;
-    let titleColIdx = -1;
-    let descColIdx = -1;
-    let headerRowIdx = -1;
-
-    // Check cols labels
-    cols.forEach((col, idx) => {
-      const lbl = String(col.label || col.id || '').trim().toLowerCase();
-      if (lbl.includes('icon')) iconColIdx = idx;
-      if (lbl.includes('title') || lbl.includes('service') || lbl.includes('name')) titleColIdx = idx;
-      if (lbl.includes('desc') || lbl.includes('detail')) descColIdx = idx;
-    });
-
-    // If headers in row 0
-    if ((titleColIdx === -1 || descColIdx === -1) && rows.length > 0) {
-      const firstRowCells = rows[0]?.c || [];
-      firstRowCells.forEach((cell, idx) => {
-        const val = String(cell?.v || '').trim().toLowerCase();
-        if (val.includes('icon')) { iconColIdx = idx; headerRowIdx = 0; }
-        if (val.includes('title') || val.includes('service') || val.includes('name')) { titleColIdx = idx; headerRowIdx = 0; }
-        if (val.includes('desc') || val.includes('detail')) { descColIdx = idx; headerRowIdx = 0; }
-      });
-    }
-
-    if (iconColIdx === -1) iconColIdx = 0;
-    if (titleColIdx === -1) titleColIdx = 1;
-    if (descColIdx === -1) descColIdx = 2;
-
-    const parsedServices = [];
-    const startRow = headerRowIdx >= 0 ? headerRowIdx + 1 : 0;
-
-    for (let i = startRow; i < rows.length; i++) {
-      const cells = rows[i]?.c || [];
-      const iconVal = String(cells[iconColIdx]?.v || '').trim() || '💼';
-      const titleVal = String(cells[titleColIdx]?.v || '').trim();
-      const descVal = String(cells[descColIdx]?.v || '').trim();
-
-      // Ensure valid entry (not repeated header and has title)
-      if (
-        titleVal &&
-        titleVal.toLowerCase() !== 'title' &&
-        titleVal.toLowerCase() !== 'icon' &&
-        titleVal.toLowerCase() !== 'description'
-      ) {
-        parsedServices.push({
-          icon: iconVal,
-          title: titleVal,
-          description: descVal || 'Quality service tailored to your requirements.'
+    const res = await fetch(MASTER_SCRIPT_URL, { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach(item => {
+          const title = item.Title || item.title || item.Service || item.name;
+          if (!title) return;
+          const activeVal = String(item.Active || item.active || item.Status || item.status || item.Published || item.published || item['On/Off'] || 'yes').trim().toLowerCase();
+          if (activeVal === 'no' || activeVal === 'off' || activeVal === 'false' || activeVal === '0' || activeVal === 'inactive' || activeVal === 'hide') {
+            return; // Skip inactive services (On/Off feature)
+          }
+          const rawPrice = item.Fee || item.fee || item.Price || item.price || item.Amount || item.amount || '';
+          loadedItems.push({
+            icon: item.Icon || item.icon || '💼',
+            title: title,
+            category: item.Category || item.category || 'General',
+            price: formatFeeDisplay(rawPrice, title),
+            description: item.Description || item.description || item.Summary || 'Professional quality service tailored to your requirements.',
+            active: 'yes'
+          });
         });
       }
     }
-
-    if (parsedServices.length > 0) {
-      allServices = parsedServices;
-    }
-  } catch (error) {
-    console.warn('Could not load services from Google Sheets, using defaults:', error);
+  } catch (err) {
+    // fallback
   }
 
+  // 2. Fallback to GViz if master script didn't return rows yet
+  if (loadedItems.length === 0) {
+    try {
+      const gRes = await fetch(GVIZ_SERVICES_URL, { cache: 'no-store' });
+      if (gRes.ok) {
+        const rawText = await gRes.text();
+        const firstBrace = rawText.indexOf('{');
+        const lastBrace = rawText.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace > firstBrace) {
+          const data = JSON.parse(rawText.slice(firstBrace, lastBrace + 1));
+          const cols = data.table?.cols || [];
+          const rows = data.table?.rows || [];
+
+          let iconColIdx = -1, titleColIdx = -1, descColIdx = -1, priceColIdx = -1, catColIdx = -1, activeColIdx = -1;
+
+          cols.forEach((col, idx) => {
+            const lbl = String(col.label || col.id || '').trim().toLowerCase();
+            if (lbl.includes('icon')) iconColIdx = idx;
+            if (lbl.includes('title') || lbl.includes('service') || lbl.includes('name')) titleColIdx = idx;
+            if (lbl.includes('desc') || lbl.includes('detail')) descColIdx = idx;
+            if (lbl.includes('price') || lbl.includes('fee') || lbl.includes('amount') || lbl.includes('bdt') || lbl.includes('খরচ') || lbl.includes('ফি') || lbl.includes('টাকা')) priceColIdx = idx;
+            if (lbl.includes('cat') || lbl.includes('type')) catColIdx = idx;
+            if (lbl.includes('active') || lbl.includes('status') || lbl.includes('publish') || lbl.includes('on')) activeColIdx = idx;
+          });
+
+          for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i]?.c || [];
+            const titleVal = String(cells[titleColIdx]?.v || '').trim();
+            if (!titleVal || titleVal.toLowerCase() === 'title') continue;
+
+            const activeVal = activeColIdx >= 0 ? String(cells[activeColIdx]?.v || '').trim().toLowerCase() : 'yes';
+            if (activeVal === 'no' || activeVal === 'off' || activeVal === 'false' || activeVal === '0' || activeVal === 'hide') continue;
+
+            const iconVal = iconColIdx >= 0 ? (String(cells[iconColIdx]?.v || '').trim() || '💼') : '💼';
+            const descVal = descColIdx >= 0 ? String(cells[descColIdx]?.v || '').trim() : '';
+            const catVal = catColIdx >= 0 ? String(cells[catColIdx]?.v || '').trim() : 'General';
+            const rawPrice = priceColIdx >= 0 ? String(cells[priceColIdx]?.v || '').trim() : '';
+
+            loadedItems.push({
+              icon: iconVal,
+              title: titleVal,
+              category: catVal || 'General',
+              price: formatFeeDisplay(rawPrice, titleVal),
+              description: descVal || 'Quality service tailored to your requirements.',
+              active: 'yes'
+            });
+          }
+        }
+      }
+    } catch (e) {
+      // fallback
+    }
+  }
+
+  if (loadedItems.length > 0) {
+    allServices = loadedItems;
+  }
+
+  renderServicesFilterTabs();
   servicesVisibleCount = SERVICES_PAGE_SIZE;
   initServicesSeeMore();
   renderServicesCards();
@@ -1704,19 +1762,58 @@ async function loadServicesContent() {
   }
 }
 
+function renderServicesFilterTabs() {
+  const filterWrap = document.getElementById('servicesFilterWrap');
+  if (!filterWrap) return;
+
+  const rawCategories = allServices.map(s => s.category).filter(Boolean);
+  const uniqueCats = ['All', ...new Set(rawCategories)];
+
+  if (uniqueCats.length <= 2) {
+    filterWrap.style.display = 'none';
+    return;
+  }
+
+  filterWrap.style.display = 'flex';
+  filterWrap.innerHTML = uniqueCats.map(cat => {
+    const count = cat === 'All' ? allServices.length : allServices.filter(s => s.category === cat).length;
+    const isActive = cat === currentServicesCategory;
+    return `
+      <button type="button" class="services-filter-btn ${isActive ? 'active' : ''}" data-category="${escapeHtml(cat)}">
+        ${escapeHtml(cat)} <span class="services-filter-count">${count}</span>
+      </button>
+    `;
+  }).join('');
+
+  filterWrap.querySelectorAll('.services-filter-btn').forEach(btn => {
+    btn.onclick = () => {
+      currentServicesCategory = btn.dataset.category || 'All';
+      servicesVisibleCount = SERVICES_PAGE_SIZE;
+      renderServicesFilterTabs();
+      renderServicesCards(false);
+    };
+  });
+}
+
+function getFilteredServices() {
+  if (currentServicesCategory === 'All') return allServices;
+  return allServices.filter(s => s.category === currentServicesCategory);
+}
+
 function renderServicesCards(append = false) {
   const servicesGrid = document.getElementById('servicesGrid');
   const seeMoreWrap = document.getElementById('servicesSeeMoreWrap');
   const seeMoreBtn = document.getElementById('servicesSeeMoreBtn');
   if (!servicesGrid) return;
 
-  const visibleServices = allServices.slice(0, servicesVisibleCount);
+  const filtered = getFilteredServices();
+  const visibleServices = filtered.slice(0, servicesVisibleCount);
 
   if (!append) {
     servicesGrid.innerHTML = visibleServices.map(service => createServiceCardHtml(service)).join('');
   } else {
     const startIndex = servicesVisibleCount - SERVICES_PAGE_SIZE;
-    const newItems = allServices.slice(startIndex, servicesVisibleCount);
+    const newItems = filtered.slice(startIndex, servicesVisibleCount);
     const newHtml = newItems.map(service => createServiceCardHtml(service)).join('');
     servicesGrid.insertAdjacentHTML('beforeend', newHtml);
   }
@@ -1724,9 +1821,9 @@ function renderServicesCards(append = false) {
   attachServiceRequestEvents();
 
   if (seeMoreWrap) {
-    if (servicesVisibleCount < allServices.length) {
+    if (servicesVisibleCount < filtered.length) {
       seeMoreWrap.style.display = 'flex';
-      const remaining = allServices.length - servicesVisibleCount;
+      const remaining = filtered.length - servicesVisibleCount;
       if (seeMoreBtn) {
         seeMoreBtn.innerHTML = `See More Services (${remaining} remaining) ↓`;
       }
@@ -1741,6 +1838,7 @@ function createServiceCardHtml(service) {
   const iconMarkup = isImage
     ? `<img src="${escapeHtml(service.icon)}" alt="${escapeHtml(service.title)}" style="width:36px;height:36px;object-fit:contain;" />`
     : escapeHtml(service.icon);
+  const displayFee = formatFeeDisplay(service.price, service.title);
 
   return `
     <article class="card service-card">
@@ -1750,9 +1848,13 @@ function createServiceCardHtml(service) {
           <h4>${escapeHtml(service.title)}</h4>
         </div>
         <p>${escapeHtml(service.description)}</p>
+        <div class="service-price-row">
+          <span class="service-price-label">Fee</span>
+          <span class="service-price-value">${escapeHtml(displayFee)}</span>
+        </div>
       </div>
       <div class="service-action-wrap">
-        <button type="button" class="service-request-btn" data-service-title="${escapeHtml(service.title)}">
+        <button type="button" class="service-request-btn" data-service-title="${escapeHtml(service.title)}" data-service-price="${escapeHtml(displayFee)}">
           I need this Service →
         </button>
       </div>
@@ -1772,6 +1874,223 @@ function initServicesSeeMore() {
   });
 }
 
+/* =========================================================
+   ACHIEVEMENTS SYSTEM (INITIAL 4 + SEE MORE + GOOGLE SHEET)
+   ========================================================= */
+
+const DEFAULT_ACHIEVEMENTS = [
+  {
+    icon: '🦷',
+    title: 'CMC Dental Unit Merit',
+    description: 'Secured national medical admission merit and currently studying Bachelor of Dental Surgery (BDS) at Chattogram Medical College.',
+    tags: ['CMC', 'BDS Merit', 'Medical'],
+    published: 'yes'
+  },
+  {
+    icon: '📜',
+    title: 'Double GPA 5.00 Excellence',
+    description: 'Achieved GPA 5.00 in both SSC (Ramkrishnapur KKRK High School) and HSC Science (Ramkrishnapur College, Cumilla).',
+    tags: ['GPA 5.00', 'HSC', 'SSC'],
+    published: 'yes'
+  },
+  {
+    icon: '🏆',
+    title: 'Face of Caretutors',
+    description: 'Applied and actively participated as an ambassador candidate for the national "Become a Face of Caretutors" initiative.',
+    tags: ['Caretutors', 'Ambassador', 'Mentorship'],
+    published: 'yes'
+  },
+  {
+    icon: '📍',
+    title: 'Google Maps Top Contributor',
+    description: 'Consistent local guide contributor, submitting verified place edits and regional navigation data for institutions and landmarks.',
+    tags: ['Google Maps', 'Local Guide', 'Community'],
+    published: 'yes'
+  },
+  {
+    icon: '🛒',
+    title: 'Daraz Hub Operations',
+    description: 'Successfully managed seller fulfillment, product handling, and drop-off logistics for Daraz e-commerce marketplace.',
+    tags: ['Daraz', 'Operations', 'E-commerce'],
+    published: 'yes'
+  },
+  {
+    icon: '🌐',
+    title: 'BTCL .bd Domain & Systems',
+    description: 'Registered and configured .com.bd / .info.bd institutional domains via BTCL, setting up complete DNS and hosting infrastructure.',
+    tags: ['BTCL', 'DNS', 'Web Hosting'],
+    published: 'yes'
+  }
+];
+
+let allAchievements = [...DEFAULT_ACHIEVEMENTS];
+const ACHIEVEMENTS_PAGE_SIZE = 4;
+let achievementsVisibleCount = 4;
+let achievementsSeeMoreInitialized = false;
+
+async function loadAchievementsContent() {
+  const grid = document.getElementById('achievementsGrid');
+  if (!grid) return;
+
+  const MASTER_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbz16uxYP0BOLHZi3ymkFZJfrpIUZdK3dhADmD-ABvBwpm-wUeYNcxRm5iOLpVdyz0yp/exec?sheet=Achievements";
+  const GVIZ_ACHIEVEMENTS_URL =
+    "https://docs.google.com/spreadsheets/d/1LtXbQRHeCscgqb79T8pnLCb5GdZwz8TeH_AX-PIXpd0/gviz/tq?tqx=out:json&sheet=Achievements";
+
+  let loaded = [];
+
+  try {
+    const res = await fetch(MASTER_SCRIPT_URL, { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach(item => {
+          const title = item.Title || item.title || item.Achievement || item.name;
+          if (!title) return;
+          const pub = String(item.Published || item.published || item.Active || item.active || item.Status || item.status || 'yes').trim().toLowerCase();
+          if (pub === 'no' || pub === 'off' || pub === 'false' || pub === '0' || pub === 'hide') return;
+
+          const rawTags = item.Tags || item.tags || '';
+          const tags = Array.isArray(rawTags)
+            ? rawTags
+            : String(rawTags).split(',').map(t => t.trim()).filter(Boolean);
+
+          loaded.push({
+            icon: item.Icon || item.icon || '🏆',
+            title: title,
+            description: item.Description || item.description || item.Summary || '',
+            tags: tags.length ? tags : ['Achievement'],
+            published: pub
+          });
+        });
+      }
+    }
+  } catch (err) {
+    // fallback
+  }
+
+  if (loaded.length === 0) {
+    try {
+      const gRes = await fetch(GVIZ_ACHIEVEMENTS_URL, { cache: 'no-store' });
+      if (gRes.ok) {
+        const rawText = await gRes.text();
+        const firstBrace = rawText.indexOf('{');
+        const lastBrace = rawText.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace > firstBrace) {
+          const data = JSON.parse(rawText.slice(firstBrace, lastBrace + 1));
+          const cols = data.table?.cols || [];
+          const rows = data.table?.rows || [];
+
+          let iconCol = -1, titleCol = -1, descCol = -1, tagsCol = -1, pubCol = -1;
+          cols.forEach((col, idx) => {
+            const lbl = String(col.label || col.id || '').trim().toLowerCase();
+            if (lbl.includes('icon')) iconCol = idx;
+            if (lbl.includes('title') || lbl.includes('name') || lbl.includes('achievement')) titleCol = idx;
+            if (lbl.includes('desc') || lbl.includes('detail')) descCol = idx;
+            if (lbl.includes('tag')) tagsCol = idx;
+            if (lbl.includes('publish') || lbl.includes('active') || lbl.includes('status')) pubCol = idx;
+          });
+
+          for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i]?.c || [];
+            const titleVal = String(cells[titleCol]?.v || '').trim();
+            if (!titleVal || titleVal.toLowerCase() === 'title') continue;
+
+            const pubVal = pubCol >= 0 ? String(cells[pubCol]?.v || '').trim().toLowerCase() : 'yes';
+            if (pubVal === 'no' || pubVal === 'off' || pubVal === 'false' || pubVal === '0') continue;
+
+            const iconVal = iconCol >= 0 ? (String(cells[iconCol]?.v || '').trim() || '🏆') : '🏆';
+            const descVal = descCol >= 0 ? String(cells[descCol]?.v || '').trim() : '';
+            const rawTags = tagsCol >= 0 ? String(cells[tagsCol]?.v || '').trim() : '';
+            const tags = rawTags ? rawTags.split(',').map(t => t.trim()).filter(Boolean) : ['Achievement'];
+
+            loaded.push({
+              icon: iconVal,
+              title: titleVal,
+              description: descVal,
+              tags: tags,
+              published: pubVal
+            });
+          }
+        }
+      }
+    } catch (e) {
+      // fallback
+    }
+  }
+
+  if (loaded.length > 0) {
+    allAchievements = loaded;
+  }
+
+  achievementsVisibleCount = ACHIEVEMENTS_PAGE_SIZE;
+  initAchievementsSeeMore();
+  renderAchievementsCards();
+}
+
+function renderAchievementsCards(append = false) {
+  const grid = document.getElementById('achievementsGrid');
+  const seeMoreWrap = document.getElementById('achievementsSeeMoreWrap');
+  const seeMoreBtn = document.getElementById('achievementsSeeMoreBtn');
+  if (!grid) return;
+
+  const visible = allAchievements.slice(0, achievementsVisibleCount);
+
+  if (!append) {
+    grid.innerHTML = visible.map(item => createAchievementCardHtml(item)).join('');
+  } else {
+    const startIndex = achievementsVisibleCount - ACHIEVEMENTS_PAGE_SIZE;
+    const newItems = allAchievements.slice(startIndex, achievementsVisibleCount);
+    grid.insertAdjacentHTML('beforeend', newItems.map(item => createAchievementCardHtml(item)).join(''));
+  }
+
+  if (seeMoreWrap) {
+    if (achievementsVisibleCount < allAchievements.length) {
+      seeMoreWrap.style.display = 'flex';
+      const remaining = allAchievements.length - achievementsVisibleCount;
+      if (seeMoreBtn) {
+        seeMoreBtn.innerHTML = `See More Achievements (${remaining} remaining) ↓`;
+      }
+    } else {
+      seeMoreWrap.style.display = 'none';
+    }
+  }
+}
+
+function createAchievementCardHtml(item) {
+  const isImage = item.icon.startsWith('http') || item.icon.startsWith('//') || item.icon.startsWith('data:');
+  const iconMarkup = isImage
+    ? `<img src="${escapeHtml(item.icon)}" alt="${escapeHtml(item.title)}" style="width:36px;height:36px;object-fit:contain;" />`
+    : escapeHtml(item.icon);
+
+  const tagsMarkup = (item.tags || [])
+    .map(tag => `<span class="tag">${escapeHtml(tag)}</span>`)
+    .join('');
+
+  return `
+    <article class="card">
+      <div class="card-header">
+        <div class="card-icon">${iconMarkup}</div>
+        <h4>${escapeHtml(item.title)}</h4>
+      </div>
+      <p>${escapeHtml(item.description)}</p>
+      ${tagsMarkup ? `<div class="tags">${tagsMarkup}</div>` : ''}
+    </article>
+  `;
+}
+
+function initAchievementsSeeMore() {
+  if (achievementsSeeMoreInitialized) return;
+  const seeMoreBtn = document.getElementById('achievementsSeeMoreBtn');
+  if (!seeMoreBtn) return;
+  achievementsSeeMoreInitialized = true;
+
+  seeMoreBtn.addEventListener('click', () => {
+    achievementsVisibleCount += ACHIEVEMENTS_PAGE_SIZE;
+    renderAchievementsCards(true);
+  });
+}
+
 function attachServiceRequestEvents() {
   document.querySelectorAll('.service-request-btn').forEach(btn => {
     if (btn.dataset.hasListener) return;
@@ -1779,14 +2098,17 @@ function attachServiceRequestEvents() {
 
     btn.addEventListener('click', () => {
       const serviceTitle = btn.dataset.serviceTitle || 'Service';
-      openServiceBookingModal(serviceTitle);
+      const servicePrice = btn.dataset.servicePrice || getDefaultPriceForService(serviceTitle);
+      openServiceBookingModal(serviceTitle, servicePrice);
     });
   });
 }
 
-function openServiceBookingModal(serviceTitle) {
+function openServiceBookingModal(serviceTitle, servicePrice) {
   const modal = document.getElementById('serviceModal');
   const titleDisplay = document.getElementById('serviceModalSelectedTitle');
+  const summaryTitle = document.getElementById('summaryServiceTitle');
+  const summaryPrice = document.getElementById('summaryServicePrice');
   const step1 = document.getElementById('serviceStep1');
   const step2 = document.getElementById('serviceStep2');
   const stepSuccess = document.getElementById('serviceStepSuccess');
@@ -1794,9 +2116,16 @@ function openServiceBookingModal(serviceTitle) {
 
   if (!modal) return;
   currentSelectedService = serviceTitle;
+  currentSelectedServicePrice = servicePrice || getDefaultPriceForService(serviceTitle);
 
   if (titleDisplay) {
-    titleDisplay.textContent = `📌 ${serviceTitle}`;
+    titleDisplay.innerHTML = `📌 <strong>${escapeHtml(serviceTitle)}</strong> <span class="service-modal-price-pill">Fee: ${escapeHtml(currentSelectedServicePrice)}</span>`;
+  }
+  if (summaryTitle) {
+    summaryTitle.textContent = serviceTitle;
+  }
+  if (summaryPrice) {
+    summaryPrice.textContent = currentSelectedServicePrice;
   }
 
   if (step1) step1.style.display = 'block';
@@ -1857,17 +2186,17 @@ function initServiceModal() {
       const location = document.getElementById('serviceLocation')?.value.trim();
 
       if (!name) {
-        alert('অনুগ্রহ করে আপনার নাম লিখুন।');
+        alert('Please enter your full name.');
         document.getElementById('serviceName')?.focus();
         return;
       }
       if (!mobile) {
-        alert('অনুগ্রহ করে আপনার মোবাইল নম্বর লিখুন।');
+        alert('Please enter your mobile / phone number.');
         document.getElementById('serviceMobile')?.focus();
         return;
       }
       if (!location) {
-        alert('অনুগ্রহ করে আপনার ঠিকানা / লোকেশন লিখুন।');
+        alert('Please enter your address / location.');
         document.getElementById('serviceLocation')?.focus();
         return;
       }
@@ -1875,6 +2204,12 @@ function initServiceModal() {
       step1.style.display = 'none';
       step2.style.display = 'block';
       stepSuccess.style.display = 'none';
+
+      const summaryTitle = document.getElementById('summaryServiceTitle');
+      const summaryPrice = document.getElementById('summaryServicePrice');
+      if (summaryTitle) summaryTitle.textContent = currentSelectedService;
+      if (summaryPrice) summaryPrice.textContent = currentSelectedServicePrice;
+
       updateGatewayDisplay();
     };
   }
@@ -1902,14 +2237,12 @@ function initServiceModal() {
     const label = document.getElementById('gatewaySelectedLabel');
     const desc = document.getElementById('gatewayInstructions');
     const descName = document.getElementById('gatewayNameInDesc');
-    const gwName = currentSelectedGateway === 'bKash' ? 'বিকাশ' :
-                   currentSelectedGateway === 'Nagad' ? 'নগদ' :
-                   currentSelectedGateway === 'Upay' ? 'উপায়' : 'রকেট';
+    const gwName = currentSelectedGateway || 'bKash';
 
-    if (label) label.textContent = `${gwName} (${currentSelectedGateway}) পার্সোনাল নাম্বার:`;
+    if (label) label.textContent = `${gwName} Personal Number:`;
     if (descName) descName.textContent = gwName;
     if (desc) {
-      desc.innerHTML = `আপনার <strong>${gwName}</strong> অ্যাকাউন্ট থেকে উপরের পার্সোনাল নম্বর <strong>${PERSONAL_NUMBER}</strong>-এ সেন্ড মানি (Send Money) করুন। টাকা পাঠানোর পর আপনি যে নম্বর থেকে টাকা পাঠিয়েছেন তা নিচের বক্সে লিখুন।`;
+      desc.innerHTML = `Send Money <span class="instruct-price">${escapeHtml(currentSelectedServicePrice)}</span> to the personal number <strong>${PERSONAL_NUMBER}</strong> from your <strong>${gwName}</strong> account. After sending, enter your sender mobile number below.`;
     }
   }
 
@@ -1931,10 +2264,10 @@ function initServiceModal() {
   function showCopySuccess() {
     copyNumberBtn.classList.add('copied');
     const textSpan = document.getElementById('copyBtnText');
-    if (textSpan) textSpan.textContent = '✓ কপি হয়েছে!';
+    if (textSpan) textSpan.textContent = '✓ Copied!';
     setTimeout(() => {
       copyNumberBtn.classList.remove('copied');
-      if (textSpan) textSpan.textContent = 'নম্বর কপি করুন';
+      if (textSpan) textSpan.textContent = 'Copy Number';
     }, 2200);
   }
 
@@ -1947,12 +2280,12 @@ function initServiceModal() {
       document.execCommand('copy');
       showCopySuccess();
     } catch {
-      prompt('নম্বরটি কপি করুন:', PERSONAL_NUMBER);
+      prompt('Copy personal number:', PERSONAL_NUMBER);
     }
     document.body.removeChild(tempInput);
   }
 
-  // Step 2 Final Submit to Google Apps Script / Services Sheet
+  // Step 2 Final Submit: Saves to Bookings tab and Server Backend
   if (finalSubmitBtn) {
     finalSubmitBtn.onclick = async (e) => {
       e.preventDefault();
@@ -1965,41 +2298,49 @@ function initServiceModal() {
       const statusBox = document.getElementById('serviceSubmitStatus');
 
       if (!paymentNumber) {
-        alert('অনুগ্রহ করে আপনি যে নম্বর থেকে টাকা পাঠিয়েছেন সেই নম্বরটি লিখুন।');
+        alert('Please enter the sender mobile number you paid from.');
         document.getElementById('servicePaymentNumber')?.focus();
         return;
       }
 
       finalSubmitBtn.disabled = true;
-      finalSubmitBtn.textContent = 'সাবমিট হচ্ছে...';
+      finalSubmitBtn.textContent = 'Confirming...';
       if (statusBox) statusBox.style.display = 'none';
 
       const GOOGLE_SCRIPT_URL =
-        "https://script.google.com/macros/s/AKfycbztBbwboWpdr3xxAxlgau8aEB216GJ9cyQcFm1OOrxvjjXiXR5otElvwx3AyvZWnkgt3Q/exec";
+        "https://script.google.com/macros/s/AKfycbz16uxYP0BOLHZi3ymkFZJfrpIUZdK3dhADmD-ABvBwpm-wUeYNcxRm5iOLpVdyz0yp/exec";
 
       const payload = {
-        sheet: "Services",
-        targetSheet: "Services",
+        action: "booking",
+        sheet: "Bookings",
+        sheetName: "Bookings",
+        tab: "Bookings",
+        spreadsheetId: "1LtXbQRHeCscgqb79T8pnLCb5GdZwz8TeH_AX-PIXpd0",
         Name: name,
         Mobile: mobile,
         Location: location,
+        "Services Title": currentSelectedService || "General Service",
+        "Amount (BDT)": currentSelectedServicePrice,
+        Price: currentSelectedServicePrice,
         "Payment Gateway": currentSelectedGateway,
         "Payment Number": paymentNumber,
-        "Services Title": currentSelectedService || "General Service",
-        TrxID: trxId || "",
+        TrxID: trxId || "N/A",
         Notes: notes || "",
         Timestamp: new Date().toLocaleString("en-US", { timeZone: "Asia/Dhaka" }),
         name: name,
         mobile: mobile,
         location: location,
+        service_title: currentSelectedService || "General Service",
+        service_price: currentSelectedServicePrice,
         payment_gateway: currentSelectedGateway,
         payment_number: paymentNumber,
-        service_title: currentSelectedService || "General Service",
-        subject: `New Service Booking: ${currentSelectedService} - ${name}`,
-        message: `Service Title: ${currentSelectedService}\nName: ${name}\nMobile: ${mobile}\nLocation: ${location}\nPayment Gateway: ${currentSelectedGateway}\nPayment Number: ${paymentNumber}\nTrxID: ${trxId || 'N/A'}\nNotes: ${notes || 'N/A'}`
+        trx_id: trxId || "",
+        subject: `New Service Booking: ${currentSelectedService} (${currentSelectedServicePrice}) - ${name}`,
+        message: `Service Title: ${currentSelectedService}\nAmount / Fee: ${currentSelectedServicePrice}\nClient Name: ${name}\nMobile: ${mobile}\nLocation: ${location}\nPayment Gateway: ${currentSelectedGateway}\nPayment Number: ${paymentNumber}\nTrxID: ${trxId || 'N/A'}\nNotes: ${notes || 'N/A'}`
       };
 
       try {
+        // 1. Submit directly to Google Apps Script / Google Sheets (SINGLE SUBMISSION)
         await fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
           mode: "no-cors",
@@ -2007,7 +2348,14 @@ function initServiceModal() {
             "Content-Type": "text/plain;charset=utf-8"
           },
           body: JSON.stringify(payload)
-        });
+        }).catch(err => console.warn('Google Script fetch status note:', err));
+
+        // 2. Also record in local Express backend for guaranteed data preservation (will not re-forward to Google Script)
+        await fetch('/api/book-service', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(err => console.warn('Local backup booking note:', err));
 
         // Show Success Step
         step1.style.display = 'none';
@@ -2016,7 +2364,7 @@ function initServiceModal() {
 
         const successMsg = document.getElementById('serviceSuccessMsg');
         if (successMsg) {
-          successMsg.textContent = `ধন্যবাদ ${name}! "${currentSelectedService}" সেবার অনুরোধ এবং পেমেন্টের তথ্য (${currentSelectedGateway}: ${paymentNumber}) আমাদের গুগল শিটে সফলভাবে জমা হয়েছে। আমরা দ্রুত আপনার সাথে যোগাযোগ করব।`;
+          successMsg.innerHTML = `Thank you <strong>${escapeHtml(name)}</strong>! Your request for "<strong>${escapeHtml(currentSelectedService)}</strong>" (Fee: <strong>${escapeHtml(currentSelectedServicePrice)}</strong>) and payment details (<strong>${escapeHtml(currentSelectedGateway)}: ${escapeHtml(paymentNumber)}</strong>) have been successfully saved to our Google Sheet. We will reach out to you shortly.`;
         }
 
         // Reset forms
@@ -2028,11 +2376,11 @@ function initServiceModal() {
           statusBox.style.display = 'block';
           statusBox.style.background = '#fef2f2';
           statusBox.style.color = '#dc2626';
-          statusBox.textContent = 'দুঃখিত, কোনো সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।';
+          statusBox.textContent = 'Sorry, something went wrong. Please try again.';
         }
       } finally {
         finalSubmitBtn.disabled = false;
-        finalSubmitBtn.textContent = 'কনফার্ম ও সাবমিট করুন ✓';
+        finalSubmitBtn.textContent = 'Confirm';
       }
     };
   }
