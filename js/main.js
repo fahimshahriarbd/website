@@ -11,6 +11,17 @@ function escapeHtml(value){
   );
 }
 
+function openExternalUrl(url) {
+  if (!url) return;
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
 function formatDateValue(val, formatted){
   if(!val && !formatted) return 'Today';
   const str = String(val || '').trim();
@@ -2402,7 +2413,7 @@ function attachProjectCardEvents() {
       if (link.startsWith('#')) {
         window.location.hash = link;
       } else {
-        window.open(link, '_blank', 'noopener,noreferrer');
+        openExternalUrl(link);
       }
     }
   });
@@ -2599,24 +2610,43 @@ function initServiceModal() {
 
   // Step 1 to Step 2
   if (goToPaymentBtn) {
+    // Clear error feedback on typing
+    ['serviceName', 'serviceMobile', 'serviceLocation'].forEach(id => {
+      document.getElementById(id)?.addEventListener('input', () => {
+        const step1Err = document.getElementById('serviceStep1Error');
+        if (step1Err) step1Err.style.display = 'none';
+      });
+    });
+
     goToPaymentBtn.onclick = (e) => {
       e.preventDefault();
       const name = document.getElementById('serviceName')?.value.trim();
       const mobile = document.getElementById('serviceMobile')?.value.trim();
       const location = document.getElementById('serviceLocation')?.value.trim();
+      const step1Err = document.getElementById('serviceStep1Error');
+      if (step1Err) step1Err.style.display = 'none';
 
       if (!name) {
-        alert('Please enter your full name.');
+        if (step1Err) {
+          step1Err.textContent = 'Please enter your full name.';
+          step1Err.style.display = 'block';
+        }
         document.getElementById('serviceName')?.focus();
         return;
       }
       if (!mobile) {
-        alert('Please enter your mobile / phone number.');
+        if (step1Err) {
+          step1Err.textContent = 'Please enter your mobile / phone number.';
+          step1Err.style.display = 'block';
+        }
         document.getElementById('serviceMobile')?.focus();
         return;
       }
       if (!location) {
-        alert('Please enter your address / location.');
+        if (step1Err) {
+          step1Err.textContent = 'Please enter your address / location.';
+          step1Err.style.display = 'block';
+        }
         document.getElementById('serviceLocation')?.focus();
         return;
       }
@@ -2728,7 +2758,13 @@ function initServiceModal() {
       const statusBox = document.getElementById('serviceSubmitStatus');
 
       if (!paymentNumber) {
-        alert('Please enter the sender mobile number you paid from.');
+        if (statusBox) {
+          statusBox.style.display = 'block';
+          statusBox.style.background = '#fef2f2';
+          statusBox.style.color = '#dc2626';
+          statusBox.style.border = '1px solid #fecaca';
+          statusBox.textContent = 'Please enter the sender mobile number you paid from.';
+        }
         document.getElementById('servicePaymentNumber')?.focus();
         return;
       }
@@ -2821,7 +2857,8 @@ function initServiceModal() {
    ========================================================= */
 
 function initBackgroundAudio() {
-  const audio = document.getElementById('bgMusic') || new Audio('audio/background.mp3');
+  const audio = document.getElementById('bgMusic');
+  if (!audio || !audio.getAttribute('src')) return;
   audio.loop = true;
   audio.volume = 0.45;
 
@@ -3172,7 +3209,7 @@ function handleCvDownloadClick(index) {
   // Rule 1: "যদি গুগল শীটে পাসওয়ার্ড ০ থাকে তাহলে ডিরেক্ট ডাউনলোড হবে।"
   if (!isProtected) {
     if (downloadLink) {
-      window.open(downloadLink, '_blank');
+      openExternalUrl(downloadLink);
     }
     return;
   }
@@ -3216,7 +3253,7 @@ function verifyCvPassword() {
     if (errorEl) errorEl.style.display = 'none';
     const downloadLink = currentSelectedCv['Download Link'] || currentSelectedCv.link;
     if (downloadLink) {
-      window.open(downloadLink, '_blank');
+      openExternalUrl(downloadLink);
     }
     closeCvModal();
   } else {

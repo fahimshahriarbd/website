@@ -14,6 +14,9 @@ const DATA_DIR = path.join(__dirname, 'data');
 const BOOKINGS_FILE = path.join(DATA_DIR, 'bookings.json');
 const MESSAGES_FILE = path.join(DATA_DIR, 'messages.json');
 
+// Prevent direct public browsing of sensitive raw JSON data files
+app.use('/data', (req, res) => res.status(403).json({ error: 'Access denied' }));
+
 function ensureDataStorage() {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -27,6 +30,30 @@ function ensureDataStorage() {
 }
 ensureDataStorage();
 
+function readJsonSafely(filePath) {
+  try {
+    ensureDataStorage();
+    if (!fs.existsSync(filePath)) return [];
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const parsed = JSON.parse(raw || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    console.warn(`Warning reading ${filePath}:`, err.message);
+    return [];
+  }
+}
+
+function writeJsonSafely(filePath, data) {
+  try {
+    ensureDataStorage();
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+    return true;
+  } catch (err) {
+    console.error(`Error writing ${filePath}:`, err.message);
+    return false;
+  }
+}
+
 // API: Save Contact Message (Messages tab)
 app.post('/api/contact-message', async (req, res) => {
   try {
@@ -37,14 +64,9 @@ app.post('/api/contact-message', async (req, res) => {
       ...req.body
     };
 
-    try {
-      ensureDataStorage();
-      const current = JSON.parse(fs.readFileSync(MESSAGES_FILE, 'utf8') || '[]');
-      current.unshift(message);
-      fs.writeFileSync(MESSAGES_FILE, JSON.stringify(current, null, 2), 'utf8');
-    } catch (fsErr) {
-      console.error('Messages file save warning:', fsErr);
-    }
+    const current = readJsonSafely(MESSAGES_FILE);
+    current.unshift(message);
+    writeJsonSafely(MESSAGES_FILE, current);
 
     res.json({ success: true, messageId: message.id });
   } catch (error) {
@@ -55,8 +77,7 @@ app.post('/api/contact-message', async (req, res) => {
 // API: List Messages
 app.get('/api/messages', (req, res) => {
   try {
-    ensureDataStorage();
-    const data = JSON.parse(fs.readFileSync(MESSAGES_FILE, 'utf8') || '[]');
+    const data = readJsonSafely(MESSAGES_FILE);
     res.json({ success: true, count: data.length, messages: data });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -73,15 +94,9 @@ app.post('/api/book-service', async (req, res) => {
       ...req.body
     };
 
-    // Save to local file
-    try {
-      ensureDataStorage();
-      const current = JSON.parse(fs.readFileSync(BOOKINGS_FILE, 'utf8') || '[]');
-      current.unshift(booking);
-      fs.writeFileSync(BOOKINGS_FILE, JSON.stringify(current, null, 2), 'utf8');
-    } catch (fsErr) {
-      console.error('File save warning:', fsErr);
-    }
+    const current = readJsonSafely(BOOKINGS_FILE);
+    current.unshift(booking);
+    writeJsonSafely(BOOKINGS_FILE, current);
 
     res.json({
       success: true,
@@ -106,8 +121,7 @@ app.get('/api/config', (req, res) => {
 // API: Export Bookings as CSV
 app.get('/api/export-bookings.csv', (req, res) => {
   try {
-    ensureDataStorage();
-    const data = JSON.parse(fs.readFileSync(BOOKINGS_FILE, 'utf8') || '[]');
+    const data = readJsonSafely(BOOKINGS_FILE);
     const headers = ['ID', 'Date (Dhaka)', 'Client Name', 'Mobile', 'Location', 'Service Title', 'Amount (BDT)', 'Gateway', 'Payment Number', 'TrxID', 'Notes'];
     const rows = data.map(b => [
       `"${b.id || ''}"`,
@@ -134,8 +148,7 @@ app.get('/api/export-bookings.csv', (req, res) => {
 // API: List Bookings
 app.get('/api/bookings', (req, res) => {
   try {
-    ensureDataStorage();
-    const data = JSON.parse(fs.readFileSync(BOOKINGS_FILE, 'utf8') || '[]');
+    const data = readJsonSafely(BOOKINGS_FILE);
     res.json({ success: true, count: data.length, bookings: data });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
