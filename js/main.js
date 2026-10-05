@@ -66,6 +66,52 @@ function formatDateValue(val, formatted){
   return str.replace(/Date\((.*?)\)/gi, '$1');
 }
 
+/* Expand / Collapse Description Action */
+function toggleCardDesc(btn, evt) {
+  if (evt) {
+    if (typeof evt.preventDefault === 'function') evt.preventDefault();
+    if (typeof evt.stopPropagation === 'function') evt.stopPropagation();
+  }
+  const container = btn ? btn.closest('.expandable-desc') : null;
+  if (!container) return;
+
+  const full = container.querySelector('.desc-full');
+  const dots = container.querySelector('.desc-dots');
+  const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+
+  if (isExpanded) {
+    if (full) full.style.display = 'none';
+    if (dots) dots.style.display = 'inline';
+    btn.textContent = 'See more';
+    btn.setAttribute('aria-expanded', 'false');
+  } else {
+    if (full) full.style.display = 'inline';
+    if (dots) dots.style.display = 'none';
+    btn.textContent = 'See less';
+    btn.setAttribute('aria-expanded', 'true');
+  }
+}
+window.toggleCardDesc = toggleCardDesc;
+
+/* 10 Words Limit + See More Truncation Helper */
+function formatTruncatedDesc(text, maxWords = 10) {
+  const str = String(text || '').trim();
+  if (!str) return '';
+  const words = str.split(/\s+/).filter(Boolean);
+  if (words.length <= maxWords) {
+    return `<p class="card-desc">${escapeHtml(str)}</p>`;
+  }
+  const shortPart = words.slice(0, maxWords).join(' ');
+  const remainingPart = words.slice(maxWords).join(' ');
+  return `
+    <p class="card-desc expandable-desc">
+      <span class="desc-short">${escapeHtml(shortPart)}</span><span class="desc-dots">...</span>
+      <span class="desc-full" style="display:none;"> ${escapeHtml(remainingPart)}</span>
+      <button type="button" class="desc-toggle-btn" aria-expanded="false" onclick="toggleCardDesc(this, event)">See more</button>
+    </p>
+  `;
+}
+
 async function loadSections(){
   const slots=[...document.querySelectorAll('[data-section]')];
 
@@ -541,14 +587,15 @@ async function initSite(){
       counter++;
       if (!card.id) card.id = `testimonial-item-${counter}`;
       const name = card.querySelector('.person-name-link')?.textContent.trim() || '';
-      const text = card.querySelector('.testimonial-text')?.textContent.trim() || '';
+      const text = card.querySelector('.testimonial-content p, .card-desc')?.textContent.trim() || '';
       const tag = card.querySelector('.person-relation-tag')?.textContent.trim() || '';
+      const about = card.querySelector('.testimonial-about-badge')?.textContent.replace(/^About:\s*/i, '').trim() || '';
       items.push({
         id: card.id,
         title: name ? `${name} (${tag})` : 'Recommendation',
         text: text,
-        meta: `Testimonial · ${tag}`,
-        tags: [...new Set(['Testimonials', tag, name].filter(Boolean))],
+        meta: `Testimonial · ${tag}${about ? ' · About ' + about : ''}`,
+        tags: [...new Set(['Testimonials', tag, name, about].filter(Boolean))],
         sectionId: 'testimonials'
       });
     });
@@ -768,13 +815,21 @@ async function initSite(){
       siteSearch.value = cleanTag;
       buildSearchIndex();
       renderSearch(cleanTag);
-      siteSearch.focus();
+      siteSearch.focus({ preventScroll: true });
       siteSearch.select();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // NO AUTO-SCROLLING! Keep current reading position without jumping to top!
     }
   }
 
   window.searchByTag = searchByTag;
+
+  // GLOBAL SEE MORE / SEE LESS TOGGLE FOR EXPANDABLE DESCRIPTIONS
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.desc-toggle-btn');
+    if (btn) {
+      toggleCardDesc(btn, e);
+    }
+  });
 
   // GLOBAL TAG CLICK LISTENER
   document.addEventListener('click', (e) => {
@@ -999,7 +1054,7 @@ async function loadWebsiteContent(){
             <span>${escapeHtml(date)} · ${escapeHtml(readTime)} min</span>
           </div>
           <h4>${escapeHtml(title)}</h4>
-          <p>${escapeHtml(summary)}</p>
+          ${formatTruncatedDesc(summary, 10)}
           <a class="read-more" href="${escapeHtml(link)}">Read article →</a>
         </div>
       </article>
@@ -1581,12 +1636,16 @@ function getDefaultPriceForService(title) {
 
 function formatFeeDisplay(val, title) {
   const raw = val || getDefaultPriceForService(title);
-  let clean = String(raw).replace(/bdt/gi, '').replace(/[৳,]/g, '').trim();
+  let clean = String(raw).replace(/bdt/gi, '').replace(/[৳,]/g, '').replace(/taka/gi, '').trim();
   const num = parseInt(clean, 10);
   if (!isNaN(num)) {
     clean = num.toLocaleString('en-US');
+    return `${clean} BDT`;
   }
-  return `${clean || '1,000'} BDT`;
+  if (clean) {
+    return `${clean} BDT`;
+  }
+  return '1,000 BDT';
 }
 
 async function loadServicesContent() {
@@ -1783,13 +1842,13 @@ function createServiceCardHtml(service) {
           <div class="card-icon">${iconMarkup}</div>
           <h4>${escapeHtml(service.title)}</h4>
         </div>
-        <p>${escapeHtml(service.description)}</p>
-        <div class="service-price-row">
-          <span class="service-price-label">Fee</span>
+        ${formatTruncatedDesc(service.description, 10)}
+      </div>
+      <div class="service-footer">
+        <div class="service-price-block">
+          <span class="service-price-label">Fee:</span>
           <span class="service-price-value">${escapeHtml(displayFee)}</span>
         </div>
-      </div>
-      <div class="service-action-wrap">
         <button type="button" class="service-request-btn" data-service-title="${escapeHtml(service.title)}" data-service-price="${escapeHtml(displayFee)}">
           I need this Service →
         </button>
@@ -2013,8 +2072,8 @@ function createAchievementCardHtml(item) {
         <div class="card-icon">${iconMarkup}</div>
         <h4>${escapeHtml(item.title)}</h4>
       </div>
-      <p>${escapeHtml(item.description)}</p>
-      ${tagsMarkup ? `<div class="tags">${tagsMarkup}</div>` : ''}
+      ${formatTruncatedDesc(item.description, 10)}
+      ${tagsMarkup ? `<div class="tags" style="margin-top:14px;">${tagsMarkup}</div>` : ''}
     </article>
   `;
 }
@@ -2316,8 +2375,8 @@ function createProjectCardHtml(item, index) {
           <div class="card-icon">${iconMarkup}</div>
           <h4>${escapeHtml(item.title)}</h4>
         </div>
-        <p>${escapeHtml(item.description)}</p>
-        ${tagsMarkup ? `<div class="tags" style="margin-top:12px;">${tagsMarkup}</div>` : ''}
+        ${formatTruncatedDesc(item.description, 10)}
+        ${tagsMarkup ? `<div class="tags" style="margin-top:14px;">${tagsMarkup}</div>` : ''}
       </div>
       <div class="project-card-footer">
         <button type="button" class="project-view-details-btn" data-project-index="${index}">
@@ -2335,8 +2394,8 @@ function attachProjectCardEvents() {
     el.dataset.hasProjectListener = 'true';
 
     el.addEventListener('click', (e) => {
-      // If clicking directly on a tag or a link, do not open modal!
-      if (e.target.closest('.tag') || e.target.closest('a')) {
+      // If clicking directly on a tag, a link, or see more button, do not open modal!
+      if (e.target.closest('.tag') || e.target.closest('a') || e.target.closest('.desc-toggle-btn')) {
         return;
       }
       const index = parseInt(el.dataset.projectIndex, 10);
@@ -2796,6 +2855,7 @@ const DEFAULT_TESTIMONIALS = [
   {
     name: 'Dr. Shafiul Alam',
     tag: 'Teacher',
+    about: 'Academic & Clinical Mentorship',
     role: 'Faculty, CMC Dental Unit',
     feedback: 'Fahim is an exceptionally dedicated dental student. His clinical eagerness, analytical discipline, and continuous search for knowledge set him apart in our academic environment.',
     image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=200&q=85',
@@ -2804,6 +2864,7 @@ const DEFAULT_TESTIMONIALS = [
   {
     name: 'Tanvir Hasan',
     tag: 'Student',
+    about: 'Biology & Chemistry Tuition',
     role: 'Science Student, Caretutors Batch',
     feedback: 'Fahim Bhai explained complex Biology and Chemistry concepts with unmatched clarity. His personalized study strategies and patient mentoring genuinely boosted my academic confidence.',
     image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=85',
@@ -2812,6 +2873,7 @@ const DEFAULT_TESTIMONIALS = [
   {
     name: 'Mahmudur Rahman',
     tag: 'Friend',
+    about: 'Website & IT Architecture',
     role: 'CMC BDS Classmate & Tech Collaborator',
     feedback: 'From dental clinical sessions to digital web management, Fahim consistently demonstrates leadership, precision, and an inspiring drive to build practical solutions.',
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=85',
@@ -2824,6 +2886,7 @@ let allTestimonials = [...DEFAULT_TESTIMONIALS];
 function createTestimonialCardHtml(item) {
   const name = String(item.name || 'Anonymous').trim();
   const tag = String(item.tag || item.relation || 'Friend').trim();
+  const about = String(item.about || item.topic || item.subject || 'Website').trim();
   const role = String(item.role || item.designation || '').trim();
   const feedback = String(item.feedback || item.quote || '').trim();
   const image = String(item.image || item.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=85').trim();
@@ -2834,23 +2897,23 @@ function createTestimonialCardHtml(item) {
 
   return `
     <article class="card testimonial-card">
-      <div>
-        <div class="quote">“</div>
-        <p class="testimonial-text">${escapeHtml(feedback)}</p>
-      </div>
-      <div class="person">
+      <div class="testimonial-header">
         <a href="${escapeHtml(link)}" ${targetAttr} class="person-avatar-link" title="View ${escapeHtml(name)}'s profile">
           <img class="avatar" src="${escapeHtml(image)}" alt="${escapeHtml(name)}" loading="lazy" />
         </a>
-        <div class="person-info" style="display:flex;flex-direction:column;">
-          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
-            <a href="${escapeHtml(link)}" ${targetAttr} class="person-name-link" title="View ${escapeHtml(name)}'s profile">
-              ${escapeHtml(name)}
-            </a>
+        <div class="person-info">
+          <a href="${escapeHtml(link)}" ${targetAttr} class="person-name-link" title="View ${escapeHtml(name)}'s profile">
+            <b>${escapeHtml(name)}</b>
+          </a>
+          <div class="testimonial-meta-row">
             ${tag ? `<span class="person-relation-tag tag" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</span>` : ''}
+            ${about ? `<span class="testimonial-about-badge">About: ${escapeHtml(about)}</span>` : ''}
           </div>
-          ${role ? `<small>${escapeHtml(role)}</small>` : ''}
         </div>
+      </div>
+      <div class="testimonial-content">
+        <div class="quote">“</div>
+        ${formatTruncatedDesc(feedback, 10)}
       </div>
     </article>
   `;
@@ -2887,6 +2950,7 @@ async function loadTestimonialsContent() {
           loaded.push({
             name: name,
             tag: String(item.Tag || item.tag || item.Relation || item.relation || 'Friend').trim(),
+            about: String(item.About || item.about || item.Topic || item.topic || item.Subject || item.subject || 'Website').trim(),
             role: String(item.Role || item.role || item.Designation || item.designation || '').trim(),
             feedback: String(item.Feedback || item.feedback || item.Quote || item.quote || item.Description || '').trim(),
             image: String(item.Image || item.image || item.Avatar || item.avatar || '').trim() || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=85',
@@ -2912,11 +2976,12 @@ async function loadTestimonialsContent() {
           const cols = data.table?.cols || [];
           const rows = data.table?.rows || [];
 
-          let nameCol = -1, tagCol = -1, roleCol = -1, fbCol = -1, imgCol = -1, linkCol = -1, pubCol = -1;
+          let nameCol = -1, tagCol = -1, aboutCol = -1, roleCol = -1, fbCol = -1, imgCol = -1, linkCol = -1, pubCol = -1;
           cols.forEach((col, idx) => {
             const lbl = String(col.label || col.id || '').trim().toLowerCase();
             if (lbl.includes('name')) nameCol = idx;
             else if (lbl.includes('tag') || lbl.includes('relat')) tagCol = idx;
+            else if (lbl.includes('about') || lbl.includes('topic') || lbl.includes('subj')) aboutCol = idx;
             else if (lbl.includes('role') || lbl.includes('designat')) roleCol = idx;
             else if (lbl.includes('feed') || lbl.includes('quote') || lbl.includes('desc')) fbCol = idx;
             else if (lbl.includes('img') || lbl.includes('image') || lbl.includes('avatar')) imgCol = idx;
@@ -2935,6 +3000,7 @@ async function loadTestimonialsContent() {
             loaded.push({
               name: nameVal,
               tag: tagCol >= 0 ? String(cells[tagCol]?.v || '').trim() : 'Friend',
+              about: aboutCol >= 0 ? (String(cells[aboutCol]?.v || '').trim() || 'Website') : 'Website',
               role: roleCol >= 0 ? String(cells[roleCol]?.v || '').trim() : '',
               feedback: fbCol >= 0 ? String(cells[fbCol]?.v || '').trim() : '',
               image: imgCol >= 0 ? (String(cells[imgCol]?.v || '').trim() || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=85') : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=85',
