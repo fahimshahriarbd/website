@@ -346,30 +346,56 @@ button,input,textarea{font:inherit;font-size:16px}
 .service-card-body{flex:1;display:flex;flex-direction:column}
 .service-card-body .card-header{margin-bottom:12px}
 .service-footer{
-  margin-top:20px;padding-top:16px;border-top:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-top:18px;padding-top:14px;border-top:1px solid var(--border);
+  display:flex;flex-direction:column;gap:12px;
 }
-.service-price-block{display:inline-flex;align-items:baseline;gap:6px}
+.service-price-block,
+.service-fee-row{
+  display:flex;align-items:center;justify-content:space-between;width:100%;
+}
 .service-price-label{
-  font-size:0.88rem;font-weight:750;color:var(--muted);letter-spacing:0.2px;
+  font-size:clamp(0.85rem, 2.2vw, 0.92rem);
+  font-weight:750;
+  color:var(--muted);
+  letter-spacing:0.2px;
 }
 .service-price-value{
-  font-size:1.06rem;font-weight:850;color:var(--primary);line-height:1;white-space:nowrap;
+  font-size:clamp(0.96rem, 2.6vw, 1.1rem);
+  font-weight:850;
+  color:var(--primary);
+  line-height:1;
+  white-space:nowrap;
+  letter-spacing:0.3px;
+  padding:5px 12px;
+  background:color-mix(in srgb,var(--primary) 10%,var(--surface2));
+  border-radius:8px;
+  border:1px solid color-mix(in srgb,var(--primary) 22%,transparent);
+  margin-left:auto;
+  text-align:right;
 }
 .service-request-btn{
-  padding:9px 18px;font-size:0.86rem;font-weight:750;border-radius:999px;
-  background:var(--primary);color:#ffffff;border:1px solid var(--primary);
-  cursor:pointer;transition:all .22s cubic-bezier(0.4,0,0.2,1);
-  display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+  width:100%;
+  justify-content:center;
+  padding:10px 18px;
+  font-size:clamp(0.84rem, 2.2vw, 0.88rem);
+  font-weight:750;
+  border-radius:999px;
+  background:var(--primary);
+  color:#ffffff;
+  border:1px solid var(--primary);
+  cursor:pointer;
+  transition:all .22s cubic-bezier(0.4,0,0.2,1);
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  white-space:nowrap;
   box-shadow:0 4px 14px rgba(37,99,235,.22);
 }
 .service-request-btn:hover{
-  background:var(--primary2);border-color:var(--primary2);
-  transform:translateY(-2px);box-shadow:0 6px 18px rgba(37,99,235,.35);
-}
-@media(max-width:480px){
-  .service-footer{flex-direction:column;align-items:stretch;gap:12px}
-  .service-request-btn{justify-content:center;width:100%;padding:11px}
+  background:var(--primary2);
+  border-color:var(--primary2);
+  transform:translateY(-2px);
+  box-shadow:0 6px 18px rgba(37,99,235,.35);
 }
 
 /* Expandable Descriptions (10 Words limit + See more) */
@@ -775,6 +801,16 @@ button,input,textarea{font:inherit;font-size:16px}
 }
 .testimonial-content{
   display:flex;flex-direction:column;gap:4px;flex:1;
+  text-align:justify;
+  text-justify:inter-word;
+}
+.testimonial-content p,
+.testimonial-card .card-desc,
+.testimonial-card .desc-short,
+.testimonial-card .desc-full{
+  text-align:justify;
+  text-justify:inter-word;
+  line-height:1.65;
 }
 .quote{display:none !important;}
 
@@ -1057,6 +1093,71 @@ button,input,textarea{font:inherit;font-size:16px}
 /* ===== CV Modal Styles ===== */
 .cv-modal-box {
   width: min(580px, 100%);
+  padding: 28px 24px;
+}
+
+.cv-modal-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.cv-header-eyebrow {
+  display: inline-block;
+  color: var(--primary);
+  font-weight: 800;
+  font-size: clamp(0.72rem, 2.2vw, 0.8rem);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.cv-header-title {
+  margin: 4px 0 8px;
+  font-size: clamp(1.2rem, 4vw, 1.48rem);
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.cv-header-sub {
+  color: var(--muted);
+  font-size: clamp(0.82rem, 2.5vw, 0.9rem);
+  margin: 0 auto;
+  max-width: 440px;
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .cv-modal-box {
+    padding: 22px 16px;
+    border-radius: 18px;
+  }
+  .cv-modal-header {
+    margin-bottom: 16px;
+  }
+  .cv-item {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+  .cv-item-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.2rem;
+    border-radius: 10px;
+  }
+  .cv-item-title {
+    font-size: clamp(0.88rem, 3.6vw, 0.96rem);
+  }
+  .cv-item-badge {
+    font-size: 0.72rem;
+  }
+  .cv-download-btn {
+    padding: 8px 14px;
+    font-size: 0.82rem;
+  }
+  .cv-unknown-password-box {
+    padding: 14px 12px;
+  }
 }
 
 .cv-list {
