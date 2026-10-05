@@ -784,11 +784,12 @@ async function initSite(){
   }
 
 
-  /* LOAD GOOGLE SHEET CONTENT (BLOG & GALLERY) */
+  /* LOAD GOOGLE SHEET CONTENT (BLOG, GALLERY & SERVICES) */
 
   await Promise.allSettled([
     loadWebsiteContent(),
-    loadGalleryContent()
+    loadGalleryContent(),
+    loadServicesContent()
   ]);
 }
 
@@ -1586,6 +1587,456 @@ async function downloadImage(url, filename) {
 }
 
 
+
+/* =========================================================
+   GOOGLE SHEETS SERVICES & BOOKING/PAYMENT SYSTEM
+   ========================================================= */
+
+const DEFAULT_SERVICES = [
+  { icon: '🎓', title: 'Tuition Media & Mentorship', description: 'Education-focused digital promotion, tutoring experience, and mentoring.' },
+  { icon: '💻', title: 'Web Development & IT', description: 'Basic website setup, static pages, DNS mapping, and BTCL domain guidance.' },
+  { icon: '🛒', title: 'E-commerce Management', description: 'Guidance on seller operations and logistics management based on Daraz experience.' },
+  { icon: '🎬', title: 'Creative Content', description: 'Ideas and support for digital content, visuals and online projects.' },
+  { icon: '🦷', title: 'Oral Health & Dental Consultation', description: 'Basic dental advice, oral hygiene tips, and clinical health guidance.' },
+  { icon: '📊', title: 'Digital Skills & Academic Support', description: 'Help with presentation slides, software tools, student projects, and career guidance.' }
+];
+
+let allServices = [...DEFAULT_SERVICES];
+const SERVICES_PAGE_SIZE = 5;
+let servicesVisibleCount = 5;
+let servicesSeeMoreInitialized = false;
+
+let currentSelectedService = '';
+let currentSelectedGateway = 'bKash';
+const PERSONAL_NUMBER = '01316831199';
+
+async function loadServicesContent() {
+  const SERVICES_API_URL =
+    "https://docs.google.com/spreadsheets/d/1FPDlW0ugDgBLds5AD86sTo-Arw0r9T4cJZ8b4Vl5s5w/gviz/tq?tqx=out:json&sheet=Services";
+
+  const servicesGrid = document.getElementById('servicesGrid');
+  if (!servicesGrid) return;
+
+  try {
+    const response = await fetch(SERVICES_API_URL, { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`Google Sheet Services returned HTTP ${response.status}`);
+    }
+
+    const rawText = await response.text();
+    const firstBrace = rawText.indexOf('{');
+    const lastBrace = rawText.lastIndexOf('}');
+
+    if (firstBrace === -1 || lastBrace <= firstBrace) {
+      throw new Error('Invalid JSON from Services sheet');
+    }
+
+    const data = JSON.parse(rawText.slice(firstBrace, lastBrace + 1));
+    const cols = data.table?.cols || [];
+    const rows = data.table?.rows || [];
+
+    let iconColIdx = -1;
+    let titleColIdx = -1;
+    let descColIdx = -1;
+    let headerRowIdx = -1;
+
+    // Check cols labels
+    cols.forEach((col, idx) => {
+      const lbl = String(col.label || col.id || '').trim().toLowerCase();
+      if (lbl.includes('icon')) iconColIdx = idx;
+      if (lbl.includes('title') || lbl.includes('service') || lbl.includes('name')) titleColIdx = idx;
+      if (lbl.includes('desc') || lbl.includes('detail')) descColIdx = idx;
+    });
+
+    // If headers in row 0
+    if ((titleColIdx === -1 || descColIdx === -1) && rows.length > 0) {
+      const firstRowCells = rows[0]?.c || [];
+      firstRowCells.forEach((cell, idx) => {
+        const val = String(cell?.v || '').trim().toLowerCase();
+        if (val.includes('icon')) { iconColIdx = idx; headerRowIdx = 0; }
+        if (val.includes('title') || val.includes('service') || val.includes('name')) { titleColIdx = idx; headerRowIdx = 0; }
+        if (val.includes('desc') || val.includes('detail')) { descColIdx = idx; headerRowIdx = 0; }
+      });
+    }
+
+    if (iconColIdx === -1) iconColIdx = 0;
+    if (titleColIdx === -1) titleColIdx = 1;
+    if (descColIdx === -1) descColIdx = 2;
+
+    const parsedServices = [];
+    const startRow = headerRowIdx >= 0 ? headerRowIdx + 1 : 0;
+
+    for (let i = startRow; i < rows.length; i++) {
+      const cells = rows[i]?.c || [];
+      const iconVal = String(cells[iconColIdx]?.v || '').trim() || '💼';
+      const titleVal = String(cells[titleColIdx]?.v || '').trim();
+      const descVal = String(cells[descColIdx]?.v || '').trim();
+
+      // Ensure valid entry (not repeated header and has title)
+      if (
+        titleVal &&
+        titleVal.toLowerCase() !== 'title' &&
+        titleVal.toLowerCase() !== 'icon' &&
+        titleVal.toLowerCase() !== 'description'
+      ) {
+        parsedServices.push({
+          icon: iconVal,
+          title: titleVal,
+          description: descVal || 'Quality service tailored to your requirements.'
+        });
+      }
+    }
+
+    if (parsedServices.length > 0) {
+      allServices = parsedServices;
+    }
+  } catch (error) {
+    console.warn('Could not load services from Google Sheets, using defaults:', error);
+  }
+
+  servicesVisibleCount = SERVICES_PAGE_SIZE;
+  initServicesSeeMore();
+  renderServicesCards();
+  initServiceModal();
+
+  if (typeof window.updateSearchIndex === 'function') {
+    window.updateSearchIndex();
+  }
+}
+
+function renderServicesCards(append = false) {
+  const servicesGrid = document.getElementById('servicesGrid');
+  const seeMoreWrap = document.getElementById('servicesSeeMoreWrap');
+  const seeMoreBtn = document.getElementById('servicesSeeMoreBtn');
+  if (!servicesGrid) return;
+
+  const visibleServices = allServices.slice(0, servicesVisibleCount);
+
+  if (!append) {
+    servicesGrid.innerHTML = visibleServices.map(service => createServiceCardHtml(service)).join('');
+  } else {
+    const startIndex = servicesVisibleCount - SERVICES_PAGE_SIZE;
+    const newItems = allServices.slice(startIndex, servicesVisibleCount);
+    const newHtml = newItems.map(service => createServiceCardHtml(service)).join('');
+    servicesGrid.insertAdjacentHTML('beforeend', newHtml);
+  }
+
+  attachServiceRequestEvents();
+
+  if (seeMoreWrap) {
+    if (servicesVisibleCount < allServices.length) {
+      seeMoreWrap.style.display = 'flex';
+      const remaining = allServices.length - servicesVisibleCount;
+      if (seeMoreBtn) {
+        seeMoreBtn.innerHTML = `See More Services (${remaining} remaining) ↓`;
+      }
+    } else {
+      seeMoreWrap.style.display = 'none';
+    }
+  }
+}
+
+function createServiceCardHtml(service) {
+  const isImage = service.icon.startsWith('http') || service.icon.startsWith('//') || service.icon.startsWith('data:');
+  const iconMarkup = isImage
+    ? `<img src="${escapeHtml(service.icon)}" alt="${escapeHtml(service.title)}" style="width:36px;height:36px;object-fit:contain;" />`
+    : escapeHtml(service.icon);
+
+  return `
+    <article class="card service-card">
+      <div class="service-card-body">
+        <div class="card-header">
+          <div class="card-icon">${iconMarkup}</div>
+          <h4>${escapeHtml(service.title)}</h4>
+        </div>
+        <p>${escapeHtml(service.description)}</p>
+      </div>
+      <div class="service-action-wrap">
+        <button type="button" class="service-request-btn" data-service-title="${escapeHtml(service.title)}">
+          I need this Service →
+        </button>
+      </div>
+    </article>
+  `;
+}
+
+function initServicesSeeMore() {
+  if (servicesSeeMoreInitialized) return;
+  const seeMoreBtn = document.getElementById('servicesSeeMoreBtn');
+  if (!seeMoreBtn) return;
+  servicesSeeMoreInitialized = true;
+
+  seeMoreBtn.addEventListener('click', () => {
+    servicesVisibleCount += SERVICES_PAGE_SIZE;
+    renderServicesCards(true);
+  });
+}
+
+function attachServiceRequestEvents() {
+  document.querySelectorAll('.service-request-btn').forEach(btn => {
+    if (btn.dataset.hasListener) return;
+    btn.dataset.hasListener = 'true';
+
+    btn.addEventListener('click', () => {
+      const serviceTitle = btn.dataset.serviceTitle || 'Service';
+      openServiceBookingModal(serviceTitle);
+    });
+  });
+}
+
+function openServiceBookingModal(serviceTitle) {
+  const modal = document.getElementById('serviceModal');
+  const titleDisplay = document.getElementById('serviceModalSelectedTitle');
+  const step1 = document.getElementById('serviceStep1');
+  const step2 = document.getElementById('serviceStep2');
+  const stepSuccess = document.getElementById('serviceStepSuccess');
+  const statusBox = document.getElementById('serviceSubmitStatus');
+
+  if (!modal) return;
+  currentSelectedService = serviceTitle;
+
+  if (titleDisplay) {
+    titleDisplay.textContent = `📌 ${serviceTitle}`;
+  }
+
+  if (step1) step1.style.display = 'block';
+  if (step2) step2.style.display = 'none';
+  if (stepSuccess) stepSuccess.style.display = 'none';
+  if (statusBox) statusBox.style.display = 'none';
+
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+
+  setTimeout(() => {
+    document.getElementById('serviceName')?.focus();
+  }, 100);
+}
+
+let serviceModalInitialized = false;
+function initServiceModal() {
+  if (serviceModalInitialized) return;
+  const modal = document.getElementById('serviceModal');
+  if (!modal) return;
+  serviceModalInitialized = true;
+
+  const overlay = document.getElementById('serviceModalOverlay');
+  const closeBtn = document.getElementById('serviceModalClose');
+  const step1 = document.getElementById('serviceStep1');
+  const step2 = document.getElementById('serviceStep2');
+  const stepSuccess = document.getElementById('serviceStepSuccess');
+
+  const goToPaymentBtn = document.getElementById('serviceGoToPaymentBtn');
+  const backToStep1Btn = document.getElementById('serviceBackToStep1Btn');
+  const copyNumberBtn = document.getElementById('copyNumberBtn');
+  const finalSubmitBtn = document.getElementById('serviceFinalSubmitBtn');
+  const doneBtn = document.getElementById('serviceSuccessDoneBtn');
+
+  function closeModal() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  if (overlay) overlay.onclick = closeModal;
+  if (closeBtn) closeBtn.onclick = closeModal;
+  if (doneBtn) doneBtn.onclick = closeModal;
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) {
+      closeModal();
+    }
+  });
+
+  // Step 1 to Step 2
+  if (goToPaymentBtn) {
+    goToPaymentBtn.onclick = (e) => {
+      e.preventDefault();
+      const name = document.getElementById('serviceName')?.value.trim();
+      const mobile = document.getElementById('serviceMobile')?.value.trim();
+      const location = document.getElementById('serviceLocation')?.value.trim();
+
+      if (!name) {
+        alert('অনুগ্রহ করে আপনার নাম লিখুন।');
+        document.getElementById('serviceName')?.focus();
+        return;
+      }
+      if (!mobile) {
+        alert('অনুগ্রহ করে আপনার মোবাইল নম্বর লিখুন।');
+        document.getElementById('serviceMobile')?.focus();
+        return;
+      }
+      if (!location) {
+        alert('অনুগ্রহ করে আপনার ঠিকানা / লোকেশন লিখুন।');
+        document.getElementById('serviceLocation')?.focus();
+        return;
+      }
+
+      step1.style.display = 'none';
+      step2.style.display = 'block';
+      stepSuccess.style.display = 'none';
+      updateGatewayDisplay();
+    };
+  }
+
+  // Back to Step 1
+  if (backToStep1Btn) {
+    backToStep1Btn.onclick = () => {
+      step2.style.display = 'none';
+      step1.style.display = 'block';
+    };
+  }
+
+  // Gateway Selection
+  const gatewayButtons = modal.querySelectorAll('.gateway-card');
+  gatewayButtons.forEach(btn => {
+    btn.onclick = () => {
+      gatewayButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentSelectedGateway = btn.dataset.gateway || 'bKash';
+      updateGatewayDisplay();
+    };
+  });
+
+  function updateGatewayDisplay() {
+    const label = document.getElementById('gatewaySelectedLabel');
+    const desc = document.getElementById('gatewayInstructions');
+    const descName = document.getElementById('gatewayNameInDesc');
+    const gwName = currentSelectedGateway === 'bKash' ? 'বিকাশ' :
+                   currentSelectedGateway === 'Nagad' ? 'নগদ' :
+                   currentSelectedGateway === 'Upay' ? 'উপায়' : 'রকেট';
+
+    if (label) label.textContent = `${gwName} (${currentSelectedGateway}) পার্সোনাল নাম্বার:`;
+    if (descName) descName.textContent = gwName;
+    if (desc) {
+      desc.innerHTML = `আপনার <strong>${gwName}</strong> অ্যাকাউন্ট থেকে উপরের পার্সোনাল নম্বর <strong>${PERSONAL_NUMBER}</strong>-এ সেন্ড মানি (Send Money) করুন। টাকা পাঠানোর পর আপনি যে নম্বর থেকে টাকা পাঠিয়েছেন তা নিচের বক্সে লিখুন।`;
+    }
+  }
+
+  // Copy Number Button
+  if (copyNumberBtn) {
+    copyNumberBtn.onclick = () => {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(PERSONAL_NUMBER).then(() => {
+          showCopySuccess();
+        }).catch(() => {
+          fallbackCopy();
+        });
+      } else {
+        fallbackCopy();
+      }
+    };
+  }
+
+  function showCopySuccess() {
+    copyNumberBtn.classList.add('copied');
+    const textSpan = document.getElementById('copyBtnText');
+    if (textSpan) textSpan.textContent = '✓ কপি হয়েছে!';
+    setTimeout(() => {
+      copyNumberBtn.classList.remove('copied');
+      if (textSpan) textSpan.textContent = 'নম্বর কপি করুন';
+    }, 2200);
+  }
+
+  function fallbackCopy() {
+    const tempInput = document.createElement('input');
+    tempInput.value = PERSONAL_NUMBER;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    try {
+      document.execCommand('copy');
+      showCopySuccess();
+    } catch {
+      prompt('নম্বরটি কপি করুন:', PERSONAL_NUMBER);
+    }
+    document.body.removeChild(tempInput);
+  }
+
+  // Step 2 Final Submit to Google Apps Script / Services Sheet
+  if (finalSubmitBtn) {
+    finalSubmitBtn.onclick = async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('serviceName')?.value.trim();
+      const mobile = document.getElementById('serviceMobile')?.value.trim();
+      const location = document.getElementById('serviceLocation')?.value.trim();
+      const notes = document.getElementById('serviceNotes')?.value.trim();
+      const paymentNumber = document.getElementById('servicePaymentNumber')?.value.trim();
+      const trxId = document.getElementById('servicePaymentTrx')?.value.trim();
+      const statusBox = document.getElementById('serviceSubmitStatus');
+
+      if (!paymentNumber) {
+        alert('অনুগ্রহ করে আপনি যে নম্বর থেকে টাকা পাঠিয়েছেন সেই নম্বরটি লিখুন।');
+        document.getElementById('servicePaymentNumber')?.focus();
+        return;
+      }
+
+      finalSubmitBtn.disabled = true;
+      finalSubmitBtn.textContent = 'সাবমিট হচ্ছে...';
+      if (statusBox) statusBox.style.display = 'none';
+
+      const GOOGLE_SCRIPT_URL =
+        "https://script.google.com/macros/s/AKfycbztBbwboWpdr3xxAxlgau8aEB216GJ9cyQcFm1OOrxvjjXiXR5otElvwx3AyvZWnkgt3Q/exec";
+
+      const payload = {
+        sheet: "Services",
+        targetSheet: "Services",
+        Name: name,
+        Mobile: mobile,
+        Location: location,
+        "Payment Gateway": currentSelectedGateway,
+        "Payment Number": paymentNumber,
+        "Services Title": currentSelectedService || "General Service",
+        TrxID: trxId || "",
+        Notes: notes || "",
+        Timestamp: new Date().toLocaleString("en-US", { timeZone: "Asia/Dhaka" }),
+        name: name,
+        mobile: mobile,
+        location: location,
+        payment_gateway: currentSelectedGateway,
+        payment_number: paymentNumber,
+        service_title: currentSelectedService || "General Service",
+        subject: `New Service Booking: ${currentSelectedService} - ${name}`,
+        message: `Service Title: ${currentSelectedService}\nName: ${name}\nMobile: ${mobile}\nLocation: ${location}\nPayment Gateway: ${currentSelectedGateway}\nPayment Number: ${paymentNumber}\nTrxID: ${trxId || 'N/A'}\nNotes: ${notes || 'N/A'}`
+      };
+
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        // Show Success Step
+        step1.style.display = 'none';
+        step2.style.display = 'none';
+        stepSuccess.style.display = 'block';
+
+        const successMsg = document.getElementById('serviceSuccessMsg');
+        if (successMsg) {
+          successMsg.textContent = `ধন্যবাদ ${name}! "${currentSelectedService}" সেবার অনুরোধ এবং পেমেন্টের তথ্য (${currentSelectedGateway}: ${paymentNumber}) আমাদের গুগল শিটে সফলভাবে জমা হয়েছে। আমরা দ্রুত আপনার সাথে যোগাযোগ করব।`;
+        }
+
+        // Reset forms
+        document.getElementById('serviceClientForm')?.reset();
+        document.getElementById('servicePaymentForm')?.reset();
+      } catch (error) {
+        console.error('Service booking submission error:', error);
+        if (statusBox) {
+          statusBox.style.display = 'block';
+          statusBox.style.background = '#fef2f2';
+          statusBox.style.color = '#dc2626';
+          statusBox.textContent = 'দুঃখিত, কোনো সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।';
+        }
+      } finally {
+        finalSubmitBtn.disabled = false;
+        finalSubmitBtn.textContent = 'কনফার্ম ও সাবমিট করুন ✓';
+      }
+    };
+  }
+}
 
 /* =========================================================
    BACKGROUND MUSIC SYSTEM (NO VISIBLE CONTROLS)

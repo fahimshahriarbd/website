@@ -331,6 +331,94 @@ button,input,textarea{font:inherit;font-size:16px}
 .timeline-content small{color:var(--primary);font-weight:800;font-size:.85rem}
 .timeline-content h4{font-size:1.05rem;margin:6px 0 4px}
 
+/* Service Card Styles */
+.service-card{display:flex;flex-direction:column;justify-content:space-between;height:100%}
+.service-card-body{flex:1}
+.service-action-wrap{margin-top:16px;padding-top:14px;border-top:1px dashed var(--border)}
+.service-request-btn{
+  width:100%;justify-content:center;font-size:0.86rem;font-weight:700;padding:10px 16px;
+  border-radius:999px;transition:all .22s ease;border:1px solid var(--border);
+  background:var(--surface2);color:var(--primary);cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.service-request-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary);transform:translateY(-2px);box-shadow:0 6px 18px rgba(37,99,235,.25)}
+
+/* Service Booking & Payment Modal */
+.service-modal{
+  position:fixed;inset:0;z-index:6000;display:none;align-items:center;justify-content:center;
+  padding:16px;opacity:0;transition:opacity .25s ease;
+}
+.service-modal.open{display:flex;opacity:1}
+.service-modal-overlay{position:absolute;inset:0;background:rgba(11,17,32,.85);backdrop-filter:blur(10px)}
+.service-modal-box{
+  position:relative;z-index:10;width:min(540px,100%);max-height:90vh;overflow-y:auto;
+  background:var(--surface);border:1px solid var(--border);border-radius:22px;
+  padding:26px 22px;box-shadow:0 25px 70px rgba(0,0,0,.45);
+}
+.service-modal-close{
+  position:absolute;top:14px;right:16px;width:36px;height:36px;border-radius:50%;
+  border:1px solid var(--border);background:var(--surface2);color:var(--muted);
+  cursor:pointer;font-size:1.2rem;display:grid;place-items:center;transition:all .2s ease;
+}
+.service-modal-close:hover{color:var(--text);background:var(--border)}
+.service-step-eyebrow{color:var(--primary);font-weight:800;font-size:.74rem;letter-spacing:.8px;text-transform:uppercase}
+.service-modal-heading{margin:4px 0 8px;font-size:1.25rem}
+.service-selected-pill{
+  display:inline-flex;align-items:center;gap:6px;padding:5px 12px;
+  background:color-mix(in srgb,var(--primary) 12%,var(--surface2));color:var(--primary);
+  font-size:.82rem;font-weight:700;border-radius:999px;border:1px solid color-mix(in srgb,var(--primary) 25%,transparent);
+}
+.service-modal-sub{color:var(--muted);font-size:.85rem;margin:8px 0 16px}
+.service-form{display:grid;gap:13px}
+.service-field{display:grid;gap:5px;text-align:left}
+.service-field label{font-size:.82rem;font-weight:700;color:var(--text)}
+.service-field input,.service-field textarea{
+  width:100%;padding:10px 14px;border:1px solid var(--border);background:var(--surface2);
+  color:var(--text);border-radius:10px;font-size:.9rem;outline:none;font-family:inherit;
+  transition:border-color .2s ease;
+}
+.service-field input:focus,.service-field textarea:focus{border-color:var(--primary)}
+.service-next-btn{margin-top:6px;width:100%;padding:12px;font-weight:700;border-radius:12px;font-size:.94rem}
+
+/* Payment Gateways */
+.payment-gateways-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.gateway-card{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;
+  border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;
+  text-align:left;transition:all .2s ease;
+}
+.gateway-card:hover{border-color:var(--primary);transform:translateY(-1px)}
+.gateway-card.active{
+  border-color:var(--primary);background:color-mix(in srgb,var(--primary) 10%,var(--surface));
+  box-shadow:0 4px 14px rgba(37,99,235,.2);
+}
+.gateway-icon-badge{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;flex-shrink:0}
+.gateway-name{font-size:.84rem;font-weight:700;color:var(--text)}
+
+/* Personal Number Box */
+.personal-number-box{
+  background:color-mix(in srgb,var(--primary) 6%,var(--surface2));
+  border:1px solid color-mix(in srgb,var(--primary) 22%,var(--border));
+  border-radius:14px;padding:14px 16px;margin-bottom:16px;text-align:left;
+}
+.personal-number-top{font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.personal-number-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.personal-number-text{font-family:monospace;font-size:1.25rem;font-weight:800;color:var(--primary);letter-spacing:1px}
+.copy-number-btn{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;
+  border:1px solid var(--primary);background:var(--primary);color:#fff;font-size:.78rem;
+  font-weight:700;cursor:pointer;transition:all .2s ease;
+}
+.copy-number-btn:hover{background:var(--primary2)}
+.copy-number-btn.copied{background:#16a34a;border-color:#16a34a}
+.personal-number-desc{font-size:.82rem;color:var(--muted);line-height:1.5;margin:0}
+.service-modal-actions{display:flex;gap:10px;margin-top:6px}
+.service-success-icon{
+  width:58px;height:58px;border-radius:50%;background:rgba(22,163,74,.12);
+  color:#16a34a;display:grid;place-items:center;font-size:1.8rem;font-weight:900;
+  margin:0 auto 14px;
+}
+
 /* Blog */
 .blog-toolbar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:-12px auto 26px;max-width:900px}
 .filter-btn{

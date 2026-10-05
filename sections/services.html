@@ -3,40 +3,17 @@
     <div class="section-head reveal">
       <span class="eyebrow">Services</span>
       <h4>What I can help with</h4>
+      <p>Professional services, academic mentorship, tech support and health consultation.</p>
     </div>
 
-    <div class="grid cards reveal">
-      <article class="card">
-        <div class="card-header">
-          <div class="card-icon">🎓</div>
-          <h4>Tuition Media & Mentorship</h4>
-        </div>
-        <p>Education-focused digital promotion, tutoring experience, and mentoring.</p>
-      </article>
+    <!-- Services Grid loaded dynamically from Google Sheets (Services tab) -->
+    <div class="grid cards reveal" id="servicesGrid"></div>
 
-      <article class="card">
-        <div class="card-header">
-          <div class="card-icon">💻</div>
-          <h4>Web Development & IT</h4>
-        </div>
-        <p>Basic website setup, static pages, DNS mapping, and BTCL domain guidance.</p>
-      </article>
-
-      <article class="card">
-        <div class="card-header">
-          <div class="card-icon">🛒</div>
-          <h4>E-commerce Management</h4>
-        </div>
-        <p>Guidance on seller operations and logistics management based on Daraz experience.</p>
-      </article>
-
-      <article class="card">
-        <div class="card-header">
-          <div class="card-icon">🎬</div>
-          <h4>Creative Content</h4>
-        </div>
-        <p>Ideas and support for digital content, visuals and online projects.</p>
-      </article>
+    <!-- See More Services Button -->
+    <div class="see-more-wrap" id="servicesSeeMoreWrap" style="display:none">
+      <button class="see-more-btn" id="servicesSeeMoreBtn">
+        See More Services ↓
+      </button>
     </div>
   </div>
 </section>

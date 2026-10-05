@@ -108,6 +108,161 @@
       </div>
     </div>
 
+    <!-- Service Booking & Payment Modal -->
+    <div class="service-modal" id="serviceModal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="service-modal-overlay" id="serviceModalOverlay"></div>
+      <div class="service-modal-box">
+        <button class="service-modal-close" id="serviceModalClose" aria-label="Close modal">×</button>
+        
+        <!-- Step 1: Client Information -->
+        <div class="service-modal-step" id="serviceStep1">
+          <div class="service-modal-header">
+            <span class="service-step-eyebrow">সেবা রিকোয়েস্ট · ধাপ ১/২</span>
+            <h3 class="service-modal-heading">I need this Service</h3>
+            <div class="service-selected-pill" id="serviceModalSelectedTitle">
+              <!-- Selected Service Title -->
+            </div>
+            <p class="service-modal-sub">অনুগ্রহ করে নিচের তথ্যগুলো পূরণ করুন:</p>
+          </div>
+
+          <form id="serviceClientForm" class="service-form" onsubmit="return false;">
+            <div class="service-field">
+              <label for="serviceName">আপনার নাম <span style="color:#ef4444">*</span></label>
+              <input type="text" id="serviceName" placeholder="যেমন: মো: রহিম আহমেদ" required autocomplete="name" />
+            </div>
+
+            <div class="service-field">
+              <label for="serviceMobile">মোবাইল নম্বর <span style="color:#ef4444">*</span></label>
+              <input type="tel" id="serviceMobile" placeholder="যেমন: 017XXXXXXXX" required autocomplete="tel" />
+            </div>
+
+            <div class="service-field">
+              <label for="serviceLocation">ঠিকানা / লোকেশন <span style="color:#ef4444">*</span></label>
+              <input type="text" id="serviceLocation" placeholder="যেমন: মিরপুর, ঢাকা" required />
+            </div>
+
+            <div class="service-field">
+              <label for="serviceNotes">অতিরিক্ত তথ্য বা বিশেষ নোট (ঐচ্ছিক)</label>
+              <textarea id="serviceNotes" rows="2" placeholder="সেবা সম্পর্কিত কোনো নির্দিষ্ট প্রয়োজন থাকলে লিখুন..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary service-next-btn" id="serviceGoToPaymentBtn">
+              পরবর্তী ধাপ: পেমেন্ট পদ্ধতি →
+            </button>
+          </form>
+        </div>
+
+        <!-- Step 2: Payment Method & Sender Number -->
+        <div class="service-modal-step" id="serviceStep2" style="display:none;">
+          <div class="service-modal-header">
+            <span class="service-step-eyebrow">পেমেন্ট পদ্ধতি · ধাপ ২/২</span>
+            <h3 class="service-modal-heading">পেমেন্ট মাধ্যম সিলেক্ট করুন</h3>
+            <p class="service-modal-sub">যেকোনো একটি পেমেন্ট গেটওয়ে বেছে নিন:</p>
+          </div>
+
+          <!-- 4 Payment Gateways -->
+          <div class="payment-gateways-grid">
+            <button type="button" class="gateway-card active" data-gateway="bKash" aria-label="bKash">
+              <div class="gateway-icon-badge bkash-badge">
+                <svg viewBox="0 0 100 100" width="28" height="28">
+                  <path d="M50 5 L90 50 L50 95 L10 50 Z" fill="#e2136e"/>
+                  <path d="M35 30 L65 50 L35 70 Z" fill="#ffffff"/>
+                </svg>
+              </div>
+              <span class="gateway-name">বিকাশ (bKash)</span>
+            </button>
+
+            <button type="button" class="gateway-card" data-gateway="Nagad" aria-label="Nagad">
+              <div class="gateway-icon-badge nagad-badge">
+                <svg viewBox="0 0 100 100" width="28" height="28">
+                  <circle cx="50" cy="50" r="45" fill="#f7941d"/>
+                  <path d="M30 65 Q50 20 70 65 Q50 50 30 65" fill="#ffffff"/>
+                </svg>
+              </div>
+              <span class="gateway-name">নগদ (Nagad)</span>
+            </button>
+
+            <button type="button" class="gateway-card" data-gateway="Upay" aria-label="Upay">
+              <div class="gateway-icon-badge upay-badge">
+                <svg viewBox="0 0 100 100" width="28" height="28">
+                  <rect x="10" y="10" width="80" height="80" rx="20" fill="#004880"/>
+                  <path d="M32 30 V55 Q32 70 50 70 Q68 70 68 55 V30" fill="none" stroke="#ffc425" stroke-width="12" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="gateway-name">উপায় (Upay)</span>
+            </button>
+
+            <button type="button" class="gateway-card" data-gateway="Rocket" aria-label="Rocket">
+              <div class="gateway-icon-badge rocket-badge">
+                <svg viewBox="0 0 100 100" width="28" height="28">
+                  <rect x="10" y="10" width="80" height="80" rx="20" fill="#8c3494"/>
+                  <path d="M50 20 L68 65 L50 55 L32 65 Z" fill="#ffffff"/>
+                </svg>
+              </div>
+              <span class="gateway-name">রকেট (Rocket)</span>
+            </button>
+          </div>
+
+          <!-- Personal Number Copy Box -->
+          <div class="personal-number-box">
+            <div class="personal-number-top">
+              <span class="personal-number-title" id="gatewaySelectedLabel">বিকাশ পার্সোনাল নাম্বার:</span>
+            </div>
+            <div class="personal-number-row">
+              <span class="personal-number-text" id="personalNumberText">01316831199</span>
+              <button type="button" class="copy-number-btn" id="copyNumberBtn" title="কপি করতে ক্লিক করুন">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span id="copyBtnText">নম্বর কপি করুন</span>
+              </button>
+            </div>
+            <p class="personal-number-desc" id="gatewayInstructions">
+              আপনার <strong id="gatewayNameInDesc">বিকাশ</strong> অ্যাকাউন্ট থেকে উপরের পার্সোনাল নম্বর <strong>01316831199</strong>-এ সেন্ড মানি (Send Money) করুন। টাকা পাঠানোর পর আপনি যে নম্বর থেকে টাকা পাঠিয়েছেন তা নিচের বক্সে লিখুন।
+            </p>
+          </div>
+
+          <!-- Payment Verification Form -->
+          <form id="servicePaymentForm" class="service-form" onsubmit="return false;">
+            <div class="service-field">
+              <label for="servicePaymentNumber">যে নম্বর থেকে টাকা পাঠিয়েছেন (Sender Number) <span style="color:#ef4444">*</span></label>
+              <input type="tel" id="servicePaymentNumber" placeholder="যেমন: 01XXXXXXXXX" required />
+            </div>
+
+            <div class="service-field">
+              <label for="servicePaymentTrx">ট্রানজেকশন আইডি (TrxID) - ঐচ্ছিক</label>
+              <input type="text" id="servicePaymentTrx" placeholder="যেমন: 9J2K81LA" />
+            </div>
+
+            <div id="serviceSubmitStatus" style="display:none;padding:10px 14px;border-radius:10px;font-size:0.86rem;margin-bottom:12px;font-weight:600;"></div>
+
+            <div class="service-modal-actions">
+              <button type="button" class="btn btn-secondary" id="serviceBackToStep1Btn" style="flex:1;">
+                ← পেছনে যান
+              </button>
+              <button type="submit" class="btn btn-primary" id="serviceFinalSubmitBtn" style="flex:2;">
+                কনফার্ম ও সাবমিট করুন ✓
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 3: Success Confirmation -->
+        <div class="service-modal-step" id="serviceStepSuccess" style="display:none;text-align:center;padding:20px 10px;">
+          <div class="service-success-icon">✓</div>
+          <h3 style="font-size:1.35rem;margin-bottom:8px;color:var(--text);">অনুরোধটি সফলভাবে জমা হয়েছে!</h3>
+          <p style="color:var(--muted);font-size:0.9rem;line-height:1.6;margin-bottom:20px;" id="serviceSuccessMsg">
+            ধন্যবাদ! আপনার সেবার রিকোয়েস্ট এবং পেমেন্টের তথ্য আমাদের গুগল শিটে সফলভাবে জমা হয়েছে। আমরা দ্রুত আপনার সাথে যোগাযোগ করব।
+          </p>
+          <button type="button" class="btn btn-primary" id="serviceSuccessDoneBtn" style="padding:10px 32px;border-radius:999px;">
+            ঠিক আছে
+          </button>
+        </div>
+
+      </div>
+    </div>
+
     <!-- Gallery Full-Page Lightbox Modal -->
     <div class="gallery-lightbox" id="galleryLightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image Preview">
       <div class="lightbox-overlay" id="lightboxOverlay"></div>
