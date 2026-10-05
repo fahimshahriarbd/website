@@ -2734,13 +2734,18 @@ function initServiceModal() {
     const activeNumber = targetNumber || getGatewayNumber(currentSelectedGateway);
     const tempInput = document.createElement('input');
     tempInput.value = activeNumber;
+    tempInput.style.position = 'fixed';
+    tempInput.style.opacity = '0';
     document.body.appendChild(tempInput);
+    tempInput.focus();
     tempInput.select();
     try {
-      document.execCommand('copy');
-      showCopySuccess();
-    } catch {
-      prompt('Copy personal number:', activeNumber);
+      const successful = document.execCommand('copy');
+      if (successful) {
+        showCopySuccess();
+      }
+    } catch (err) {
+      console.warn('Fallback copy error:', err);
     }
     document.body.removeChild(tempInput);
   }

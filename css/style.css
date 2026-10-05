@@ -595,7 +595,7 @@ button,input,textarea{font:inherit;font-size:16px}
 .copy-number-btn:hover{background:var(--primary);color:#fff;transform:scale(1.05)}
 .copy-number-btn.copied{background:#16a34a;border-color:#16a34a;color:#fff;transform:scale(1.05)}
 .personal-number-desc{font-size:.82rem;color:var(--muted);line-height:1.5;margin:0}
-.personal-number-desc .instruct-price{color:var(--primary);font-weight:800;text-decoration:underline}
+.personal-number-desc .instruct-price{color:var(--primary);font-weight:700;text-decoration:none}
 .service-modal-actions{display:flex;gap:10px;margin-top:6px}
 .service-success-icon{
   width:58px;height:58px;border-radius:50%;background:rgba(22,163,74,.12);
