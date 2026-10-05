@@ -2085,11 +2085,21 @@ const DEFAULT_PROJECTS = [
   {
     icon: '🛒',
     title: 'E-commerce Operations',
-    category: 'E-commerce',
+    category: 'Commerce',
     description: 'Managed seller operations, product listings, and drop-off hub arrangements for Daraz.',
     details: 'Streamlined fulfillment processes, product quality checks, inventory handling, and daily courier handovers at regional Daraz drop-off stations.',
     tags: ['E-commerce', 'Daraz', 'Management'],
-    link: '#contact',
+    link: 'https://aistudio.google.com/u/7/apps/70e40eec-355b-4568-afc0-f96d7a507937?showAssistant=true&showPreview=true&appParams=contact',
+    published: 'yes'
+  },
+  {
+    icon: '🔬',
+    title: 'Bengali Handwritten Dataset',
+    category: 'Research',
+    description: 'A curated dataset of handwritten Bengali numerals and characters for machine learning and optical character recognition experiments.',
+    details: 'Collaborated on data acquisition, preprocessing, normalization, and annotation pipelines to support regional NLP and OCR research initiatives.',
+    tags: ['Machine Learning', 'Dataset', 'OCR', 'Research'],
+    link: '#projects',
     published: 'yes'
   },
   {
@@ -2151,6 +2161,15 @@ let projectsVisibleCount = 6;
 let projectsSeeMoreInitialized = false;
 let projectModalInitialized = false;
 
+function formatCategoryName(cat) {
+  if (!cat) return 'Portfolio';
+  const str = String(cat).trim();
+  if (str.toLowerCase() === 'commerce' || str.toLowerCase() === 'ecommerce' || str.toLowerCase() === 'e-commerce') {
+    return 'Commerce';
+  }
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 async function loadProjectsContent() {
   const grid = document.getElementById('projectsGrid');
   if (!grid) return;
@@ -2169,25 +2188,27 @@ async function loadProjectsContent() {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
         data.forEach(item => {
-          const title = item.Title || item.title || item.Project || item.name;
+          const title = item.Title || item.title || item.Project || item.project || item.Name || item.name;
           if (!title) return;
           const pub = String(item.Published || item.published || item.Active || item.active || item.Status || item.status || 'yes').trim().toLowerCase();
           if (pub === 'no' || pub === 'off' || pub === 'false' || pub === '0' || pub === 'hide' || pub === 'inactive') return;
 
-          const rawTags = item.Tags || item.tags || item.TechStack || item.Stack || '';
+          const rawCat = item.Category || item.category || item.Catagory || item.catagory || item.Type || item.type || 'Portfolio';
+          const cat = formatCategoryName(rawCat);
+          const rawTags = item.Tags || item.tags || item.Tag || item.tag || item.TechStack || item.techstack || item.Stack || item.stack || '';
           const tags = Array.isArray(rawTags)
             ? rawTags
             : String(rawTags).split(',').map(t => t.trim()).filter(Boolean);
 
           loaded.push({
-            icon: item.Icon || item.icon || '🚀',
-            title: title,
-            category: item.Category || item.category || 'Portfolio',
-            description: item.Description || item.description || item.Summary || '',
-            details: item.Details || item.details || item.LongDescription || item.Description || '',
-            image: item.Image || item.image || '',
-            tags: tags.length ? tags : ['Project'],
-            link: item.Link || item.link || item.Url || item.url || '',
+            icon: item.Icon || item.icon || item.Emoji || item.emoji || '🚀',
+            title: String(title).trim(),
+            category: cat,
+            description: String(item.Description || item.description || item.Summary || item.summary || item.Desc || item.desc || '').trim(),
+            details: String(item.Details || item.details || item.LongDescription || item.longdescription || item.Impact || item.impact || item.Description || item.description || '').trim(),
+            image: String(item.Image || item.image || item.Photo || item.photo || item.Banner || item.banner || '').trim(),
+            tags: tags.length ? tags : [cat],
+            link: String(item.Link || item.link || item.Url || item.url || item.Website || item.website || '').trim(),
             published: pub
           });
         });
@@ -2213,14 +2234,14 @@ async function loadProjectsContent() {
           let iconCol = -1, titleCol = -1, catCol = -1, descCol = -1, detailsCol = -1, tagsCol = -1, linkCol = -1, pubCol = -1, imgCol = -1;
           cols.forEach((col, idx) => {
             const lbl = String(col.label || col.id || '').trim().toLowerCase();
-            if (lbl.includes('icon')) iconCol = idx;
+            if (lbl.includes('icon') || lbl.includes('emoji')) iconCol = idx;
             if (lbl.includes('title') || lbl.includes('project') || lbl.includes('name')) titleCol = idx;
             if (lbl.includes('cat') || lbl.includes('type')) catCol = idx;
             if (lbl.includes('desc') || lbl.includes('summary')) descCol = idx;
             if (lbl.includes('detail') || lbl.includes('long') || lbl.includes('impact')) detailsCol = idx;
             if (lbl.includes('tag') || lbl.includes('stack')) tagsCol = idx;
-            if (lbl.includes('link') || lbl.includes('url')) linkCol = idx;
-            if (lbl.includes('image') || lbl.includes('img') || lbl.includes('photo')) imgCol = idx;
+            if (lbl.includes('link') || lbl.includes('url') || lbl.includes('web')) linkCol = idx;
+            if (lbl.includes('image') || lbl.includes('img') || lbl.includes('photo') || lbl.includes('banner')) imgCol = idx;
             if (lbl.includes('publish') || lbl.includes('active') || lbl.includes('status')) pubCol = idx;
           });
 
@@ -2239,12 +2260,12 @@ async function loadProjectsContent() {
             const imgVal = imgCol >= 0 ? String(cells[imgCol]?.v || '').trim() : '';
             const linkVal = linkCol >= 0 ? String(cells[linkCol]?.v || '').trim() : '';
             const rawTags = tagsCol >= 0 ? String(cells[tagsCol]?.v || '').trim() : '';
-            const tags = rawTags ? rawTags.split(',').map(t => t.trim()).filter(Boolean) : ['Project'];
+            const tags = rawTags ? rawTags.split(',').map(t => t.trim()).filter(Boolean) : [formatCategoryName(catVal)];
 
             loaded.push({
               icon: iconVal,
               title: titleVal,
-              category: catVal,
+              category: formatCategoryName(catVal),
               description: descVal,
               details: detailsVal,
               image: imgVal,
@@ -2261,7 +2282,13 @@ async function loadProjectsContent() {
   }
 
   if (loaded.length > 0) {
-    allProjects = loaded;
+    // Put Google Sheets projects at top, then append default projects that are not duplicates
+    const uniqueDefaults = DEFAULT_PROJECTS.filter(d =>
+      !loaded.some(l => l.title.trim().toLowerCase() === d.title.trim().toLowerCase())
+    );
+    allProjects = [...loaded, ...uniqueDefaults];
+  } else {
+    allProjects = [...DEFAULT_PROJECTS];
   }
 
   renderProjectsFilterTabs();
@@ -2279,18 +2306,20 @@ function renderProjectsFilterTabs() {
   const filterWrap = document.getElementById('projectsFilterWrap');
   if (!filterWrap) return;
 
-  const rawCategories = allProjects.map(p => p.category).filter(Boolean);
+  const rawCategories = allProjects.map(p => formatCategoryName(p.category)).filter(Boolean);
   const uniqueCats = ['All', ...new Set(rawCategories)];
 
-  if (uniqueCats.length <= 2) {
+  if (uniqueCats.length <= 1) {
     filterWrap.style.display = 'none';
     return;
   }
 
   filterWrap.style.display = 'flex';
   filterWrap.innerHTML = uniqueCats.map(cat => {
-    const count = cat === 'All' ? allProjects.length : allProjects.filter(p => p.category === cat).length;
-    const isActive = cat === currentProjectsCategory;
+    const count = cat === 'All'
+      ? allProjects.length
+      : allProjects.filter(p => formatCategoryName(p.category).toLowerCase() === cat.toLowerCase()).length;
+    const isActive = cat.toLowerCase() === currentProjectsCategory.toLowerCase();
     return `
       <button type="button" class="projects-filter-btn ${isActive ? 'active' : ''}" data-category="${escapeHtml(cat)}">
         ${escapeHtml(cat)} <span class="projects-filter-count">${count}</span>
@@ -2310,7 +2339,7 @@ function renderProjectsFilterTabs() {
 
 function getFilteredProjects() {
   if (currentProjectsCategory === 'All') return allProjects;
-  return allProjects.filter(p => p.category === currentProjectsCategory);
+  return allProjects.filter(p => formatCategoryName(p.category).toLowerCase() === currentProjectsCategory.toLowerCase());
 }
 
 function renderProjectsCards(append = false) {
@@ -2346,14 +2375,16 @@ function renderProjectsCards(append = false) {
 }
 
 function createProjectCardHtml(item, index) {
-  const isImage = item.icon.startsWith('http') || item.icon.startsWith('//') || item.icon.startsWith('data:');
+  const isImage = item.icon && (item.icon.startsWith('http') || item.icon.startsWith('//') || item.icon.startsWith('data:'));
   const iconMarkup = isImage
     ? `<img src="${escapeHtml(item.icon)}" alt="${escapeHtml(item.title)}" style="width:36px;height:36px;object-fit:contain;" />`
-    : escapeHtml(item.icon);
+    : escapeHtml(item.icon || '🚀');
 
   const tagsMarkup = (item.tags || [])
     .map(tag => `<span class="tag">${escapeHtml(tag)}</span>`)
     .join('');
+
+  const hasLink = item.link && item.link.trim() !== '' && item.link !== '#';
 
   return `
     <article class="card project-card" data-project-index="${index}">
@@ -2369,29 +2400,31 @@ function createProjectCardHtml(item, index) {
         <button type="button" class="project-view-details-btn" data-project-index="${index}">
           View details →
         </button>
-        ${item.link ? `<a href="${escapeHtml(item.link)}" target="${item.link.startsWith('#') ? '_self' : '_blank'}" rel="noopener" class="read-more" style="font-size:0.82rem;margin:0;" onclick="event.stopPropagation();">Visit ↗</a>` : ''}
+        ${hasLink ? `<a href="${escapeHtml(item.link)}" target="${item.link.startsWith('#') ? '_self' : '_blank'}" rel="noopener noreferrer" class="read-more" style="font-size:0.82rem;margin:0;" onclick="event.stopPropagation();">Visit ↗</a>` : ''}
       </div>
     </article>
   `;
 }
 
 function attachProjectCardEvents() {
-  document.querySelectorAll('.project-card, .project-view-details-btn').forEach(el => {
-    if (el.dataset.hasProjectListener) return;
-    el.dataset.hasProjectListener = 'true';
+  const grid = document.getElementById('projectsGrid');
+  if (!grid || grid.dataset.hasProjectDelegation) return;
+  grid.dataset.hasProjectDelegation = 'true';
 
-    el.addEventListener('click', (e) => {
-      // If clicking directly on a tag, a link, or see more button, do not open modal!
-      if (e.target.closest('.tag') || e.target.closest('a') || e.target.closest('.desc-toggle-btn')) {
-        return;
-      }
-      const index = parseInt(el.dataset.projectIndex, 10);
-      const filtered = getFilteredProjects();
-      const project = filtered[index];
-      if (project) {
-        openProjectModal(project);
-      }
-    });
+  grid.addEventListener('click', (e) => {
+    // If clicking directly on a tag, an external link, or description toggle, don't open modal!
+    if (e.target.closest('.tag') || e.target.closest('a') || e.target.closest('.desc-toggle-btn')) {
+      return;
+    }
+    const card = e.target.closest('.project-card');
+    if (!card) return;
+
+    const index = parseInt(card.dataset.projectIndex, 10);
+    const filtered = getFilteredProjects();
+    const project = filtered[index];
+    if (project) {
+      openProjectModal(project);
+    }
   });
 }
 
@@ -3078,9 +3111,9 @@ function renderCvList() {
           class="cv-download-btn"
           data-cv-index="${index}"
           aria-label="Download ${title}"
+          title="Download ${title}"
         >
-          <span>Download</span>
-          <span style="font-size:1.05rem;">↓</span>
+          <span style="font-size:1.25rem;line-height:1;display:inline-block;">↓</span>
         </button>
       </div>
     `;

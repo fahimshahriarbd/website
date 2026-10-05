@@ -354,24 +354,21 @@ button,input,textarea{font:inherit;font-size:16px}
   display:flex;align-items:center;justify-content:space-between;width:100%;
 }
 .service-price-label{
-  font-size:clamp(0.85rem, 2.2vw, 0.92rem);
-  font-weight:750;
+  font-size:0.9rem;
+  font-weight:400;
   color:var(--muted);
-  letter-spacing:0.2px;
 }
 .service-price-value{
-  font-size:clamp(0.96rem, 2.6vw, 1.1rem);
-  font-weight:850;
-  color:var(--primary);
-  line-height:1;
+  font-size:0.9rem;
+  font-weight:500;
+  color:var(--text);
+  line-height:1.4;
   white-space:nowrap;
-  letter-spacing:0.3px;
-  padding:5px 12px;
-  background:color-mix(in srgb,var(--primary) 10%,var(--surface2));
-  border-radius:8px;
-  border:1px solid color-mix(in srgb,var(--primary) 22%,transparent);
   margin-left:auto;
   text-align:right;
+  padding:0;
+  background:none;
+  border:none;
 }
 .service-request-btn{
   width:100%;
@@ -1151,10 +1148,6 @@ button,input,textarea{font:inherit;font-size:16px}
   .cv-item-badge {
     font-size: 0.72rem;
   }
-  .cv-download-btn {
-    padding: 8px 14px;
-    font-size: 0.82rem;
-  }
   .cv-unknown-password-box {
     padding: 14px 12px;
   }
@@ -1239,25 +1232,26 @@ button,input,textarea{font:inherit;font-size:16px}
 }
 
 .cv-download-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 18px;
-  border-radius: 999px;
-  font-size: 0.88rem;
-  font-weight: 750;
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  font-weight: 800;
   flex-shrink: 0;
   cursor: pointer;
   border: none;
   background: var(--primary);
   color: #fff;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
 }
 
 .cv-download-btn:hover {
   background: var(--primary-dark);
-  transform: scale(1.04);
+  transform: scale(1.1);
 }
 
 .cv-lock-icon-badge {
