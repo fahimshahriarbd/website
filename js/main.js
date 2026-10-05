@@ -865,8 +865,8 @@ async function loadWebsiteContent(){
 
   let allBlogPosts = [];
   let activeFilteredBlog = [];
-  const BLOG_PAGE_SIZE = 6;
-  let blogVisibleCount = 6;
+  const BLOG_PAGE_SIZE = 4;
+  let blogVisibleCount = 4;
   let blogSeeMoreInitialized = false;
 
   function createBlogCardHtml(post) {
