@@ -582,23 +582,7 @@ async function initSite(){
       });
     });
 
-    // Testimonial cards
-    document.querySelectorAll('#testimonialsGrid .testimonial-card').forEach(card => {
-      counter++;
-      if (!card.id) card.id = `testimonial-item-${counter}`;
-      const name = card.querySelector('.person-name-link')?.textContent.trim() || '';
-      const text = card.querySelector('.testimonial-content p, .card-desc')?.textContent.trim() || '';
-      const tag = card.querySelector('.person-relation-tag')?.textContent.trim() || '';
-      const about = card.querySelector('.testimonial-about-badge')?.textContent.replace(/^About:\s*/i, '').trim() || '';
-      items.push({
-        id: card.id,
-        title: name ? `${name} (${tag})` : 'Recommendation',
-        text: text,
-        meta: `Testimonial · ${tag}${about ? ' · About ' + about : ''}`,
-        tags: [...new Set(['Testimonials', tag, name, about].filter(Boolean))],
-        sectionId: 'testimonials'
-      });
-    });
+    testimonialsGrid
 
     // Ensure all tags have accessibility attributes
     document.querySelectorAll('.tag').forEach(tag => {
