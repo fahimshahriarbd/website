@@ -776,7 +776,7 @@ button,input,textarea{font:inherit;font-size:16px}
 .testimonial-content{
   display:flex;flex-direction:column;gap:4px;flex:1;
 }
-.quote{font-size:1.8rem;color:var(--primary);margin-bottom:0;line-height:1}
+.quote{display:none !important;}
 
 /* Contact */
 .contact-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:25px}
@@ -1053,3 +1053,199 @@ button,input,textarea{font:inherit;font-size:16px}
   display: block;
   margin-bottom: 8px;
 }
+
+/* ===== CV Modal Styles ===== */
+.cv-modal-box {
+  width: min(580px, 100%);
+}
+
+.cv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.cv-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cv-item:hover {
+  border-color: color-mix(in srgb, var(--primary) 60%, var(--border));
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.cv-item-left {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  flex: 1;
+}
+
+.cv-item-icon {
+  font-size: 1.4rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  color: var(--primary);
+  flex-shrink: 0;
+  border: 1px solid color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+.cv-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.cv-item-title {
+  font-size: 1rem;
+  font-weight: 750;
+  color: var(--text);
+  margin: 0;
+  word-break: break-word;
+}
+
+.cv-item-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.cv-item-badge.free {
+  color: #16a34a;
+}
+
+.cv-item-badge.protected {
+  color: #d97706;
+}
+
+.cv-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 750;
+  flex-shrink: 0;
+  cursor: pointer;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+}
+
+.cv-download-btn:hover {
+  background: var(--primary-dark);
+  transform: scale(1.04);
+}
+
+.cv-lock-icon-badge {
+  font-size: 2.2rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin: 0 auto 6px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, #f59e0b 16%, var(--surface2));
+  border: 1px solid color-mix(in srgb, #f59e0b 35%, transparent);
+}
+
+.cv-password-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cv-password-input-wrap input {
+  padding-right: 44px;
+}
+
+.cv-pw-toggle-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.15rem;
+  color: var(--muted);
+  padding: 6px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  transition: color 0.15s ease;
+}
+
+.cv-pw-toggle-btn:hover {
+  color: var(--text);
+}
+
+.cv-password-error {
+  margin-top: 6px;
+  font-size: 0.84rem;
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.cv-unknown-password-box {
+  margin-top: 20px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface2));
+  border: 1px dashed color-mix(in srgb, var(--primary) 35%, var(--border));
+  text-align: center;
+}
+
+.cv-unknown-text strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.cv-unknown-text p {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+
+.cv-contact-btn {
+  width: 100%;
+  padding: 11px 18px;
+  font-size: 0.88rem;
+  font-weight: 750;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--primary);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.cv-contact-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+

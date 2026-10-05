@@ -6,17 +6,17 @@
     <meta name="theme-color" content="#2563eb" />
     <meta
       name="description"
-      content="Fahim Shahriar — Dental Student, Artical Writer, Researcher, Content Creator."
+      content="Fahim Shahriar — Medical Student, Web Developer and Content Creator."
     />
     <meta name="author" content="Fahim Shahriar" />
-    <meta property="og:title" content="Fahim Shahriar | Dental Student" />
+    <meta property="og:title" content="Fahim Shahriar | Medical Student" />
     <meta
       property="og:description"
-      content="Fahim Shahriar — Dental Student, Web Developer and Content Creator."
+      content="Fahim Shahriar — Medical Student, Web Developer and Content Creator."
     />
     <meta property="og:type" content="website" />
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/ltd7gw9d/image/upload/fahim200KB.png" />
-    <title>Fahim Shahriar | Dental Student</title>
+    <title>Fahim Shahriar | Medical Student</title>
     <link rel="stylesheet" href="css/style.css" />
     <script src="js/main.js" defer></script>
   </head>
@@ -294,6 +294,77 @@
           <button type="button" class="btn btn-primary" id="serviceSuccessDoneBtn" style="padding:10px 32px;border-radius:999px;">
             Done
           </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Curriculum Vitae (CV) Download Modal -->
+    <div class="service-modal" id="cvModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="cvModalHeading">
+      <div class="service-modal-overlay" id="cvModalOverlay"></div>
+      <div class="service-modal-box cv-modal-box">
+        <button class="service-modal-close" id="cvModalClose" aria-label="Close modal">×</button>
+        
+        <!-- Step 1: CV List Selection -->
+        <div class="cv-modal-step" id="cvStepList">
+          <div class="service-modal-header">
+            <span class="service-step-eyebrow">Curriculum Vitae · Resume</span>
+            <h3 class="service-modal-heading" id="cvModalHeading">Download Curriculum Vitae</h3>
+            <p class="service-modal-sub">Select your required CV from below to view or download:</p>
+          </div>
+
+          <div class="cv-list" id="cvListContainer">
+            <!-- Dynamically populated from Google Sheets CV tab -->
+          </div>
+        </div>
+
+        <!-- Step 2: Password Verification Screen -->
+        <div class="cv-modal-step" id="cvStepPassword" style="display:none;">
+          <div class="service-modal-header" style="text-align:center;">
+            <div class="cv-lock-icon-badge">🔒</div>
+            <span class="service-step-eyebrow" style="margin-top:6px;display:inline-block;">Protected Document</span>
+            <h3 class="service-modal-heading" id="cvPasswordTitle">Enter CV Password</h3>
+            <p class="service-modal-sub" id="cvPasswordSubtitle">This CV is protected with a password. Please enter it below to download.</p>
+          </div>
+
+          <form id="cvPasswordForm" class="service-form" onsubmit="return false;" style="margin-top:16px;">
+            <div class="service-field">
+              <label for="cvPasswordInput">Access Password <span style="color:#ef4444">*</span></label>
+              <div class="cv-password-input-wrap">
+                <input
+                  type="password"
+                  id="cvPasswordInput"
+                  placeholder="Enter password..."
+                  autocomplete="off"
+                  required
+                />
+                <button type="button" id="cvTogglePasswordVisibility" class="cv-pw-toggle-btn" aria-label="Toggle password visibility">
+                  👁
+                </button>
+              </div>
+              <div id="cvPasswordError" class="cv-password-error" style="display:none;"></div>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:14px;">
+              <button type="button" class="btn btn-secondary" id="cvBackToListBtn" style="flex:1;">
+                ← Back
+              </button>
+              <button type="submit" class="btn btn-primary" id="cvSubmitPasswordBtn" style="flex:2;">
+                Unlock & Download →
+              </button>
+            </div>
+          </form>
+
+          <!-- Contact Fahim if password is unknown -->
+          <div class="cv-unknown-password-box">
+            <div class="cv-unknown-text">
+              <strong>Don't have or know the password?</strong>
+              <p>Contact Fahim directly to request access to this CV.</p>
+            </div>
+            <button type="button" class="btn cv-contact-btn" id="cvContactRedirectBtn">
+              📩 Contact Me to Request Password →
+            </button>
+          </div>
         </div>
 
       </div>

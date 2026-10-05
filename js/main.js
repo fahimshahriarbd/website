@@ -929,7 +929,7 @@ async function initSite(){
   }
 
 
-  /* LOAD GOOGLE SHEET CONTENT (BLOG, GALLERY, SERVICES, ACHIEVEMENTS, PROJECTS & TESTIMONIALS) */
+  /* LOAD GOOGLE SHEET CONTENT (BLOG, GALLERY, SERVICES, ACHIEVEMENTS, PROJECTS, TESTIMONIALS & CV) */
 
   await Promise.allSettled([
     loadWebsiteContent(),
@@ -937,8 +937,11 @@ async function initSite(){
     loadServicesContent(),
     loadAchievementsContent(),
     loadProjectsContent(),
-    loadTestimonialsContent()
+    loadTestimonialsContent(),
+    loadCvContent()
   ]);
+
+  initCvModal();
 }
 
 
@@ -2873,6 +2876,7 @@ function createTestimonialCardHtml(item) {
   const about = String(item.about || item.topic || item.subject || 'Website').trim();
   const role = String(item.role || item.designation || '').trim();
   const feedback = String(item.feedback || item.quote || '').trim();
+  const cleanFeedback = feedback.replace(/^[“"']+|[”"']+$/g, '').trim();
   const image = String(item.image || item.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=85').trim();
   const link = String(item.link || '#').trim();
 
@@ -2896,8 +2900,7 @@ function createTestimonialCardHtml(item) {
         </div>
       </div>
       <div class="testimonial-content">
-        <div class="quote">“</div>
-        ${formatTruncatedDesc(feedback, 10)}
+        ${formatTruncatedDesc(cleanFeedback, 10)}
       </div>
     </article>
   `;
@@ -3007,6 +3010,313 @@ async function loadTestimonialsContent() {
   if (typeof window.updateSearchIndex === 'function') {
     window.updateSearchIndex();
   }
+}
+
+/* =========================================================
+   CURRICULUM VITAE (CV) GOOGLE SHEETS & POPUP MODAL SYSTEM
+   ========================================================= */
+
+const DEFAULT_CVS = [
+  {
+    Title: "Student CV",
+    "Download Link": "https://docs.google.com/spreadsheets/d/1FPDlW0ugDgBLds5AD86sTo-Arw0r9T4cJZ8b4Vl5s5w/edit?gid=1451073170#gid=1451073170",
+    Password: 0
+  },
+  {
+    Title: "Tuition CV",
+    "Download Link": "https://docs.google.com/spreadsheets/d/1FPDlW0ugDgBLds5AD86sTo-Arw0r9T4cJZ8b4Vl5s5w/edit?gid=1451073170#gid=1451073170",
+    Password: 123
+  },
+  {
+    Title: "Marrige CV",
+    "Download Link": "https://docs.google.com/spreadsheets/d/1FPDlW0ugDgBLds5AD86sTo-Arw0r9T4cJZ8b4Vl5s5w/edit?gid=1451073170#gid=1451073170",
+    Password: 123
+  },
+  {
+    Title: "Career CV",
+    "Download Link": "https://docs.google.com/spreadsheets/d/1FPDlW0ugDgBLds5AD86sTo-Arw0r9T4cJZ8b4Vl5s5w/edit?gid=1451073170#gid=1451073170",
+    Password: 123
+  }
+];
+
+let allCvs = [...DEFAULT_CVS];
+let currentSelectedCv = null;
+
+function renderCvList() {
+  const container = document.getElementById('cvListContainer');
+  if (!container) return;
+
+  if (!allCvs || allCvs.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:24px;color:var(--muted);">
+        No CV documents available at the moment.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = allCvs.map((cv, index) => {
+    const title = escapeHtml(cv.Title || cv.title || 'CV Document');
+    const pwdStr = String(cv.Password !== undefined ? cv.Password : (cv.password !== undefined ? cv.password : '')).trim();
+    const isProtected = pwdStr !== '0' && pwdStr !== '' && pwdStr !== 'null';
+
+    return `
+      <div class="cv-item">
+        <div class="cv-item-left">
+          <div class="cv-item-icon" aria-hidden="true">
+            📄
+          </div>
+          <div class="cv-item-info">
+            <h4 class="cv-item-title">${title}</h4>
+            <span class="cv-item-badge ${isProtected ? 'protected' : 'free'}">
+              ${isProtected ? '🔒 Password Protected' : '✓ Direct Download'}
+            </span>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="cv-download-btn"
+          data-cv-index="${index}"
+          aria-label="Download ${title}"
+        >
+          <span>Download</span>
+          <span style="font-size:1.05rem;">↓</span>
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+async function loadCvContent() {
+  const MASTER_CV_URL =
+    "https://script.google.com/macros/s/AKfycbz16uxYP0BOLHZi3ymkFZJfrpIUZdK3dhADmD-ABvBwpm-wUeYNcxRm5iOLpVdyz0yp/exec?sheet=CV";
+
+  try {
+    const res = await fetch(MASTER_CV_URL, { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        const valid = data.filter(item => item && (item.Title || item.title) && (item['Download Link'] || item.download_link || item.link));
+        if (valid.length > 0) {
+          allCvs = valid.map(item => ({
+            Title: String(item.Title || item.title || '').trim(),
+            "Download Link": String(item['Download Link'] || item.download_link || item.link || '').trim(),
+            Password: item.Password !== undefined ? item.Password : (item.password !== undefined ? item.password : 0)
+          }));
+          renderCvList();
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Error fetching CVs from Google Sheets:', err);
+  }
+}
+
+function openCvModal() {
+  const modal = document.getElementById('cvModal');
+  if (!modal) return;
+
+  const stepList = document.getElementById('cvStepList');
+  const stepPassword = document.getElementById('cvStepPassword');
+  if (stepList) stepList.style.display = 'block';
+  if (stepPassword) stepPassword.style.display = 'none';
+
+  renderCvList();
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+
+  loadCvContent();
+}
+
+function closeCvModal() {
+  const modal = document.getElementById('cvModal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  currentSelectedCv = null;
+}
+
+function handleCvDownloadClick(index) {
+  const cv = allCvs[index];
+  if (!cv) return;
+
+  const downloadLink = cv['Download Link'] || cv.link;
+  const pwdStr = String(cv.Password !== undefined ? cv.Password : (cv.password !== undefined ? cv.password : '')).trim();
+  const isProtected = pwdStr !== '0' && pwdStr !== '' && pwdStr !== 'null';
+
+  // Rule 1: "যদি গুগল শীটে পাসওয়ার্ড ০ থাকে তাহলে ডিরেক্ট ডাউনলোড হবে।"
+  if (!isProtected) {
+    if (downloadLink) {
+      window.open(downloadLink, '_blank');
+    }
+    return;
+  }
+
+  // Rule 2: "আর যদি অন্য সংখ্যা থাকে তাহলে পাসওয়ার্ড চাইবে।"
+  currentSelectedCv = cv;
+  const stepList = document.getElementById('cvStepList');
+  const stepPassword = document.getElementById('cvStepPassword');
+  const cvPasswordTitle = document.getElementById('cvPasswordTitle');
+  const cvPasswordSubtitle = document.getElementById('cvPasswordSubtitle');
+  const cvPasswordInput = document.getElementById('cvPasswordInput');
+  const cvPasswordError = document.getElementById('cvPasswordError');
+
+  if (stepList) stepList.style.display = 'none';
+  if (stepPassword) stepPassword.style.display = 'block';
+
+  if (cvPasswordTitle) cvPasswordTitle.textContent = cv.Title || 'Enter CV Password';
+  if (cvPasswordSubtitle) {
+    cvPasswordSubtitle.textContent = `"${cv.Title || 'This CV'}" is protected with a password. Please enter the password to download.`;
+  }
+  if (cvPasswordInput) {
+    cvPasswordInput.value = '';
+    cvPasswordInput.type = 'password';
+    setTimeout(() => cvPasswordInput.focus(), 60);
+  }
+  if (cvPasswordError) {
+    cvPasswordError.style.display = 'none';
+    cvPasswordError.textContent = '';
+  }
+}
+
+function verifyCvPassword() {
+  if (!currentSelectedCv) return;
+
+  const input = document.getElementById('cvPasswordInput');
+  const errorEl = document.getElementById('cvPasswordError');
+  const entered = String(input ? input.value : '').trim();
+  const expected = String(currentSelectedCv.Password !== undefined ? currentSelectedCv.Password : (currentSelectedCv.password !== undefined ? currentSelectedCv.password : '')).trim();
+
+  if (entered === expected) {
+    if (errorEl) errorEl.style.display = 'none';
+    const downloadLink = currentSelectedCv['Download Link'] || currentSelectedCv.link;
+    if (downloadLink) {
+      window.open(downloadLink, '_blank');
+    }
+    closeCvModal();
+  } else {
+    if (errorEl) {
+      errorEl.style.display = 'block';
+      errorEl.textContent = '❌ Incorrect password. Please try again or contact Fahim.';
+    }
+    if (input) {
+      input.select();
+      input.focus();
+    }
+  }
+}
+
+// Rule 3: "যদি পাসওয়ার্ড না জানে তখন আমার কন্টাক্ট করা অপশন থাকবে সেখানে ক্লিক দিলে কনটাক্ট সেকশনে নিয়া যাবে।"
+function redirectToContactForCv() {
+  const cvName = currentSelectedCv ? currentSelectedCv.Title : 'Curriculum Vitae';
+  closeCvModal();
+
+  const contactSection = document.getElementById('contact');
+  if (contactSection) {
+    contactSection.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  setTimeout(() => {
+    const subjectField = document.getElementById('subject');
+    const msgField = document.getElementById('message');
+    const nameField = document.getElementById('name');
+
+    if (subjectField) {
+      subjectField.value = `Request Access Password: ${cvName}`;
+    }
+    if (msgField && !msgField.value.trim()) {
+      msgField.value = `Hi Fahim,\n\nI would like to request the password to download your "${cvName}".\n\nThank you!`;
+    }
+    if (nameField) {
+      nameField.focus();
+    }
+  }, 400);
+}
+
+function initCvModal() {
+  renderCvList();
+
+  // Global event delegation for opening CV modal
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('#openCvModalBtn, .open-cv-modal-btn, [data-action="download-cv"], a[href="#cv-download"], a[href="#download-cv"]');
+    if (trigger) {
+      e.preventDefault();
+      openCvModal();
+      return;
+    }
+
+    // Download button click inside modal
+    const dlBtn = e.target.closest('.cv-download-btn');
+    if (dlBtn && dlBtn.dataset.cvIndex !== undefined) {
+      e.preventDefault();
+      const index = parseInt(dlBtn.dataset.cvIndex, 10);
+      handleCvDownloadClick(index);
+      return;
+    }
+  });
+
+  // Modal Close buttons
+  const closeBtn = document.getElementById('cvModalClose');
+  const overlay = document.getElementById('cvModalOverlay');
+  if (closeBtn) closeBtn.addEventListener('click', closeCvModal);
+  if (overlay) overlay.addEventListener('click', closeCvModal);
+
+  // Back to list button from password view
+  const backBtn = document.getElementById('cvBackToListBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      const stepList = document.getElementById('cvStepList');
+      const stepPassword = document.getElementById('cvStepPassword');
+      if (stepList) stepList.style.display = 'block';
+      if (stepPassword) stepPassword.style.display = 'none';
+      currentSelectedCv = null;
+    });
+  }
+
+  // Password Form Submit
+  const pwForm = document.getElementById('cvPasswordForm');
+  if (pwForm) {
+    pwForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      verifyCvPassword();
+    });
+  }
+
+  // Password Visibility Toggle
+  const toggleBtn = document.getElementById('cvTogglePasswordVisibility');
+  const pwInput = document.getElementById('cvPasswordInput');
+  if (toggleBtn && pwInput) {
+    toggleBtn.addEventListener('click', () => {
+      if (pwInput.type === 'password') {
+        pwInput.type = 'text';
+        toggleBtn.textContent = '🙈';
+      } else {
+        pwInput.type = 'password';
+        toggleBtn.textContent = '👁';
+      }
+    });
+  }
+
+  // Contact Redirect Button
+  const contactBtn = document.getElementById('cvContactRedirectBtn');
+  if (contactBtn) {
+    contactBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      redirectToContactForCv();
+    });
+  }
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('cvModal');
+      if (modal && modal.classList.contains('open')) {
+        closeCvModal();
+      }
+    }
+  });
 }
 
 /* =========================================================
