@@ -802,13 +802,14 @@ async function initSite(){
   }
 
 
-  /* LOAD GOOGLE SHEET CONTENT (BLOG, GALLERY, SERVICES & ACHIEVEMENTS) */
+  /* LOAD GOOGLE SHEET CONTENT (BLOG, GALLERY, SERVICES, ACHIEVEMENTS & PROJECTS) */
 
   await Promise.allSettled([
     loadWebsiteContent(),
     loadGalleryContent(),
     loadServicesContent(),
-    loadAchievementsContent()
+    loadAchievementsContent(),
+    loadProjectsContent()
   ]);
 }
 
@@ -2089,6 +2090,420 @@ function initAchievementsSeeMore() {
     achievementsVisibleCount += ACHIEVEMENTS_PAGE_SIZE;
     renderAchievementsCards(true);
   });
+}
+
+/* =========================================================
+   PROJECTS SYSTEM (PORTFOLIO, CATEGORIES, MODAL & GOOGLE SHEET)
+   ========================================================= */
+
+const DEFAULT_PROJECTS = [
+  {
+    icon: '🛒',
+    title: 'E-commerce Operations',
+    category: 'E-commerce',
+    description: 'Managed seller operations, product listings, and drop-off hub arrangements for Daraz.',
+    details: 'Streamlined fulfillment processes, product quality checks, inventory handling, and daily courier handovers at regional Daraz drop-off stations.',
+    tags: ['E-commerce', 'Daraz', 'Management'],
+    link: '#contact',
+    published: 'yes'
+  },
+  {
+    icon: '📱',
+    title: 'Android App Development',
+    category: 'Technology',
+    description: 'Generated and tested a demo Android application build using the Swing2App platform.',
+    details: 'Customized web-to-app conversion workflows, push notification triggers, responsive UI webview optimization, and APK signing.',
+    tags: ['Android', 'Swing2App', 'App Dev'],
+    link: '#projects',
+    published: 'yes'
+  },
+  {
+    icon: '🌐',
+    title: 'Domain & Hosting Management',
+    category: 'Technology',
+    description: 'Successfully registered and managed .com.bd and .info.bd domains, along with DNS setup via BTCL.',
+    details: 'Configured NS records, A/CNAME mappings, SSL certificate installations, and custom email routing for institutional web presences.',
+    tags: ['BTCL', 'DNS', 'Web Hosting'],
+    link: '#services',
+    published: 'yes'
+  },
+  {
+    icon: '🎓',
+    title: 'Tutoring & Mentorship',
+    category: 'Education',
+    description: 'Conducted active tutoring through Caretutors and participated as a candidate for the "Face of Caretutors" initiative.',
+    details: 'Guided secondary and higher secondary science students in Biology, Chemistry, and ICT with personalized study plans and assessment tracking.',
+    tags: ['Education', 'Caretutors', 'Mentorship'],
+    link: '#services',
+    published: 'yes'
+  },
+  {
+    icon: '🗺️',
+    title: 'Google Maps Local Guide',
+    category: 'Community',
+    description: 'Actively submitted map edits and updates for local institutions and landmarks to improve regional navigation.',
+    details: 'Level-contributor verified place details, operating hours, road corrections, and photo contributions across Chattogram and Cumilla regions.',
+    tags: ['Google Maps', 'Local Guide'],
+    link: 'https://maps.app.goo.gl/HGjXCdkwxR2FPkSF9',
+    published: 'yes'
+  },
+  {
+    icon: '📚',
+    title: 'Medical / Dental Notes',
+    category: 'Medical',
+    description: 'A growing collection of study notes and educational material organized for quick personal reference.',
+    details: 'Curated clinical summaries, anatomy illustrations, pharmacology charts, and dental surgical procedures prepared during CMC BDS coursework.',
+    tags: ['Dental', 'Research', 'Medical'],
+    link: '#blog',
+    published: 'yes'
+  }
+];
+
+let allProjects = [...DEFAULT_PROJECTS];
+let currentProjectsCategory = 'All';
+const PROJECTS_PAGE_SIZE = 6;
+let projectsVisibleCount = 6;
+let projectsSeeMoreInitialized = false;
+let projectModalInitialized = false;
+
+async function loadProjectsContent() {
+  const grid = document.getElementById('projectsGrid');
+  if (!grid) return;
+
+  const MASTER_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbz16uxYP0BOLHZi3ymkFZJfrpIUZdK3dhADmD-ABvBwpm-wUeYNcxRm5iOLpVdyz0yp/exec?sheet=Projects";
+  const GVIZ_PROJECTS_URL =
+    "https://docs.google.com/spreadsheets/d/1LtXbQRHeCscgqb79T8pnLCb5GdZwz8TeH_AX-PIXpd0/gviz/tq?tqx=out:json&sheet=Projects";
+
+  let loaded = [];
+
+  // 1. Try reading from Master Web App (JSON)
+  try {
+    const res = await fetch(MASTER_SCRIPT_URL, { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach(item => {
+          const title = item.Title || item.title || item.Project || item.name;
+          if (!title) return;
+          const pub = String(item.Published || item.published || item.Active || item.active || item.Status || item.status || 'yes').trim().toLowerCase();
+          if (pub === 'no' || pub === 'off' || pub === 'false' || pub === '0' || pub === 'hide' || pub === 'inactive') return;
+
+          const rawTags = item.Tags || item.tags || item.TechStack || item.Stack || '';
+          const tags = Array.isArray(rawTags)
+            ? rawTags
+            : String(rawTags).split(',').map(t => t.trim()).filter(Boolean);
+
+          loaded.push({
+            icon: item.Icon || item.icon || '🚀',
+            title: title,
+            category: item.Category || item.category || 'Portfolio',
+            description: item.Description || item.description || item.Summary || '',
+            details: item.Details || item.details || item.LongDescription || item.Description || '',
+            image: item.Image || item.image || '',
+            tags: tags.length ? tags : ['Project'],
+            link: item.Link || item.link || item.Url || item.url || '',
+            published: pub
+          });
+        });
+      }
+    }
+  } catch (err) {
+    // fallback
+  }
+
+  // 2. Fallback to GViz
+  if (loaded.length === 0) {
+    try {
+      const gRes = await fetch(GVIZ_PROJECTS_URL, { cache: 'no-store' });
+      if (gRes.ok) {
+        const rawText = await gRes.text();
+        const firstBrace = rawText.indexOf('{');
+        const lastBrace = rawText.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace > firstBrace) {
+          const data = JSON.parse(rawText.slice(firstBrace, lastBrace + 1));
+          const cols = data.table?.cols || [];
+          const rows = data.table?.rows || [];
+
+          let iconCol = -1, titleCol = -1, catCol = -1, descCol = -1, detailsCol = -1, tagsCol = -1, linkCol = -1, pubCol = -1, imgCol = -1;
+          cols.forEach((col, idx) => {
+            const lbl = String(col.label || col.id || '').trim().toLowerCase();
+            if (lbl.includes('icon')) iconCol = idx;
+            if (lbl.includes('title') || lbl.includes('project') || lbl.includes('name')) titleCol = idx;
+            if (lbl.includes('cat') || lbl.includes('type')) catCol = idx;
+            if (lbl.includes('desc') || lbl.includes('summary')) descCol = idx;
+            if (lbl.includes('detail') || lbl.includes('long') || lbl.includes('impact')) detailsCol = idx;
+            if (lbl.includes('tag') || lbl.includes('stack')) tagsCol = idx;
+            if (lbl.includes('link') || lbl.includes('url')) linkCol = idx;
+            if (lbl.includes('image') || lbl.includes('img') || lbl.includes('photo')) imgCol = idx;
+            if (lbl.includes('publish') || lbl.includes('active') || lbl.includes('status')) pubCol = idx;
+          });
+
+          for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i]?.c || [];
+            const titleVal = String(cells[titleCol]?.v || '').trim();
+            if (!titleVal || titleVal.toLowerCase() === 'title') continue;
+
+            const pubVal = pubCol >= 0 ? String(cells[pubCol]?.v || '').trim().toLowerCase() : 'yes';
+            if (pubVal === 'no' || pubVal === 'off' || pubVal === 'false' || pubVal === '0') continue;
+
+            const iconVal = iconCol >= 0 ? (String(cells[iconCol]?.v || '').trim() || '🚀') : '🚀';
+            const catVal = catCol >= 0 ? (String(cells[catCol]?.v || '').trim() || 'Portfolio') : 'Portfolio';
+            const descVal = descCol >= 0 ? String(cells[descCol]?.v || '').trim() : '';
+            const detailsVal = detailsCol >= 0 ? String(cells[detailsCol]?.v || '').trim() : descVal;
+            const imgVal = imgCol >= 0 ? String(cells[imgCol]?.v || '').trim() : '';
+            const linkVal = linkCol >= 0 ? String(cells[linkCol]?.v || '').trim() : '';
+            const rawTags = tagsCol >= 0 ? String(cells[tagsCol]?.v || '').trim() : '';
+            const tags = rawTags ? rawTags.split(',').map(t => t.trim()).filter(Boolean) : ['Project'];
+
+            loaded.push({
+              icon: iconVal,
+              title: titleVal,
+              category: catVal,
+              description: descVal,
+              details: detailsVal,
+              image: imgVal,
+              tags: tags,
+              link: linkVal,
+              published: pubVal
+            });
+          }
+        }
+      }
+    } catch (e) {
+      // fallback
+    }
+  }
+
+  if (loaded.length > 0) {
+    allProjects = loaded;
+  }
+
+  renderProjectsFilterTabs();
+  projectsVisibleCount = PROJECTS_PAGE_SIZE;
+  initProjectsSeeMore();
+  renderProjectsCards();
+  initProjectModal();
+}
+
+function renderProjectsFilterTabs() {
+  const filterWrap = document.getElementById('projectsFilterWrap');
+  if (!filterWrap) return;
+
+  const rawCategories = allProjects.map(p => p.category).filter(Boolean);
+  const uniqueCats = ['All', ...new Set(rawCategories)];
+
+  if (uniqueCats.length <= 2) {
+    filterWrap.style.display = 'none';
+    return;
+  }
+
+  filterWrap.style.display = 'flex';
+  filterWrap.innerHTML = uniqueCats.map(cat => {
+    const count = cat === 'All' ? allProjects.length : allProjects.filter(p => p.category === cat).length;
+    const isActive = cat === currentProjectsCategory;
+    return `
+      <button type="button" class="projects-filter-btn ${isActive ? 'active' : ''}" data-category="${escapeHtml(cat)}">
+        ${escapeHtml(cat)} <span class="projects-filter-count">${count}</span>
+      </button>
+    `;
+  }).join('');
+
+  filterWrap.querySelectorAll('.projects-filter-btn').forEach(btn => {
+    btn.onclick = () => {
+      currentProjectsCategory = btn.dataset.category || 'All';
+      projectsVisibleCount = PROJECTS_PAGE_SIZE;
+      renderProjectsFilterTabs();
+      renderProjectsCards(false);
+    };
+  });
+}
+
+function getFilteredProjects() {
+  if (currentProjectsCategory === 'All') return allProjects;
+  return allProjects.filter(p => p.category === currentProjectsCategory);
+}
+
+function renderProjectsCards(append = false) {
+  const grid = document.getElementById('projectsGrid');
+  const seeMoreWrap = document.getElementById('projectsSeeMoreWrap');
+  const seeMoreBtn = document.getElementById('projectsSeeMoreBtn');
+  if (!grid) return;
+
+  const filtered = getFilteredProjects();
+  const visible = filtered.slice(0, projectsVisibleCount);
+
+  if (!append) {
+    grid.innerHTML = visible.map((item, idx) => createProjectCardHtml(item, idx)).join('');
+  } else {
+    const startIndex = projectsVisibleCount - PROJECTS_PAGE_SIZE;
+    const newItems = filtered.slice(startIndex, projectsVisibleCount);
+    grid.insertAdjacentHTML('beforeend', newItems.map((item, idx) => createProjectCardHtml(item, startIndex + idx)).join(''));
+  }
+
+  attachProjectCardEvents();
+
+  if (seeMoreWrap) {
+    if (projectsVisibleCount < filtered.length) {
+      seeMoreWrap.style.display = 'flex';
+      const remaining = filtered.length - projectsVisibleCount;
+      if (seeMoreBtn) {
+        seeMoreBtn.innerHTML = `See More Projects (${remaining} remaining) ↓`;
+      }
+    } else {
+      seeMoreWrap.style.display = 'none';
+    }
+  }
+}
+
+function createProjectCardHtml(item, index) {
+  const isImage = item.icon.startsWith('http') || item.icon.startsWith('//') || item.icon.startsWith('data:');
+  const iconMarkup = isImage
+    ? `<img src="${escapeHtml(item.icon)}" alt="${escapeHtml(item.title)}" style="width:36px;height:36px;object-fit:contain;" />`
+    : escapeHtml(item.icon);
+
+  const tagsMarkup = (item.tags || [])
+    .map(tag => `<span class="tag">${escapeHtml(tag)}</span>`)
+    .join('');
+
+  return `
+    <article class="card project-card" data-project-index="${index}">
+      <div>
+        <div class="card-header">
+          <div class="card-icon">${iconMarkup}</div>
+          <h4>${escapeHtml(item.title)}</h4>
+        </div>
+        <p>${escapeHtml(item.description)}</p>
+        ${tagsMarkup ? `<div class="tags" style="margin-top:12px;">${tagsMarkup}</div>` : ''}
+      </div>
+      <div class="project-card-footer">
+        <button type="button" class="project-view-details-btn" data-project-index="${index}">
+          View details →
+        </button>
+        ${item.link ? `<a href="${escapeHtml(item.link)}" target="${item.link.startsWith('#') ? '_self' : '_blank'}" rel="noopener" class="read-more" style="font-size:0.82rem;margin:0;" onclick="event.stopPropagation();">Visit ↗</a>` : ''}
+      </div>
+    </article>
+  `;
+}
+
+function attachProjectCardEvents() {
+  document.querySelectorAll('.project-card, .project-view-details-btn').forEach(el => {
+    if (el.dataset.hasProjectListener) return;
+    el.dataset.hasProjectListener = 'true';
+
+    el.addEventListener('click', (e) => {
+      if (e.target.tagName.toLowerCase() === 'a') return;
+      const index = parseInt(el.dataset.projectIndex, 10);
+      const filtered = getFilteredProjects();
+      const project = filtered[index];
+      if (project) {
+        openProjectModal(project);
+      }
+    });
+  });
+}
+
+function initProjectsSeeMore() {
+  if (projectsSeeMoreInitialized) return;
+  const seeMoreBtn = document.getElementById('projectsSeeMoreBtn');
+  if (!seeMoreBtn) return;
+  projectsSeeMoreInitialized = true;
+
+  seeMoreBtn.addEventListener('click', () => {
+    projectsVisibleCount += PROJECTS_PAGE_SIZE;
+    renderProjectsCards(true);
+  });
+}
+
+function initProjectModal() {
+  if (projectModalInitialized) return;
+  const modal = document.getElementById('projectModal');
+  if (!modal) return;
+  projectModalInitialized = true;
+
+  const overlay = document.getElementById('projectModalOverlay');
+  const closeBtn = document.getElementById('projectModalClose');
+  const closeActionBtn = document.getElementById('projectModalCloseBtn');
+
+  function closeProjectModal() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  if (overlay) overlay.onclick = closeProjectModal;
+  if (closeBtn) closeBtn.onclick = closeProjectModal;
+  if (closeActionBtn) closeActionBtn.onclick = closeProjectModal;
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) {
+      closeProjectModal();
+    }
+  });
+}
+
+function openProjectModal(project) {
+  const modal = document.getElementById('projectModal');
+  if (!modal) return;
+
+  const iconEl = document.getElementById('projectModalIcon');
+  const catEl = document.getElementById('projectModalCategory');
+  const titleEl = document.getElementById('projectModalTitle');
+  const descEl = document.getElementById('projectModalDescription');
+  const detailsWrap = document.getElementById('projectModalDetailsWrap');
+  const detailsEl = document.getElementById('projectModalDetails');
+  const imageWrap = document.getElementById('projectModalImageWrap');
+  const imageEl = document.getElementById('projectModalImage');
+  const tagsEl = document.getElementById('projectModalTags');
+  const linkBtn = document.getElementById('projectModalLink');
+
+  if (iconEl) {
+    const isImage = project.icon.startsWith('http') || project.icon.startsWith('//') || project.icon.startsWith('data:');
+    iconEl.innerHTML = isImage
+      ? `<img src="${escapeHtml(project.icon)}" alt="${escapeHtml(project.title)}" style="width:36px;height:36px;object-fit:contain;" />`
+      : escapeHtml(project.icon);
+  }
+  if (catEl) catEl.textContent = project.category || 'Portfolio';
+  if (titleEl) titleEl.textContent = project.title || 'Project';
+  if (descEl) descEl.textContent = project.description || '';
+
+  if (detailsEl && detailsWrap) {
+    if (project.details && project.details !== project.description) {
+      detailsEl.textContent = project.details;
+      detailsWrap.style.display = 'block';
+    } else {
+      detailsWrap.style.display = 'none';
+    }
+  }
+
+  if (imageWrap && imageEl) {
+    if (project.image) {
+      imageEl.src = project.image;
+      imageWrap.style.display = 'block';
+    } else {
+      imageWrap.style.display = 'none';
+    }
+  }
+
+  if (tagsEl) {
+    tagsEl.innerHTML = (project.tags || [])
+      .map(t => `<span class="tag">${escapeHtml(t)}</span>`)
+      .join('');
+  }
+
+  if (linkBtn) {
+    if (project.link) {
+      linkBtn.href = project.link;
+      linkBtn.style.display = 'inline-flex';
+      linkBtn.target = project.link.startsWith('#') ? '_self' : '_blank';
+    } else {
+      linkBtn.style.display = 'none';
+    }
+  }
+
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
 }
 
 function attachServiceRequestEvents() {

@@ -299,6 +299,43 @@
       </div>
     </div>
 
+    <!-- Project Details Modal -->
+    <div class="service-modal" id="projectModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Project Details">
+      <div class="service-modal-overlay" id="projectModalOverlay"></div>
+      <div class="service-modal-container" style="max-width:540px;">
+        <button type="button" class="service-modal-close" id="projectModalClose" title="Close" aria-label="Close modal">✕</button>
+        <div style="padding: 24px 22px;">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+            <div id="projectModalIcon" style="font-size:2rem;line-height:1;width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:var(--surface2);"></div>
+            <div>
+              <span id="projectModalCategory" style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;color:var(--primary);background:color-mix(in srgb,var(--primary) 12%,var(--surface2));padding:2px 10px;border-radius:999px;"></span>
+              <h3 id="projectModalTitle" style="font-size:1.25rem;font-weight:800;color:var(--text);margin-top:4px;"></h3>
+            </div>
+          </div>
+          <div id="projectModalImageWrap" style="display:none;margin-bottom:16px;border-radius:12px;overflow:hidden;max-height:220px;">
+            <img id="projectModalImage" src="" alt="Project Image" style="width:100%;height:100%;object-fit:cover;" />
+          </div>
+          <p id="projectModalDescription" style="font-size:0.92rem;color:var(--muted);line-height:1.6;margin-bottom:16px;"></p>
+          <div id="projectModalDetailsWrap" style="display:none;margin-bottom:16px;padding:12px 14px;background:var(--surface2);border-radius:10px;font-size:0.88rem;line-height:1.6;color:var(--text);border:1px solid var(--border);">
+            <strong style="display:block;margin-bottom:6px;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);">Key Details & Impact:</strong>
+            <span id="projectModalDetails"></span>
+          </div>
+          <div style="margin-bottom:20px;">
+            <span style="display:block;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:8px;">Technologies / Tags</span>
+            <div id="projectModalTags" class="tags"></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <a id="projectModalLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="flex:1;text-align:center;text-decoration:none;display:inline-flex;justify-content:center;align-items:center;gap:6px;">
+              <span>View Project / Link</span> <span>→</span>
+            </a>
+            <button type="button" class="btn btn-secondary" id="projectModalCloseBtn" style="padding:10px 20px;">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Gallery Full-Page Lightbox Modal -->
     <div class="gallery-lightbox" id="galleryLightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image Preview">
       <div class="lightbox-overlay" id="lightboxOverlay"></div>
