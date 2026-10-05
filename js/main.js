@@ -485,6 +485,74 @@ async function initSite(){
       });
     });
 
+    // Project cards (Dynamic Portfolio)
+    document.querySelectorAll('#projectsGrid .project-card').forEach(card => {
+      counter++;
+      if (!card.id) card.id = `project-item-${counter}`;
+      const title = card.querySelector('h4, h3')?.textContent.trim() || '';
+      const text = card.querySelector('p')?.textContent.trim() || '';
+      const cardTags = [...card.querySelectorAll('.tag')].map(t => t.textContent.trim()).filter(Boolean);
+      items.push({
+        id: card.id,
+        title: title || 'Project',
+        text: text,
+        meta: 'Projects · Portfolio',
+        tags: [...new Set(['Projects', 'Portfolio', ...cardTags])],
+        sectionId: 'projects'
+      });
+    });
+
+    // Achievement cards
+    document.querySelectorAll('#achievementsGrid .card').forEach(card => {
+      counter++;
+      if (!card.id) card.id = `achievement-item-${counter}`;
+      const title = card.querySelector('h4, h3')?.textContent.trim() || '';
+      const text = card.querySelector('p')?.textContent.trim() || '';
+      const cardTags = [...card.querySelectorAll('.tag')].map(t => t.textContent.trim()).filter(Boolean);
+      items.push({
+        id: card.id,
+        title: title || 'Achievement',
+        text: text,
+        meta: 'Achievements · Recognition',
+        tags: [...new Set(['Achievements', 'Honors', ...cardTags])],
+        sectionId: 'achievements'
+      });
+    });
+
+    // Service cards
+    document.querySelectorAll('#servicesGrid .service-card').forEach(card => {
+      counter++;
+      if (!card.id) card.id = `service-item-${counter}`;
+      const title = card.querySelector('h4, h3')?.textContent.trim() || '';
+      const text = card.querySelector('p')?.textContent.trim() || '';
+      const fee = card.querySelector('.service-price-value')?.textContent.trim() || '';
+      items.push({
+        id: card.id,
+        title: title || 'Service',
+        text: `${text} (Fee: ${fee})`,
+        meta: `Services · ${fee}`,
+        tags: ['Services', title],
+        sectionId: 'services'
+      });
+    });
+
+    // Testimonial cards
+    document.querySelectorAll('#testimonialsGrid .testimonial-card').forEach(card => {
+      counter++;
+      if (!card.id) card.id = `testimonial-item-${counter}`;
+      const name = card.querySelector('.person-name-link')?.textContent.trim() || '';
+      const text = card.querySelector('.testimonial-text')?.textContent.trim() || '';
+      const tag = card.querySelector('.person-relation-tag')?.textContent.trim() || '';
+      items.push({
+        id: card.id,
+        title: name ? `${name} (${tag})` : 'Recommendation',
+        text: text,
+        meta: `Testimonial · ${tag}`,
+        tags: [...new Set(['Testimonials', tag, name].filter(Boolean))],
+        sectionId: 'testimonials'
+      });
+    });
+
     // Ensure all tags have accessibility attributes
     document.querySelectorAll('.tag').forEach(tag => {
       if (!tag.hasAttribute('tabindex')) tag.setAttribute('tabindex', '0');
@@ -666,6 +734,48 @@ async function initSite(){
     });
   }
 
+  // GLOBAL TAG CLICK & SEARCH FUNCTION
+  function searchByTag(tagText) {
+    if (!tagText) return;
+    const cleanTag = tagText.trim();
+    if (!cleanTag) return;
+
+    // Close any open modals
+    const projectModal = document.getElementById('projectModal');
+    if (projectModal && projectModal.classList.contains('open')) {
+      projectModal.classList.remove('open');
+      projectModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    const serviceModal = document.getElementById('serviceModal');
+    if (serviceModal && serviceModal.classList.contains('open')) {
+      serviceModal.classList.remove('open');
+      serviceModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    const contentModal = document.getElementById('contentModal');
+    if (contentModal && contentModal.classList.contains('open')) {
+      contentModal.classList.remove('open');
+      contentModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    if (searchBox && siteSearch && searchBtn) {
+      searchBox.classList.add('open');
+      searchBtn.classList.add('active');
+      siteSearch.value = cleanTag;
+      buildSearchIndex();
+      renderSearch(cleanTag);
+      siteSearch.focus();
+      siteSearch.select();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  window.searchByTag = searchByTag;
+
   // GLOBAL TAG CLICK LISTENER
   document.addEventListener('click', (e) => {
     const tag = e.target.closest('.tag');
@@ -676,29 +786,7 @@ async function initSite(){
 
     const tagText = tag.textContent.trim();
     if (!tagText) return;
-
-    const contentModal = document.getElementById('contentModal');
-    if (contentModal && contentModal.classList.contains('open')) {
-      contentModal.classList.remove('open');
-      contentModal.setAttribute('aria-hidden', 'true');
-    }
-
-    if (searchBox && siteSearch && searchBtn) {
-      searchBox.classList.add('open');
-      searchBtn.classList.add('active');
-      siteSearch.value = tagText;
-      renderSearch(tagText);
-      siteSearch.focus();
-      siteSearch.select();
-
-      const header = document.querySelector('.header');
-      if (header) {
-        const headerRect = header.getBoundingClientRect();
-        if (headerRect.top < 0) {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-      }
-    }
+    searchByTag(tagText);
   });
 
   // Handle Enter key on focused tags or search results
@@ -802,14 +890,15 @@ async function initSite(){
   }
 
 
-  /* LOAD GOOGLE SHEET CONTENT (BLOG, GALLERY, SERVICES, ACHIEVEMENTS & PROJECTS) */
+  /* LOAD GOOGLE SHEET CONTENT (BLOG, GALLERY, SERVICES, ACHIEVEMENTS, PROJECTS & TESTIMONIALS) */
 
   await Promise.allSettled([
     loadWebsiteContent(),
     loadGalleryContent(),
     loadServicesContent(),
     loadAchievementsContent(),
-    loadProjectsContent()
+    loadProjectsContent(),
+    loadTestimonialsContent()
   ]);
 }
 
@@ -973,235 +1062,117 @@ async function loadWebsiteContent(){
   }
 
 
-  try{
+  const MASTER_BLOG_URL =
+    "https://script.google.com/macros/s/AKfycbz16uxYP0BOLHZi3ymkFZJfrpIUZdK3dhADmD-ABvBwpm-wUeYNcxRm5iOLpVdyz0yp/exec?sheet=Blog%26Articles";
+  const GVIZ_BLOG_URL =
+    "https://docs.google.com/spreadsheets/d/1LtXbQRHeCscgqb79T8pnLCb5GdZwz8TeH_AX-PIXpd0/gviz/tq?tqx=out:json&sheet=Blog%26Articles";
 
-    /* Google Sheet থেকে data আনবে */
+  let loadedPosts = [];
 
-    const response=
-      await fetch(
-        CONTENT_API_URL,
-        {
-          cache:'no-store'
-        }
-      );
-
-
-    if(!response.ok){
-
-      throw new Error(
-        `Google Sheet returned HTTP ${response.status}`
-      );
-    }
-
-
-    const rawText=
-      await response.text();
-
-
-    /*
-      Google Visualization API সাধারণত এমন response দেয়:
-
-      google.visualization.Query.setResponse({...});
-
-      তাই প্রথম { এবং শেষ } বের করছি।
-    */
-
-    const firstBrace=
-      rawText.indexOf('{');
-
-    const lastBrace=
-      rawText.lastIndexOf('}');
-
-
-    if(
-      firstBrace===-1 ||
-      lastBrace===-1 ||
-      lastBrace<=firstBrace
-    ){
-
-      throw new Error(
-        'Google Sheet response did not contain valid JSON.'
-      );
-    }
-
-
-    const data=
-      JSON.parse(
-        rawText.slice(
-          firstBrace,
-          lastBrace+1
-        )
-      );
-
-
-    /* Sheet-এর column বের করা */
-
-    const columns=
-      (data.table?.cols||[])
-      .map(col=>
-        String(
-          col.label||
-          col.id||
-          ''
-        ).trim()
-      );
-
-
-    const rows=
-      data.table?.rows||[];
-
-
-    /* প্রতিটি row object বানানো */
-
-    const posts=
-      rows
-      .map(row=>{
-
-        const cells=
-          row.c||[];
-
-        const obj={};
-
-
-        columns.forEach(
-          (column,index)=>{
-            const cell = cells[index];
-            obj[column] = cell && typeof cell.v !== 'undefined' ? String(cell.v) : '';
-            if (cell && typeof cell.f !== 'undefined') {
-              obj[column + '_formatted'] = String(cell.f);
-            }
-          }
-        );
-
-
-        return obj;
-      })
-
-
-      /* Published yes হলে দেখাবে */
-
-      .filter(post=>{
-
-        const title=
-          String(
-            post.Title||''
-          ).trim();
-
-
-        const published=
-          String(
-            post.Published||''
-          )
-          .trim()
-          .toLowerCase();
-
-
-        return(
-          title &&
-          published!=='no' &&
-          published!=='false' &&
-          published!=='draft'
-        );
-      });
-
-
-    /* কোনো post না পাওয়া গেলে */
-
-    if(!posts.length){
-
-      blogGrid.innerHTML=`
-
-        <div style="
-          grid-column:1/-1;
-          padding:30px;
-          text-align:center;
-          color:var(--muted);
-        ">
-
-          No published blog posts found
-
-        </div>
-
-      `;
-
-      const seeMoreWrap = document.getElementById('blogSeeMoreWrap');
-      if (seeMoreWrap) seeMoreWrap.style.display = 'none';
-      return;
-    }
-
-    allBlogPosts = posts;
-    activeFilteredBlog = [...allBlogPosts];
-    blogVisibleCount = BLOG_PAGE_SIZE;
-
-    const blogToolbar = document.getElementById('blogToolbar') || document.querySelector('.blog-toolbar');
-    if (blogToolbar) {
-      const categories = [...new Set(allBlogPosts.map(p => (p.Category || 'Blog').trim()).filter(Boolean))];
-      blogToolbar.innerHTML = `
-        <button class="filter-btn active" data-filter="all">All (${allBlogPosts.length})</button>
-        ${categories.map(cat => {
-          const count = allBlogPosts.filter(p => (p.Category || '').trim().toLowerCase() === cat.toLowerCase()).length;
-          return `<button class="filter-btn" data-filter="${escapeHtml(cat)}">${escapeHtml(cat)} (${count})</button>`;
-        }).join('')}
-      `;
-
-      blogToolbar.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          blogToolbar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-
-          const filter = btn.dataset.filter || 'all';
-          if (!filter || filter === 'all') {
-            activeFilteredBlog = [...allBlogPosts];
-          } else {
-            activeFilteredBlog = allBlogPosts.filter(p => (p.Category || '').trim().toLowerCase() === filter.toLowerCase());
-          }
-
-          blogVisibleCount = BLOG_PAGE_SIZE;
-          renderBlogCards();
+  // 1. Try reading directly from master Web App
+  try {
+    const res = await fetch(MASTER_BLOG_URL, { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        loadedPosts = data.filter(post => {
+          const title = String(post.Title || post.title || '').trim();
+          const pub = String(post.Published || post.published || 'yes').trim().toLowerCase();
+          return title && pub !== 'no' && pub !== 'false' && pub !== 'draft';
         });
-      });
+      }
     }
+  } catch (err) {
+    // fallback
+  }
 
-    initBlogSeeMore();
-    renderBlogCards();
+  // 2. Fallback to GViz if needed
+  if (loadedPosts.length === 0) {
+    try {
+      const response = await fetch(GVIZ_BLOG_URL, { cache: 'no-store' });
+      if (response.ok) {
+        const rawText = await response.text();
+        const firstBrace = rawText.indexOf('{');
+        const lastBrace = rawText.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace > firstBrace) {
+          const data = JSON.parse(rawText.slice(firstBrace, lastBrace + 1));
+          const columns = (data.table?.cols || []).map(col => String(col.label || col.id || '').trim());
+          const rows = data.table?.rows || [];
 
-  }catch(error){
+          loadedPosts = rows.map(row => {
+            const cells = row.c || [];
+            const obj = {};
+            columns.forEach((col, idx) => {
+              const cell = cells[idx];
+              obj[col] = cell && typeof cell.v !== 'undefined' ? String(cell.v) : '';
+              if (cell && typeof cell.f !== 'undefined') {
+                obj[col + '_formatted'] = String(cell.f);
+              }
+            });
+            return obj;
+          }).filter(post => {
+            const title = String(post.Title || '').trim();
+            const pub = String(post.Published || '').trim().toLowerCase();
+            return title && pub !== 'no' && pub !== 'false' && pub !== 'draft';
+          });
+        }
+      }
+    } catch (gvizErr) {
+      console.warn('GViz blog fallback notice:', gvizErr);
+    }
+  }
 
-    console.error(
-      'Blog content could not be loaded:',
-      error
-    );
-
-    /*
-      Google Sheet থেকে data না এলে
-      সরাসরি Blog-এর জায়গায় error দেখাবে।
-    */
-
-    blogGrid.innerHTML=`
-
-      <div style="
-        grid-column:1/-1;
-        padding:30px;
-        text-align:center;
-        color:#dc2626;
-      ">
-
-        <strong>
-          Blog posts could not be loaded.
-        </strong>
-
-        <br><br>
-
-        Please make sure the Google Sheet
-        is published to the web.
-
+  if (!loadedPosts.length) {
+    blogGrid.innerHTML = `
+      <div style="grid-column:1/-1;padding:36px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:16px;">
+        No published blog posts found.
       </div>
+    `;
+    const seeMoreWrap = document.getElementById('blogSeeMoreWrap');
+    if (seeMoreWrap) seeMoreWrap.style.display = 'none';
+    return;
+  }
 
+  allBlogPosts = loadedPosts;
+  activeFilteredBlog = [...allBlogPosts];
+  blogVisibleCount = BLOG_PAGE_SIZE;
+
+  const blogToolbar = document.getElementById('blogToolbar') || document.querySelector('.blog-toolbar');
+  if (blogToolbar) {
+    const rawCategories = allBlogPosts.map(p => (p.Category || p.category || 'Blog').trim()).filter(Boolean);
+    const uniqueCats = [...new Set(rawCategories)];
+
+    blogToolbar.innerHTML = `
+      <button class="filter-btn active" data-filter="all">All (${allBlogPosts.length})</button>
+      ${uniqueCats.map(cat => {
+        const count = allBlogPosts.filter(p => (p.Category || p.category || '').trim().toLowerCase() === cat.toLowerCase()).length;
+        return `<button class="filter-btn" data-filter="${escapeHtml(cat)}">${escapeHtml(cat)} (${count})</button>`;
+      }).join('')}
     `;
 
-    if(typeof window.updateSearchIndex==='function'){
-      window.updateSearchIndex();
-    }
+    blogToolbar.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        blogToolbar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.dataset.filter || 'all';
+        if (!filter || filter === 'all') {
+          activeFilteredBlog = [...allBlogPosts];
+        } else {
+          activeFilteredBlog = allBlogPosts.filter(p => (p.Category || p.category || '').trim().toLowerCase() === filter.toLowerCase());
+        }
+
+        blogVisibleCount = BLOG_PAGE_SIZE;
+        renderBlogCards();
+      });
+    });
+  }
+
+  initBlogSeeMore();
+  renderBlogCards();
+
+  if (typeof window.updateSearchIndex === 'function') {
+    window.updateSearchIndex();
   }
 }
 
@@ -1218,39 +1189,9 @@ const DEFAULT_GALLERY_PHOTOS = [
     caption: 'Campus Life & CMC Dental Unit'
   },
   {
-    category: 'Medical',
-    image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=85',
-    caption: 'Dental Surgery & Clinical Study'
-  },
-  {
-    category: 'Technology',
-    image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=85',
-    caption: 'Web Development & IT Systems'
-  },
-  {
-    category: 'Projects',
-    image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1200&q=85',
-    caption: 'Digital Projects & Team Collaboration'
-  },
-  {
-    category: 'Work',
-    image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=85',
-    caption: 'Operations & Management Experience'
-  },
-  {
-    category: 'Writing',
-    image: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1200&q=85',
-    caption: 'Content Creation & Educational Notes'
-  },
-  {
-    category: 'Learning',
-    image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1200&q=85',
-    caption: 'Continuous Reading & Research'
-  },
-  {
-    category: 'Personal',
-    image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=85',
-    caption: 'Personal Life & Interests'
+    category: 'Moments',
+    image: 'https://i.postimg.cc/yNHWtF9Z/screenshot-9.png?auto=format&fit=crop&w=1200&q=85',
+    caption: 'Personal Life & Moments'
   }
 ];
 
@@ -1259,91 +1200,85 @@ let activeFilteredGallery = [...DEFAULT_GALLERY_PHOTOS];
 let currentLightboxIndex = 0;
 
 async function loadGalleryContent() {
-  const GALLERY_API_URL =
-    "https://docs.google.com/spreadsheets/d/1FPDlW0ugDgBLds5AD86sTo-Arw0r9T4cJZ8b4Vl5s5w/gviz/tq?tqx=out:json&sheet=Photos%26Moments";
+  const MASTER_GALLERY_URL =
+    "https://script.google.com/macros/s/AKfycbz16uxYP0BOLHZi3ymkFZJfrpIUZdK3dhADmD-ABvBwpm-wUeYNcxRm5iOLpVdyz0yp/exec?sheet=Photos%26Moments";
+  const GVIZ_GALLERY_URL =
+    "https://docs.google.com/spreadsheets/d/1LtXbQRHeCscgqb79T8pnLCb5GdZwz8TeH_AX-PIXpd0/gviz/tq?tqx=out:json&sheet=Photos%26Moments";
 
   const galleryGrid = document.getElementById('galleryGrid');
   if (!galleryGrid) return;
 
+  let loadedPhotos = [];
+
+  // 1. Try reading directly from master Web App
   try {
-    const response = await fetch(GALLERY_API_URL, { cache: 'no-store' });
-    if (!response.ok) {
-      throw new Error(`Google Sheet returned HTTP ${response.status}`);
-    }
+    const res = await fetch(MASTER_GALLERY_URL, { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach(item => {
+          const cat = String(item.Catagory || item.category || item.Category || item.tag || 'Moments').trim();
+          const img = String(item.ImageLink || item.imagelink || item.Image || item.image || item.url || item.Url || '').trim();
+          const cap = String(item.Caption || item.caption || item.Title || item.title || cat || 'Moments').trim();
 
-    const rawText = await response.text();
-    const firstBrace = rawText.indexOf('{');
-    const lastBrace = rawText.lastIndexOf('}');
-
-    if (firstBrace === -1 || lastBrace <= firstBrace) {
-      throw new Error('Google Sheet response did not contain valid JSON.');
-    }
-
-    const data = JSON.parse(rawText.slice(firstBrace, lastBrace + 1));
-    const cols = data.table?.cols || [];
-    const rows = data.table?.rows || [];
-
-    const isCatName = str => /^(catagory|category|type|tag|group)$/i.test(String(str || '').trim());
-    const isImgName = str => /^(imagelink|image|photo|link|url|img|photolink)$/i.test(String(str || '').trim());
-    const isCapName = str => /^(caption|title|name|description)$/i.test(String(str || '').trim());
-
-    let catColIdx = -1;
-    let imgColIdx = -1;
-    let capColIdx = -1;
-    let headerRowIdx = -1;
-
-    // Check cols labels first
-    cols.forEach((col, idx) => {
-      const lbl = String(col.label || col.id || '').trim();
-      if (isCatName(lbl)) catColIdx = idx;
-      if (isImgName(lbl)) imgColIdx = idx;
-      if (isCapName(lbl)) capColIdx = idx;
-    });
-
-    // Check rows[0] if headers are in the data row
-    if ((catColIdx === -1 || imgColIdx === -1) && rows.length > 0) {
-      const firstRowCells = rows[0]?.c || [];
-      firstRowCells.forEach((cell, idx) => {
-        const val = String(cell?.v || '').trim();
-        if (isCatName(val)) { catColIdx = idx; headerRowIdx = 0; }
-        if (isImgName(val)) { imgColIdx = idx; headerRowIdx = 0; }
-        if (isCapName(val)) { capColIdx = idx; headerRowIdx = 0; }
-      });
-    }
-
-    // Default indices if not detected
-    if (catColIdx === -1) catColIdx = 0;
-    if (imgColIdx === -1) imgColIdx = 1;
-
-    const parsedPhotos = [];
-    const startRow = headerRowIdx >= 0 ? headerRowIdx + 1 : 0;
-
-    for (let i = startRow; i < rows.length; i++) {
-      const cells = rows[i]?.c || [];
-      const catVal = String(cells[catColIdx]?.v || '').trim();
-      const imgVal = String(cells[imgColIdx]?.v || '').trim();
-      const capVal = capColIdx >= 0 ? String(cells[capColIdx]?.v || '').trim() : '';
-
-      // Validate image link and avoid re-parsing headers
-      if (
-        imgVal &&
-        !isImgName(imgVal) &&
-        !isCatName(catVal) &&
-        (imgVal.startsWith('http://') || imgVal.startsWith('https://') || imgVal.startsWith('data:') || imgVal.startsWith('//'))
-      ) {
-        parsedPhotos.push({
-          category: catVal || 'Moments',
-          image: imgVal,
-          caption: capVal || catVal || 'Moments'
+          if (img && (img.startsWith('http://') || img.startsWith('https://') || img.startsWith('data:') || img.startsWith('//'))) {
+            loadedPhotos.push({
+              category: cat || 'Moments',
+              image: img,
+              caption: cap
+            });
+          }
         });
       }
     }
+  } catch (err) {
+    // fallback
+  }
 
-    if (parsedPhotos.length > 0) {
-      allGalleryPhotos = parsedPhotos;
+  // 2. Fallback to GViz if needed
+  if (loadedPhotos.length === 0) {
+    try {
+      const response = await fetch(GVIZ_GALLERY_URL, { cache: 'no-store' });
+      if (response.ok) {
+        const rawText = await response.text();
+        const firstBrace = rawText.indexOf('{');
+        const lastBrace = rawText.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace > firstBrace) {
+          const data = JSON.parse(rawText.slice(firstBrace, lastBrace + 1));
+          const cols = data.table?.cols || [];
+          const rows = data.table?.rows || [];
+
+          let catColIdx = -1, imgColIdx = -1, capColIdx = -1;
+          cols.forEach((col, idx) => {
+            const lbl = String(col.label || col.id || '').trim().toLowerCase();
+            if (lbl.includes('cat')) catColIdx = idx;
+            if (lbl.includes('img') || lbl.includes('image') || lbl.includes('photo') || lbl.includes('link')) imgColIdx = idx;
+            if (lbl.includes('cap') || lbl.includes('title') || lbl.includes('desc')) capColIdx = idx;
+          });
+
+          for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i]?.c || [];
+            const catVal = catColIdx >= 0 ? String(cells[catColIdx]?.v || '').trim() : 'Moments';
+            const imgVal = imgColIdx >= 0 ? String(cells[imgColIdx]?.v || '').trim() : '';
+            const capVal = capColIdx >= 0 ? String(cells[capColIdx]?.v || '').trim() : catVal;
+
+            if (imgVal && (imgVal.startsWith('http://') || imgVal.startsWith('https://') || imgVal.startsWith('data:') || imgVal.startsWith('//'))) {
+              loadedPhotos.push({
+                category: catVal || 'Moments',
+                image: imgVal,
+                caption: capVal || catVal || 'Moments'
+              });
+            }
+          }
+        }
+      }
+    } catch (gErr) {
+      console.warn('Photos fallback note:', gErr);
     }
-  } catch (error) {
-    console.warn('Photos&Moments could not be fetched, using default gallery:', error);
+  }
+
+  if (loadedPhotos.length > 0) {
+    allGalleryPhotos = loadedPhotos;
   }
 
   renderGallerySection();
@@ -2027,6 +1962,10 @@ async function loadAchievementsContent() {
   achievementsVisibleCount = ACHIEVEMENTS_PAGE_SIZE;
   initAchievementsSeeMore();
   renderAchievementsCards();
+
+  if (typeof window.updateSearchIndex === 'function') {
+    window.updateSearchIndex();
+  }
 }
 
 function renderAchievementsCards(append = false) {
@@ -2284,6 +2223,10 @@ async function loadProjectsContent() {
   initProjectsSeeMore();
   renderProjectsCards();
   initProjectModal();
+
+  if (typeof window.updateSearchIndex === 'function') {
+    window.updateSearchIndex();
+  }
 }
 
 function renderProjectsFilterTabs() {
@@ -2392,7 +2335,10 @@ function attachProjectCardEvents() {
     el.dataset.hasProjectListener = 'true';
 
     el.addEventListener('click', (e) => {
-      if (e.target.tagName.toLowerCase() === 'a') return;
+      // If clicking directly on a tag or a link, do not open modal!
+      if (e.target.closest('.tag') || e.target.closest('a')) {
+        return;
+      }
       const index = parseInt(el.dataset.projectIndex, 10);
       const filtered = getFilteredProjects();
       const project = filtered[index];
@@ -2841,6 +2787,177 @@ function initBackgroundAudio() {
 }
 
 
+
+/* =========================================================
+   GOOGLE SHEETS TESTIMONIALS SYSTEM
+   ========================================================= */
+
+const DEFAULT_TESTIMONIALS = [
+  {
+    name: 'Dr. Shafiul Alam',
+    tag: 'Teacher',
+    role: 'Faculty, CMC Dental Unit',
+    feedback: 'Fahim is an exceptionally dedicated dental student. His clinical eagerness, analytical discipline, and continuous search for knowledge set him apart in our academic environment.',
+    image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=200&q=85',
+    link: '#about'
+  },
+  {
+    name: 'Tanvir Hasan',
+    tag: 'Student',
+    role: 'Science Student, Caretutors Batch',
+    feedback: 'Fahim Bhai explained complex Biology and Chemistry concepts with unmatched clarity. His personalized study strategies and patient mentoring genuinely boosted my academic confidence.',
+    image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=85',
+    link: 'https://caretutors.com'
+  },
+  {
+    name: 'Mahmudur Rahman',
+    tag: 'Friend',
+    role: 'CMC BDS Classmate & Tech Collaborator',
+    feedback: 'From dental clinical sessions to digital web management, Fahim consistently demonstrates leadership, precision, and an inspiring drive to build practical solutions.',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=85',
+    link: 'https://facebook.com/fahim.shahriar.100'
+  }
+];
+
+let allTestimonials = [...DEFAULT_TESTIMONIALS];
+
+function createTestimonialCardHtml(item) {
+  const name = String(item.name || 'Anonymous').trim();
+  const tag = String(item.tag || item.relation || 'Friend').trim();
+  const role = String(item.role || item.designation || '').trim();
+  const feedback = String(item.feedback || item.quote || '').trim();
+  const image = String(item.image || item.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=85').trim();
+  const link = String(item.link || '#').trim();
+
+  const isExternal = link.startsWith('http://') || link.startsWith('https://');
+  const targetAttr = isExternal ? 'target="_blank" rel="noopener noreferrer"' : '';
+
+  return `
+    <article class="card testimonial-card">
+      <div>
+        <div class="quote">“</div>
+        <p class="testimonial-text">${escapeHtml(feedback)}</p>
+      </div>
+      <div class="person">
+        <a href="${escapeHtml(link)}" ${targetAttr} class="person-avatar-link" title="View ${escapeHtml(name)}'s profile">
+          <img class="avatar" src="${escapeHtml(image)}" alt="${escapeHtml(name)}" loading="lazy" />
+        </a>
+        <div class="person-info" style="display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
+            <a href="${escapeHtml(link)}" ${targetAttr} class="person-name-link" title="View ${escapeHtml(name)}'s profile">
+              ${escapeHtml(name)}
+            </a>
+            ${tag ? `<span class="person-relation-tag tag" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</span>` : ''}
+          </div>
+          ${role ? `<small>${escapeHtml(role)}</small>` : ''}
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function renderTestimonialsCards() {
+  const grid = document.getElementById('testimonialsGrid');
+  if (!grid) return;
+  grid.innerHTML = allTestimonials.map(item => createTestimonialCardHtml(item)).join('');
+}
+
+async function loadTestimonialsContent() {
+  const MASTER_TESTIMONIALS_URL =
+    "https://script.google.com/macros/s/AKfycbz16uxYP0BOLHZi3ymkFZJfrpIUZdK3dhADmD-ABvBwpm-wUeYNcxRm5iOLpVdyz0yp/exec?sheet=Testimonials";
+  const GVIZ_TESTIMONIALS_URL =
+    "https://docs.google.com/spreadsheets/d/1LtXbQRHeCscgqb79T8pnLCb5GdZwz8TeH_AX-PIXpd0/gviz/tq?tqx=out:json&sheet=Testimonials";
+
+  const grid = document.getElementById('testimonialsGrid');
+  if (!grid) return;
+
+  let loaded = [];
+
+  // 1. Try master script
+  try {
+    const res = await fetch(MASTER_TESTIMONIALS_URL, { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach(item => {
+          const name = String(item.Name || item.name || '').trim();
+          const pub = String(item.Published || item.published || 'yes').trim().toLowerCase();
+          if (!name || pub === 'no' || pub === 'false' || pub === 'off') return;
+
+          loaded.push({
+            name: name,
+            tag: String(item.Tag || item.tag || item.Relation || item.relation || 'Friend').trim(),
+            role: String(item.Role || item.role || item.Designation || item.designation || '').trim(),
+            feedback: String(item.Feedback || item.feedback || item.Quote || item.quote || item.Description || '').trim(),
+            image: String(item.Image || item.image || item.Avatar || item.avatar || '').trim() || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=85',
+            link: String(item.Link || item.link || item.ProfileLink || item.profilelink || '#').trim()
+          });
+        });
+      }
+    }
+  } catch (err) {
+    // fallback
+  }
+
+  // 2. Try GViz if needed
+  if (loaded.length === 0) {
+    try {
+      const res = await fetch(GVIZ_TESTIMONIALS_URL, { cache: 'no-store' });
+      if (res.ok) {
+        const rawText = await res.text();
+        const firstBrace = rawText.indexOf('{');
+        const lastBrace = rawText.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace > firstBrace) {
+          const data = JSON.parse(rawText.slice(firstBrace, lastBrace + 1));
+          const cols = data.table?.cols || [];
+          const rows = data.table?.rows || [];
+
+          let nameCol = -1, tagCol = -1, roleCol = -1, fbCol = -1, imgCol = -1, linkCol = -1, pubCol = -1;
+          cols.forEach((col, idx) => {
+            const lbl = String(col.label || col.id || '').trim().toLowerCase();
+            if (lbl.includes('name')) nameCol = idx;
+            else if (lbl.includes('tag') || lbl.includes('relat')) tagCol = idx;
+            else if (lbl.includes('role') || lbl.includes('designat')) roleCol = idx;
+            else if (lbl.includes('feed') || lbl.includes('quote') || lbl.includes('desc')) fbCol = idx;
+            else if (lbl.includes('img') || lbl.includes('image') || lbl.includes('avatar')) imgCol = idx;
+            else if (lbl.includes('link') || lbl.includes('url')) linkCol = idx;
+            else if (lbl.includes('pub')) pubCol = idx;
+          });
+
+          for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i]?.c || [];
+            const nameVal = nameCol >= 0 ? String(cells[nameCol]?.v || '').trim() : '';
+            if (!nameVal || nameVal.toLowerCase() === 'name') continue;
+
+            const pubVal = pubCol >= 0 ? String(cells[pubCol]?.v || '').trim().toLowerCase() : 'yes';
+            if (pubVal === 'no' || pubVal === 'false' || pubVal === 'off') continue;
+
+            loaded.push({
+              name: nameVal,
+              tag: tagCol >= 0 ? String(cells[tagCol]?.v || '').trim() : 'Friend',
+              role: roleCol >= 0 ? String(cells[roleCol]?.v || '').trim() : '',
+              feedback: fbCol >= 0 ? String(cells[fbCol]?.v || '').trim() : '',
+              image: imgCol >= 0 ? (String(cells[imgCol]?.v || '').trim() || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=85') : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=85',
+              link: linkCol >= 0 ? String(cells[linkCol]?.v || '').trim() : '#'
+            });
+          }
+        }
+      }
+    } catch (gErr) {
+      // fallback
+    }
+  }
+
+  if (loaded.length > 0) {
+    allTestimonials = loaded;
+  }
+
+  renderTestimonialsCards();
+
+  if (typeof window.updateSearchIndex === 'function') {
+    window.updateSearchIndex();
+  }
+}
 
 /* =========================================================
    START WEBSITE
