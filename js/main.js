@@ -2924,7 +2924,7 @@ function initServiceModal() {
         }
       } finally {
         finalSubmitBtn.disabled = false;
-        finalSubmitBtn.textContent = 'Confirm & Submit Request';
+        finalSubmitBtn.textContent = 'Processing...';
       }
     };
   }
