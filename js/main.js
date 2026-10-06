@@ -232,17 +232,62 @@ async function initSite(){
 
   const menuBtn=document.getElementById('menuBtn');
   const navLinks=document.getElementById('navLinks');
+  const mobileNavBackdrop=document.getElementById('mobileNavBackdrop');
+
+  function openMobileMenu(){
+    if(!navLinks) return;
+    navLinks.classList.add('open');
+    if(mobileNavBackdrop) mobileNavBackdrop.classList.add('open');
+    if(menuBtn){
+      menuBtn.classList.add('active');
+      menuBtn.setAttribute('aria-expanded','true');
+      menuBtn.setAttribute('aria-label','Close menu');
+      menuBtn.textContent='✕';
+    }
+  }
+
+  function closeMobileMenu(){
+    if(!navLinks) return;
+    navLinks.classList.remove('open');
+    if(mobileNavBackdrop) mobileNavBackdrop.classList.remove('open');
+    if(menuBtn){
+      menuBtn.classList.remove('active');
+      menuBtn.setAttribute('aria-expanded','false');
+      menuBtn.setAttribute('aria-label','Open menu');
+      menuBtn.textContent='☰';
+    }
+  }
 
   if(menuBtn && navLinks){
-
-    menuBtn.addEventListener('click',()=>{
-      navLinks.classList.toggle('open');
+    menuBtn.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      if(navLinks.classList.contains('open')){
+        closeMobileMenu();
+      }else{
+        openMobileMenu();
+      }
     });
+
+    if(mobileNavBackdrop){
+      mobileNavBackdrop.addEventListener('click', closeMobileMenu);
+    }
 
     document.querySelectorAll('.nav-links a').forEach(a=>{
       a.addEventListener('click',()=>{
-        navLinks.classList.remove('open');
+        closeMobileMenu();
       });
+    });
+
+    document.addEventListener('keydown',(e)=>{
+      if(e.key === 'Escape' && navLinks.classList.contains('open')){
+        closeMobileMenu();
+      }
+    });
+
+    document.addEventListener('click',(e)=>{
+      if(navLinks.classList.contains('open') && !navLinks.contains(e.target) && !menuBtn.contains(e.target)){
+        closeMobileMenu();
+      }
     });
   }
 
@@ -2542,6 +2587,7 @@ function openServiceBookingModal(serviceTitle, servicePrice) {
   const summaryPrice = document.getElementById('summaryServicePrice');
   const step1 = document.getElementById('serviceStep1');
   const step2 = document.getElementById('serviceStep2');
+  const step3 = document.getElementById('serviceStep3');
   const stepSuccess = document.getElementById('serviceStepSuccess');
   const statusBox = document.getElementById('serviceSubmitStatus');
 
@@ -2561,6 +2607,7 @@ function openServiceBookingModal(serviceTitle, servicePrice) {
 
   if (step1) step1.style.display = 'block';
   if (step2) step2.style.display = 'none';
+  if (step3) step3.style.display = 'none';
   if (stepSuccess) stepSuccess.style.display = 'none';
   if (statusBox) statusBox.style.display = 'none';
 
@@ -2584,10 +2631,13 @@ function initServiceModal() {
   const closeBtn = document.getElementById('serviceModalClose');
   const step1 = document.getElementById('serviceStep1');
   const step2 = document.getElementById('serviceStep2');
+  const step3 = document.getElementById('serviceStep3');
   const stepSuccess = document.getElementById('serviceStepSuccess');
 
   const goToPaymentBtn = document.getElementById('serviceGoToPaymentBtn');
   const backToStep1Btn = document.getElementById('serviceBackToStep1Btn');
+  const goToStep3Btn = document.getElementById('serviceGoToStep3Btn');
+  const backToStep2Btn = document.getElementById('serviceBackToStep2Btn');
   const copyNumberBtn = document.getElementById('copyNumberBtn');
   const finalSubmitBtn = document.getElementById('serviceFinalSubmitBtn');
   const doneBtn = document.getElementById('serviceSuccessDoneBtn');
@@ -2636,7 +2686,7 @@ function initServiceModal() {
       }
       if (!mobile) {
         if (step1Err) {
-          step1Err.textContent = 'Please enter your mobile / phone number.';
+          step1Err.textContent = 'Please enter your phone number.';
           step1Err.style.display = 'block';
         }
         document.getElementById('serviceMobile')?.focus();
@@ -2644,7 +2694,7 @@ function initServiceModal() {
       }
       if (!location) {
         if (step1Err) {
-          step1Err.textContent = 'Please enter your address / location.';
+          step1Err.textContent = 'Please enter your address.';
           step1Err.style.display = 'block';
         }
         document.getElementById('serviceLocation')?.focus();
@@ -2653,6 +2703,7 @@ function initServiceModal() {
 
       step1.style.display = 'none';
       step2.style.display = 'block';
+      if (step3) step3.style.display = 'none';
       stepSuccess.style.display = 'none';
 
       const summaryTitle = document.getElementById('summaryServiceTitle');
@@ -2668,7 +2719,28 @@ function initServiceModal() {
   if (backToStep1Btn) {
     backToStep1Btn.onclick = () => {
       step2.style.display = 'none';
+      if (step3) step3.style.display = 'none';
       step1.style.display = 'block';
+    };
+  }
+
+  // Step 2 to Step 3 (Payment Verification)
+  if (goToStep3Btn) {
+    goToStep3Btn.onclick = () => {
+      step2.style.display = 'none';
+      if (step3) step3.style.display = 'block';
+      updateGatewayDisplay();
+      setTimeout(() => {
+        document.getElementById('servicePaymentNumber')?.focus();
+      }, 50);
+    };
+  }
+
+  // Step 3 Back to Step 2
+  if (backToStep2Btn) {
+    backToStep2Btn.onclick = () => {
+      if (step3) step3.style.display = 'none';
+      step2.style.display = 'block';
     };
   }
 
@@ -2750,7 +2822,7 @@ function initServiceModal() {
     document.body.removeChild(tempInput);
   }
 
-  // Step 2 Final Submit: Saves to Bookings tab and Server Backend
+  // Step 3 Final Submit: Saves to Bookings tab and Server Backend
   if (finalSubmitBtn) {
     finalSubmitBtn.onclick = async (e) => {
       e.preventDefault();
@@ -2768,14 +2840,14 @@ function initServiceModal() {
           statusBox.style.background = '#fef2f2';
           statusBox.style.color = '#dc2626';
           statusBox.style.border = '1px solid #fecaca';
-          statusBox.textContent = 'Please enter the sender mobile number you paid from.';
+          statusBox.textContent = 'Please enter the sender phone number you paid from.';
         }
         document.getElementById('servicePaymentNumber')?.focus();
         return;
       }
 
       finalSubmitBtn.disabled = true;
-      finalSubmitBtn.textContent = 'Confirming...';
+      finalSubmitBtn.textContent = 'Submitting Request...';
       if (statusBox) statusBox.style.display = 'none';
 
       const GOOGLE_SCRIPT_URL =
@@ -2811,7 +2883,7 @@ function initServiceModal() {
       };
 
       try {
-        // 1. Submit directly to Google Apps Script / Google Sheets (SINGLE SUBMISSION)
+        // 1. Submit directly to Google Apps Script / Google Sheets
         await fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
           mode: "no-cors",
@@ -2821,7 +2893,7 @@ function initServiceModal() {
           body: JSON.stringify(payload)
         }).catch(err => console.warn('Google Script fetch status note:', err));
 
-        // 2. Also record in local Express backend for guaranteed data preservation (will not re-forward to Google Script)
+        // 2. Also record in local Express backend for guaranteed data preservation
         await fetch('/api/book-service', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -2831,11 +2903,12 @@ function initServiceModal() {
         // Show Success Step
         step1.style.display = 'none';
         step2.style.display = 'none';
+        if (step3) step3.style.display = 'none';
         stepSuccess.style.display = 'block';
 
         const successMsg = document.getElementById('serviceSuccessMsg');
         if (successMsg) {
-          successMsg.innerHTML = `Thank you <strong>${escapeHtml(name)}</strong>! Your request for "<strong>${escapeHtml(currentSelectedService)}</strong>" (Charge: <strong>${escapeHtml(currentSelectedServicePrice)}</strong>) and payment details (<strong>${escapeHtml(currentSelectedGateway)}: ${escapeHtml(paymentNumber)}</strong>) have been successfully saved to our Google Sheet. We will reach out to you shortly.`;
+          successMsg.innerHTML = `Thank you <strong>${escapeHtml(name)}</strong>! Your request for "<strong>${escapeHtml(currentSelectedService)}</strong>" (Charge: <strong>${escapeHtml(currentSelectedServicePrice)}</strong>) and payment details (<strong>${escapeHtml(currentSelectedGateway)}: ${escapeHtml(paymentNumber)}</strong>) have been received. I will review and reach out to you shortly.`;
         }
 
         // Reset forms
@@ -2851,7 +2924,7 @@ function initServiceModal() {
         }
       } finally {
         finalSubmitBtn.disabled = false;
-        finalSubmitBtn.textContent = 'Confirm';
+        finalSubmitBtn.textContent = 'Confirm & Submit Request';
       }
     };
   }

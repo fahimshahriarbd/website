@@ -37,13 +37,13 @@
 
         <nav aria-label="Main navigation">
           <ul class="nav-links" id="navLinks">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#gallery">Gallery</a></li>
-            <li><a href="#blog">Blog</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li><a href="#home"><span class="nav-link-content"><span class="nav-icon">🏠</span><span>Home</span></span></a></li>
+            <li><a href="#about"><span class="nav-link-content"><span class="nav-icon">👤</span><span>About</span></span></a></li>
+            <li><a href="#gallery"><span class="nav-link-content"><span class="nav-icon">🖼️</span><span>Gallery</span></span></a></li>
+            <li><a href="#blog"><span class="nav-link-content"><span class="nav-icon">✍️</span><span>Blog</span></span></a></li>
+            <li><a href="#projects"><span class="nav-link-content"><span class="nav-icon">🚀</span><span>Projects</span></span></a></li>
+            <li><a href="#services"><span class="nav-link-content"><span class="nav-icon">💼</span><span>Services</span></span></a></li>
+            <li><a href="#contact"><span class="nav-link-content"><span class="nav-icon">✉️</span><span>Contact</span></span></a></li>
           </ul>
         </nav>
 
@@ -75,6 +75,7 @@
         </div>
       </div>
     </header>
+    <div class="mobile-nav-backdrop" id="mobileNavBackdrop"></div>
 
     <main>
       <div data-section="home"></div>
@@ -117,7 +118,7 @@
         <!-- Step 1: Client Information -->
         <div class="service-modal-step" id="serviceStep1">
           <div class="service-modal-header">
-            <span class="service-step-eyebrow">Service Request · Step 1 of 2</span>
+            <span class="service-step-eyebrow">Service Request · Step 1 of 3</span>
             <h3 class="service-modal-heading">I need this Service</h3>
             <div class="service-selected-pill" id="serviceModalSelectedTitle">
               <!-- Selected Service Title -->
@@ -130,22 +131,22 @@
 
             <div class="service-field">
               <label for="serviceName">Full Name <span style="color:#ef4444">*</span></label>
-              <input type="text" id="serviceName" placeholder="e.g. John Doe" required autocomplete="name" />
+              <input type="text" id="serviceName" placeholder="eg: Fahim Shahriar" required autocomplete="name" />
             </div>
 
             <div class="service-field">
-              <label for="serviceMobile">Mobile / Phone Number <span style="color:#ef4444">*</span></label>
-              <input type="tel" id="serviceMobile" placeholder="e.g. 017XXXXXXXX" required autocomplete="tel" />
+              <label for="serviceMobile">Phone Number <span style="color:#ef4444">*</span></label>
+              <input type="tel" id="serviceMobile" placeholder="eg: 01XXXXXXXXX" required autocomplete="tel" />
             </div>
 
             <div class="service-field">
-              <label for="serviceLocation">Address / Location <span style="color:#ef4444">*</span></label>
-              <input type="text" id="serviceLocation" placeholder="e.g. Mirpur, Dhaka" required />
+              <label for="serviceLocation">Address <span style="color:#ef4444">*</span></label>
+              <input type="text" id="serviceLocation" placeholder="eg: Cumilla, Bangladesh" required />
             </div>
 
             <div class="service-field">
-              <label for="serviceNotes">Additional Notes or Requirements (Optional)</label>
-              <textarea id="serviceNotes" rows="2" placeholder="Specify any project details or specific requirements..."></textarea>
+              <label for="serviceNotes">Additional Notes (Optional)</label>
+              <textarea id="serviceNotes" rows="2" placeholder="Just additional Notes (optional)"></textarea>
             </div>
 
             <button type="submit" class="btn btn-primary service-next-btn" id="serviceGoToPaymentBtn">
@@ -154,10 +155,10 @@
           </form>
         </div>
 
-        <!-- Step 2: Payment Method & Sender Number -->
+        <!-- Step 2: Payment Method Selection -->
         <div class="service-modal-step" id="serviceStep2" style="display:none;">
           <div class="service-modal-header">
-            <span class="service-step-eyebrow">Payment Method · Step 2 of 2</span>
+            <span class="service-step-eyebrow">Payment Method · Step 2 of 3</span>
             <h3 class="service-modal-heading">Select Payment Method</h3>
             <p class="service-modal-sub">Choose your preferred mobile financial service:</p>
           </div>
@@ -205,6 +206,24 @@
             </button>
           </div>
 
+          <div class="service-modal-actions">
+            <button type="button" class="btn btn-secondary" id="serviceBackToStep1Btn" style="flex:1;">
+              ← Back
+            </button>
+            <button type="button" class="btn btn-primary" id="serviceGoToStep3Btn" style="flex:2;">
+              Next →
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Payment Verification & Final Submit -->
+        <div class="service-modal-step" id="serviceStep3" style="display:none;">
+          <div class="service-modal-header">
+            <span class="service-step-eyebrow">Payment Verification · Step 3 of 3</span>
+            <h3 class="service-modal-heading">Complete Payment</h3>
+            <p class="service-modal-sub">Send money to the personal number below, then provide your transaction details:</p>
+          </div>
+
           <!-- Personal Number Copy Box -->
           <div class="personal-number-box">
             <div class="personal-number-top">
@@ -231,7 +250,7 @@
           <form id="servicePaymentForm" class="service-form" onsubmit="return false;">
             <div class="service-field">
               <label for="servicePaymentNumber">Sender Number (Number you sent payment from) <span style="color:#ef4444">*</span></label>
-              <input type="tel" id="servicePaymentNumber" placeholder="e.g. 01XXXXXXXXX" required />
+              <input type="tel" id="servicePaymentNumber" placeholder="eg: 01XXXXXXXXX" required />
             </div>
 
             <div class="service-field">
@@ -242,22 +261,22 @@
             <div id="serviceSubmitStatus" style="display:none;padding:10px 14px;border-radius:10px;font-size:0.86rem;margin-bottom:12px;font-weight:600;"></div>
 
             <div class="service-modal-actions">
-              <button type="button" class="btn btn-secondary" id="serviceBackToStep1Btn" style="flex:1;">
+              <button type="button" class="btn btn-secondary" id="serviceBackToStep2Btn" style="flex:1;">
                 ← Back
               </button>
               <button type="submit" class="btn btn-primary" id="serviceFinalSubmitBtn" style="flex:2;">
-                Confirm
+                Confirm & Submit Request
               </button>
             </div>
           </form>
         </div>
 
-        <!-- Step 3: Success Confirmation -->
+        <!-- Step 4: Success Confirmation -->
         <div class="service-modal-step" id="serviceStepSuccess" style="display:none;text-align:center;padding:20px 10px;">
           <div class="service-success-icon">✓</div>
           <h3 style="font-size:1.35rem;margin-bottom:8px;color:var(--text);">Request Submitted Successfully!</h3>
           <p style="color:var(--muted);font-size:0.9rem;line-height:1.6;margin-bottom:20px;" id="serviceSuccessMsg">
-            Thank you! Your service request and payment verification details have been recorded. We will contact you shortly.
+            Thank you! Your service request and payment details have been received. I will review and contact you shortly.
           </p>
           <button type="button" class="btn btn-primary" id="serviceSuccessDoneBtn" style="padding:10px 32px;border-radius:999px;">
             Done
