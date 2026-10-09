@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel — Fahim Shahriar</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/admin.js" defer></script>
+</head>
+<body class="admin-body">
+  <!-- Login Screen -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="login-header">
+        <img src="https://res.cloudinary.com/ltd7gw9d/image/upload/fahim200KB.png?auto=format&fit=crop&w=80&q=85" alt="Fahim Shahriar" class="login-avatar" />
+        <h1>Admin Panel</h1>
+        <p>Fahim Shahriar — Website Manager</p>
+      </div>
+      <form id="loginForm" class="login-form">
+        <div class="login-field">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="your@email.com" required autocomplete="email" />
+        </div>
+        <div class="login-field">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter password" required autocomplete="current-password" />
+        </div>
+        <div id="loginError" class="login-error" style="display:none;"></div>
+        <button type="submit" class="btn btn-primary login-btn" id="loginSubmitBtn">Sign In →</button>
+        <a href="index.html" class="login-back-link">← Back to website</a>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard -->
+  <div id="adminDashboard" class="admin-dashboard" style="display:none;">
+    <header class="admin-header">
+      <div class="admin-header-left">
+        <img src="https://res.cloudinary.com/ltd7gw9d/image/upload/fahim200KB.png?auto=format&fit=crop&w=40&q=85" alt="" class="admin-header-avatar" />
+        <div>
+          <strong>Admin Panel</strong>
+          <span id="adminUserEmail" class="admin-user-email"></span>
+        </div>
+      </div>
+      <div class="admin-header-right">
+        <a href="index.html" class="admin-header-link" target="_blank">View Site ↗</a>
+        <button class="admin-header-link" id="logoutBtn">Logout</button>
+      </div>
+    </header>
+
+    <div class="admin-layout">
+      <!-- Sidebar -->
+      <nav class="admin-sidebar" id="adminSidebar">
+        <button class="admin-nav-btn active" data-table="blog_posts">✍️ Blog Posts</button>
+        <button class="admin-nav-btn" data-table="projects">🚀 Projects</button>
+        <button class="admin-nav-btn" data-table="services">💼 Services</button>
+        <button class="admin-nav-btn" data-table="achievements">🏆 Achievements</button>
+        <button class="admin-nav-btn" data-table="testimonials">💬 Testimonials</button>
+        <button class="admin-nav-btn" data-table="gallery_photos">🖼️ Gallery</button>
+        <button class="admin-nav-btn" data-table="cvs">📄 CVs</button>
+        <div class="admin-nav-divider"></div>
+        <button class="admin-nav-btn" data-table="messages">✉️ Messages</button>
+        <button class="admin-nav-btn" data-table="bookings">📅 Bookings</button>
+      </nav>
+
+      <!-- Content Area -->
+      <main class="admin-content" id="adminContent">
+        <div class="admin-content-header">
+          <h2 id="adminTableTitle">Blog Posts</h2>
+          <button class="btn btn-primary admin-add-btn" id="adminAddBtn">+ Add New</button>
+        </div>
+        <div id="adminTableWrap" class="admin-table-wrap">
+          <div class="admin-loading">Loading...</div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Edit/Create Modal -->
+  <div class="admin-modal" id="adminModal" aria-hidden="true">
+    <div class="admin-modal-overlay" id="adminModalOverlay"></div>
+    <div class="admin-modal-box">
+      <div class="admin-modal-header">
+        <h3 id="adminModalTitle">Add New</h3>
+        <button class="admin-modal-close" id="adminModalClose">×</button>
+      </div>
+      <form id="adminForm" class="admin-form">
+        <div id="adminFormFields"></div>
+        <div class="admin-form-actions">
+          <button type="button" class="btn btn-secondary" id="adminCancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="adminSaveBtn">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Mobile sidebar toggle -->
+  <button class="admin-sidebar-toggle" id="sidebarToggle">☰ Menu</button>
+</body>
+</html>

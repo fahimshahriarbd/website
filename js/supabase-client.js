@@ -1,16 +1,19 @@
-import { createClient } from '@supabase/supabase-js';
-
+/*
+ * Supabase client initialization.
+ * Uses the global window.supabase from the CDN script.
+ * Fetches config from /api/config endpoint (served by Express).
+ */
 let supabaseInstance = null;
 
-export async function initSupabase() {
+async function initSupabase() {
   if (supabaseInstance) return supabaseInstance;
 
   try {
     const res = await fetch('/api/config', { cache: 'no-store' });
     if (res.ok) {
       const config = await res.json();
-      if (config.supabaseUrl && config.supabaseAnonKey) {
-        supabaseInstance = createClient(config.supabaseUrl, config.supabaseAnonKey, {
+      if (config.supabaseUrl && config.supabaseAnonKey && window.supabase) {
+        supabaseInstance = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
           auth: { persistSession: true, autoRefreshToken: true },
         });
         return supabaseInstance;
@@ -24,8 +27,6 @@ export async function initSupabase() {
   return null;
 }
 
-export function getSupabase() {
+function getSupabase() {
   return supabaseInstance;
 }
-
-export default supabaseInstance;
