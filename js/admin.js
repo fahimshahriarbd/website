@@ -3,7 +3,7 @@
    Login + Full CRUD for all content tables via Supabase
    ============================================================ */
 
-let supabase = null;
+let db = null;
 let currentTable = 'blog_posts';
 let currentEditId = null;
 let isAdminLoggedIn = false;
@@ -137,8 +137,8 @@ function getEditableColumns() {
 
 /* ---- AUTH ---- */
 async function checkSession() {
-  if (!supabase) return null;
-  const { data: { session } } = await supabase.auth.getSession();
+  if (!db) return null;
+  const { data: { session } } = await db.auth.getSession();
   return session;
 }
 
@@ -168,7 +168,7 @@ async function handleLogin(e) {
   btn.textContent = 'Signing in...';
 
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await db.auth.signInWithPassword({ email, password });
     if (error) throw error;
     showDashboard(data.user?.email || email);
   } catch (err) {
@@ -181,7 +181,7 @@ async function handleLogin(e) {
 }
 
 async function handleLogout() {
-  if (supabase) await supabase.auth.signOut();
+  if (db) await db.auth.signOut();
   showLogin();
   document.getElementById('loginEmail').value = '';
   document.getElementById('loginPassword').value = '';
@@ -204,7 +204,7 @@ async function loadTable(tableName) {
   wrap.innerHTML = '<div class="admin-loading">Loading...</div>';
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from(tableName)
       .select('*')
       .order('sort_order', { ascending: true })
@@ -361,7 +361,7 @@ async function openEditModal(id) {
 
   // Fetch the specific row
   try {
-    const { data, error } = await supabase.from(currentTable).select('*').eq('id', id).maybeSingle();
+    const { data, error } = await db.from(currentTable).select('*').eq('id', id).maybeSingle();
     if (error) throw error;
     renderFormFields(data);
     document.getElementById('adminModal').classList.add('open');
@@ -453,10 +453,10 @@ async function handleFormSubmit(e) {
 
   try {
     if (currentEditId) {
-      const { error } = await supabase.from(currentTable).update(data).eq('id', currentEditId);
+      const { error } = await db.from(currentTable).update(data).eq('id', currentEditId);
       if (error) throw error;
     } else {
-      const { error } = await supabase.from(currentTable).insert(data);
+      const { error } = await db.from(currentTable).insert(data);
       if (error) throw error;
     }
     closeModal();
@@ -478,7 +478,7 @@ function closeModal() {
 async function confirmDelete(id) {
   if (!confirm('Are you sure you want to delete this entry? This cannot be undone.')) return;
   try {
-    const { error } = await supabase.from(currentTable).delete().eq('id', id);
+    const { error } = await db.from(currentTable).delete().eq('id', id);
     if (error) throw error;
     loadTable(currentTable);
   } catch (err) {
@@ -492,8 +492,8 @@ async function confirmDelete(id) {
 window.addEventListener('DOMContentLoaded', async () => {
   // Wait for supabase-client.js to load
   try {
-    supabase = await initSupabase();
-    if (!supabase) {
+    db = await initSupabase();
+    if (!db) {
       document.getElementById('loginError').textContent = 'Cannot connect to database. Please try again later.';
       document.getElementById('loginError').style.display = 'block';
       return;
@@ -540,7 +540,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Listen for auth state changes
-  supabase.auth.onAuthStateChange((event, session) => {
+  db.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_OUT') {
       showLogin();
     } else if (event === 'SIGNED_IN' && session && !isAdminLoggedIn) {

@@ -3,7 +3,7 @@
    Data source: Supabase database
    ============================================================ */
 
-let supabase = null;
+let db = null;
 
 /* ---- UTILITY HELPERS ---- */
 function escapeHtml(value){
@@ -218,7 +218,7 @@ function initContactForm() {
     const subject = document.getElementById('subject').value.trim();
     const message = document.getElementById('message').value.trim();
     try {
-      const { error } = await supabase.from('messages').insert({ name, email, subject, message });
+      const { error } = await db.from('messages').insert({ name, email, subject, message });
       if (error) throw error;
       status.style.display = 'block'; status.textContent = '✓ Message sent successfully. Thank you!'; status.style.color = '#16a34a';
       form.reset();
@@ -249,7 +249,7 @@ function renderBlog(append=false) {
 }
 async function loadBlog() {
   const g = document.getElementById('blogGrid'); if (!g) return;
-  try { const {data,error} = await supabase.from('blog_posts').select('*').eq('published',true).order('sort_order',{ascending:true}).order('created_at',{ascending:false}); if(error) throw error; allBlogPosts = data||[]; } catch { allBlogPosts = []; }
+  try { const {data,error} = await db.from('blog_posts').select('*').eq('published',true).order('sort_order',{ascending:true}).order('created_at',{ascending:false}); if(error) throw error; allBlogPosts = data||[]; } catch { allBlogPosts = []; }
   activeFilteredBlog = [...allBlogPosts]; blogVis = BLOG_PG;
   const tb = document.getElementById('blogToolbar');
   if (tb && allBlogPosts.length) {
@@ -305,7 +305,7 @@ async function downloadImg(url, fn) {
 }
 async function loadGallery() {
   const g = document.getElementById('galleryGrid'); if(!g) return;
-  try { const {data,error} = await supabase.from('gallery_photos').select('*').order('sort_order',{ascending:true}); if(error) throw error; allGallery = data||[]; } catch { allGallery = []; }
+  try { const {data,error} = await db.from('gallery_photos').select('*').order('sort_order',{ascending:true}); if(error) throw error; allGallery = data||[]; } catch { allGallery = []; }
   if (!allGallery.length) { g.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">No photos available.</div>'; return; }
   renderGallerySection(); initLightbox(); window.updateSearchIndex?.();
 }
@@ -340,7 +340,7 @@ function renderSvc(append=false) {
 }
 async function loadServices() {
   const g = document.getElementById('servicesGrid'); if(!g) return;
-  try { const {data,error} = await supabase.from('services').select('*').eq('is_active',true).order('sort_order',{ascending:true}); if(error) throw error; allServices = data||[]; } catch { allServices = []; }
+  try { const {data,error} = await db.from('services').select('*').eq('is_active',true).order('sort_order',{ascending:true}); if(error) throw error; allServices = data||[]; } catch { allServices = []; }
   if(!allServices.length) { g.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">No services available.</div>'; return; }
   renderSvcFilter(); svcVis=SVC_PG;
   const sb = document.getElementById('servicesSeeMoreBtn');
@@ -404,7 +404,7 @@ function initSvcModal() {
     if(!pnum) { if(st){st.style.display='block';st.style.background='#fef2f2';st.style.color='#dc2626';st.style.border='1px solid #fecaca';st.textContent='Please enter the sender phone number you paid from.';} document.getElementById('servicePaymentNumber')?.focus(); return; }
     const fb = document.getElementById('serviceFinalSubmitBtn'); fb.disabled=true; fb.textContent='Submitting...'; if(st) st.style.display='none';
     try {
-      const { error } = await supabase.from('bookings').insert({ name, mobile, location:loc, service_title:curSvc, amount:curSvcPrice, payment_gateway:curGw, payment_number:pnum, trx_id:trx||'', notes:notes||'' });
+      const { error } = await db.from('bookings').insert({ name, mobile, location:loc, service_title:curSvc, amount:curSvcPrice, payment_gateway:curGw, payment_number:pnum, trx_id:trx||'', notes:notes||'' });
       if(error) throw error;
       document.getElementById('serviceStep1').style.display='none'; document.getElementById('serviceStep2').style.display='none'; document.getElementById('serviceStep3').style.display='none'; document.getElementById('serviceStepSuccess').style.display='block';
       document.getElementById('serviceSuccessMsg').innerHTML = `Thank you <strong>${escapeHtml(name)}</strong>! Your request for "<strong>${escapeHtml(curSvc)}</strong>" (Charge: <strong>${escapeHtml(curSvcPrice)}</strong>) has been received.`;
@@ -430,7 +430,7 @@ function renderAch(append=false) {
 }
 async function loadAchievements() {
   const g = document.getElementById('achievementsGrid'); if(!g) return;
-  try { const {data,error} = await supabase.from('achievements').select('*').eq('published',true).order('sort_order',{ascending:true}); if(error) throw error; allAch = data||[]; } catch { allAch = []; }
+  try { const {data,error} = await db.from('achievements').select('*').eq('published',true).order('sort_order',{ascending:true}); if(error) throw error; allAch = data||[]; } catch { allAch = []; }
   achVis = ACH_PG;
   const sb = document.getElementById('achievementsSeeMoreBtn');
   if(sb && !achInit) { achInit=true; sb.addEventListener('click', () => { achVis+=ACH_PG; renderAch(true); }); }
@@ -470,7 +470,7 @@ function renderProj(append=false) {
 }
 async function loadProjects() {
   const g = document.getElementById('projectsGrid'); if(!g) return;
-  try { const {data,error} = await supabase.from('projects').select('*').eq('published',true).order('sort_order',{ascending:true}); if(error) throw error; allProj = data||[]; } catch { allProj = []; }
+  try { const {data,error} = await db.from('projects').select('*').eq('published',true).order('sort_order',{ascending:true}); if(error) throw error; allProj = data||[]; } catch { allProj = []; }
   renderProjFilter(); projVis = PROJ_PG;
   const sb = document.getElementById('projectsSeeMoreBtn');
   if(sb && !projInit) { projInit=true; sb.addEventListener('click', () => { projVis+=PROJ_PG; renderProj(true); }); }
@@ -492,7 +492,7 @@ function testiCardHtml(t) {
 }
 async function loadTestimonials() {
   const g = document.getElementById('testimonialsGrid'); if(!g) return;
-  try { const {data,error} = await supabase.from('testimonials').select('*').eq('published',true).order('sort_order',{ascending:true}); if(error) throw error; allTesti = data||[]; } catch { allTesti = []; }
+  try { const {data,error} = await db.from('testimonials').select('*').eq('published',true).order('sort_order',{ascending:true}); if(error) throw error; allTesti = data||[]; } catch { allTesti = []; }
   g.innerHTML = allTesti.length ? allTesti.map(testiCardHtml).join('') : '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">No testimonials yet.</div>';
   window.updateSearchIndex?.();
 }
@@ -505,7 +505,7 @@ function renderCvList() {
   c.innerHTML = allCvs.map((cv, i) => { const pwd = String(cv.password ?? '').trim(); const prot = pwd !== '0' && pwd !== '' && pwd !== 'null'; return `<div class="cv-item"><div class="cv-item-left"><div class="cv-item-icon">📄</div><div class="cv-item-info"><h4 class="cv-item-title">${escapeHtml(cv.title)}</h4><span class="cv-item-badge ${prot?'protected':'free'}">${prot?'🔒 Password Protected':'✓ Direct Download'}</span></div></div><button type="button" class="cv-download-btn" data-cv-index="${i}" aria-label="Download ${escapeHtml(cv.title)}"><span style="font-size:1.25rem;">↓</span></button></div>`; }).join('');
 }
 async function loadCvs() {
-  try { const {data,error} = await supabase.from('cvs').select('*').order('sort_order',{ascending:true}); if(error) throw error; allCvs = data||[]; renderCvList(); } catch {}
+  try { const {data,error} = await db.from('cvs').select('*').order('sort_order',{ascending:true}); if(error) throw error; allCvs = data||[]; renderCvList(); } catch {}
 }
 function openCvModal() { const m = document.getElementById('cvModal'); if(!m) return; document.getElementById('cvStepList').style.display='block'; document.getElementById('cvStepPassword').style.display='none'; renderCvList(); m.classList.add('open'); m.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; loadCvs(); }
 function closeCvModal() { const m = document.getElementById('cvModal'); if(!m) return; m.classList.remove('open'); m.setAttribute('aria-hidden','true'); document.body.style.overflow=''; curCv = null; }
@@ -565,8 +565,8 @@ async function initSite() {
 
 window.addEventListener('DOMContentLoaded', async () => {
   try {
-    supabase = await initSupabase();
-    if (!supabase) { console.error('Supabase not initialized — content will not load.'); return; }
+    db = await initSupabase();
+    if (!db) { console.error('Supabase not initialized — content will not load.'); return; }
     initAudio();
     await loadSections();
     await initSite();
