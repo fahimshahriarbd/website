@@ -638,7 +638,24 @@ async function initSite(){
       });
     });
 
-    testimonialsGrid
+    // Testimonial cards
+    document.querySelectorAll('#testimonialsGrid .testimonial-card').forEach(card => {
+      counter++;
+      if (!card.id) card.id = `testimonial-item-${counter}`;
+      const title = card.querySelector('.person-name-link b')?.textContent.trim() || card.querySelector('b')?.textContent.trim() || '';
+      const text = card.querySelector('.testimonial-content p')?.textContent.trim() ||
+        card.querySelector('.card-desc')?.textContent.trim() || '';
+      const tag = card.querySelector('.person-relation-tag')?.textContent.trim() || '';
+      const about = card.querySelector('.testimonial-about-badge')?.textContent.trim() || '';
+      items.push({
+        id: card.id,
+        title: title || 'Testimonial',
+        text: text,
+        meta: `Testimonials${tag ? ' · ' + tag : ''}${about ? ' · ' + about : ''}`,
+        tags: ['Testimonials', 'Reviews', 'Feedback', tag].filter(Boolean),
+        sectionId: 'testimonials'
+      });
+    });
 
     // Ensure all tags have accessibility attributes
     document.querySelectorAll('.tag').forEach(tag => {
@@ -902,6 +919,24 @@ async function initSite(){
 
   buildSearchIndex();
 
+  /* SCROLL REVEAL ANIMATION */
+
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  // Re-observe new reveal elements after dynamic content loads
+  window.refreshReveal = function() {
+    document.querySelectorAll('.reveal:not(.visible)').forEach(el => revealObserver.observe(el));
+  };
+
 
   /* SCROLL PROGRESS */
 
@@ -987,6 +1022,19 @@ async function initSite(){
 
   /* LOAD GOOGLE SHEET CONTENT (BLOG, GALLERY, SERVICES, ACHIEVEMENTS, PROJECTS, TESTIMONIALS & CV) */
 
+  // Show skeleton loaders before fetching dynamic content
+  ['blogGrid', 'galleryGrid', 'servicesGrid', 'achievementsGrid', 'projectsGrid', 'testimonialsGrid'].forEach(id => {
+    const grid = document.getElementById(id);
+    if (!grid) return;
+    const count = id === 'galleryGrid' ? 8 : id === 'blogGrid' ? 4 : 6;
+    grid.innerHTML = Array.from({length: count}, () => {
+      if (id === 'galleryGrid') {
+        return `<div style="border-radius:18px;aspect-ratio:1/1;background:linear-gradient(90deg,var(--surface2) 25%,var(--border) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border:1px solid var(--border);"></div>`;
+      }
+      return `<div class="skeleton-card"><div class="skeleton-line icon"></div><div class="skeleton-line medium"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>`;
+    }).join('');
+  });
+
   await Promise.allSettled([
     loadWebsiteContent(),
     loadGalleryContent(),
@@ -996,6 +1044,10 @@ async function initSite(){
     loadTestimonialsContent(),
     loadCvContent()
   ]);
+
+  if (typeof window.refreshReveal === 'function') {
+    window.refreshReveal();
+  }
 
   initCvModal();
 }
@@ -2924,7 +2976,7 @@ function initServiceModal() {
         }
       } finally {
         finalSubmitBtn.disabled = false;
-        finalSubmitBtn.textContent = 'Processing...';
+        finalSubmitBtn.textContent = 'Confirm';
       }
     };
   }

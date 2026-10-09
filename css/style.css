@@ -170,6 +170,35 @@ button,input,textarea{font:inherit;font-size:16px}
 [data-theme="dark"] .search-snippet mark{background:#facc15;color:#111827}
 .search-empty{padding:12px;color:var(--muted);font-size:.9rem;text-align:center}
 
+/* ================= SCROLL REVEAL ANIMATION ================= */
+.reveal{
+  opacity:0;
+  transform:translateY(24px);
+  transition:opacity .6s cubic-bezier(0.16,1,0.3,1), transform .6s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+@media(prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  .hero-photo-wrap{animation:none}
+}
+
+/* ================= LOADING SKELETONS ================= */
+.skeleton-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:25px;box-shadow:var(--shadow);
+}
+.skeleton-line{
+  height:14px;border-radius:7px;background:linear-gradient(90deg,var(--surface2) 25%,var(--border) 50%,var(--surface2) 75%);
+  background-size:200% 100%;animation:shimmer 1.4s infinite;margin-bottom:10px;
+}
+.skeleton-line.short{width:60%}
+.skeleton-line.medium{width:80%}
+.skeleton-line.icon{width:48px;height:48px;border-radius:14px;margin-bottom:14px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
 /* ================= CONTENT CMS / ARTICLE MODAL ================= */
 .content-modal{position:fixed;inset:0;background:rgba(15,23,42,.62);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:3000}
 .content-modal.open{display:flex}
@@ -1143,7 +1172,7 @@ button,input,textarea{font:inherit;font-size:16px}
   font-weight: 600;
   font-size: 0.95rem;
   letter-spacing: 0.5px;
-  color: #your-brand-color;
+  color: var(--primary);
   display: block;
   margin-bottom: 8px;
 }
@@ -1311,7 +1340,7 @@ button,input,textarea{font:inherit;font-size:16px}
 }
 
 .cv-download-btn:hover {
-  background: var(--primary-dark);
+  background: var(--primary2);
   transform: scale(1.1);
 }
 
