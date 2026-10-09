@@ -295,7 +295,10 @@ function renderReadOnlyTable(data, config) {
         html += `<td title="${esc(val)}">${esc(val ?? '—')}</td>`;
       }
     });
-    html += `<td class="col-actions"><button class="admin-action-btn view" onclick="viewDetail('${esc(row.id)}')">View</button></td>`;
+    html += `<td class="col-actions">
+      <button class="admin-action-btn view" onclick="viewDetail('${esc(row.id)}')">View</button>
+      <button class="admin-action-btn delete" onclick="confirmDelete('${esc(row.id)}')">Delete</button>
+    </td>`;
     html += '</tr>';
   });
 
@@ -339,25 +342,31 @@ async function viewDetail(id) {
   html += '</div>';
   fieldsEl.innerHTML = html;
 
-  document.getElementById('adminFormActions').style.display = 'none';
-  modal.classList.add('open');
+  const actionsEl = document.getElementById('adminFormActions');
+  if (actionsEl) actionsEl.style.display = 'none';
+  if (modal) modal.classList.add('open');
 }
 
 /* ---- ADD / EDIT MODAL ---- */
 function openAddModal() {
   currentEditId = null;
   const config = TABLE_CONFIG[currentTable];
-  document.getElementById('adminModalTitle').textContent = `Add New ${config.label.replace(/s$/, '')}`;
-  document.getElementById('adminFormActions').style.display = 'flex';
+  const titleEl = document.getElementById('adminModalTitle');
+  if (titleEl && config) titleEl.textContent = `Add New ${config.label.replace(/s$/, '')}`;
+  const actionsEl = document.getElementById('adminFormActions');
+  if (actionsEl) actionsEl.style.display = 'flex';
   renderFormFields(null);
-  document.getElementById('adminModal').classList.add('open');
+  const modal = document.getElementById('adminModal');
+  if (modal) modal.classList.add('open');
 }
 
 async function openEditModal(id) {
   currentEditId = id;
   const config = TABLE_CONFIG[currentTable];
-  document.getElementById('adminModalTitle').textContent = `Edit ${config.label.replace(/s$/, '')}`;
-  document.getElementById('adminFormActions').style.display = 'flex';
+  const titleEl = document.getElementById('adminModalTitle');
+  if (titleEl && config) titleEl.textContent = `Edit ${config.label.replace(/s$/, '')}`;
+  const actionsEl = document.getElementById('adminFormActions');
+  if (actionsEl) actionsEl.style.display = 'flex';
 
   // Fetch the specific row
   try {
@@ -534,9 +543,27 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('adminSidebar').classList.toggle('open');
   });
 
-  // Escape to close modal
+  // Google Sheet Guide modal listeners
+  const guideModal = document.getElementById('sheetGuideModal');
+  const openGuideBtn = document.getElementById('openSheetGuideBtn');
+  const closeGuideBtn = document.getElementById('sheetGuideClose');
+  const okGuideBtn = document.getElementById('sheetGuideOkBtn');
+  const guideOverlay = document.getElementById('sheetGuideOverlay');
+
+  const openGuide = () => { if (guideModal) guideModal.classList.add('open'); };
+  const closeGuide = () => { if (guideModal) guideModal.classList.remove('open'); };
+
+  if (openGuideBtn) openGuideBtn.addEventListener('click', openGuide);
+  if (closeGuideBtn) closeGuideBtn.addEventListener('click', closeGuide);
+  if (okGuideBtn) okGuideBtn.addEventListener('click', closeGuide);
+  if (guideOverlay) guideOverlay.addEventListener('click', closeGuide);
+
+  // Escape to close modals
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Escape') {
+      closeModal();
+      closeGuide();
+    }
   });
 
   // Listen for auth state changes
