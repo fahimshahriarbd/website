@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "msg-1791585645039",
+    "name": "Rakib Hasan",
+    "email": "rakib@example.com",
+    "subject": "Portfolio Inquiry",
+    "message": "Hello Fahim, loved your work!",
+    "status": "new",
+    "created_at": "2026-10-09T22:40:45.039Z"
+  }
+]
