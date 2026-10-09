@@ -668,13 +668,6 @@ async function initSite(){
       });
     });
 
-    // Ensure all tags have accessibility attributes
-    document.querySelectorAll('.tag').forEach(tag => {
-      if (!tag.hasAttribute('tabindex')) tag.setAttribute('tabindex', '0');
-      if (!tag.hasAttribute('role')) tag.setAttribute('role', 'button');
-      if (!tag.hasAttribute('title')) tag.setAttribute('title', `Search for "${tag.textContent.trim()}"`);
-    });
-
     searchItems = items;
   }
 
@@ -687,7 +680,7 @@ async function initSite(){
 
     if (!q) {
       searchResults.innerHTML =
-        '<div class="search-empty">Search blogs, projects, education, skills, services and tags.</div>';
+        '<div class="search-empty">Search blogs, projects, education, skills and services.</div>';
       return;
     }
 
@@ -744,23 +737,18 @@ async function initSite(){
       searchResults.innerHTML = `
         <div class="search-empty">
           No matches found for "<b>${escapeHtml(query)}</b>".
-          <br><small style="margin-top:6px;display:block;color:var(--muted)">Try searching for BDS, Daraz, Web Development, Caretutors, or click on any tag.</small>
+          <br><small style="margin-top:6px;display:block;color:var(--muted)">Try searching for BDS, Daraz, Web Development, or Caretutors.</small>
         </div>
       `;
       return;
     }
 
     searchResults.innerHTML = matches.slice(0, 12).map(item => {
-      const tagHtml = (item.tags || []).length
-        ? `<div class="tags" style="margin-top:7px;gap:5px;">${item.tags.map(t => `<span class="tag" style="font-size:0.72rem;padding:2px 8px;">${escapeHtml(t)}</span>`).join('')}</div>`
-        : '';
-
       return `
         <div class="search-result" data-target-id="${escapeHtml(item.id)}" role="button" tabindex="0">
           <span class="search-result-meta">${escapeHtml(item.meta)}</span>
           <strong class="search-result-title">${highlightMatch(item.title, q)}</strong>
           <span class="search-snippet">${getSnippet(item.text, q)}</span>
-          ${tagHtml}
         </div>
       `;
     }).join('');
@@ -827,7 +815,6 @@ async function initSite(){
     });
 
     document.addEventListener('click', (e) => {
-      if (e.target.closest('.tag')) return;
       if (!e.target.closest('.search-wrap')) {
         searchBox.classList.remove('open');
         searchBtn.classList.remove('active');
@@ -835,8 +822,6 @@ async function initSite(){
     });
 
     searchResults.addEventListener('click', (e) => {
-      if (e.target.closest('.tag')) return;
-
       const resultCard = e.target.closest('.search-result');
       if (!resultCard) return;
 
@@ -869,48 +854,6 @@ async function initSite(){
     });
   }
 
-  // GLOBAL TAG CLICK & SEARCH FUNCTION
-  function searchByTag(tagText) {
-    if (!tagText) return;
-    const cleanTag = tagText.trim();
-    if (!cleanTag) return;
-
-    // Close any open modals
-    const projectModal = document.getElementById('projectModal');
-    if (projectModal && projectModal.classList.contains('open')) {
-      projectModal.classList.remove('open');
-      projectModal.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-
-    const serviceModal = document.getElementById('serviceModal');
-    if (serviceModal && serviceModal.classList.contains('open')) {
-      serviceModal.classList.remove('open');
-      serviceModal.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-
-    const contentModal = document.getElementById('contentModal');
-    if (contentModal && contentModal.classList.contains('open')) {
-      contentModal.classList.remove('open');
-      contentModal.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-
-    if (searchBox && siteSearch && searchBtn) {
-      searchBox.classList.add('open');
-      searchBtn.classList.add('active');
-      siteSearch.value = cleanTag;
-      buildSearchIndex();
-      renderSearch(cleanTag);
-      siteSearch.focus({ preventScroll: true });
-      siteSearch.select();
-      // NO AUTO-SCROLLING! Keep current reading position without jumping to top!
-    }
-  }
-
-  window.searchByTag = searchByTag;
-
   // GLOBAL SEE MORE / SEE LESS TOGGLE FOR EXPANDABLE DESCRIPTIONS
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.desc-toggle-btn');
@@ -919,27 +862,9 @@ async function initSite(){
     }
   });
 
-  // GLOBAL TAG CLICK LISTENER
-  document.addEventListener('click', (e) => {
-    const tag = e.target.closest('.tag');
-    if (!tag) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    const tagText = tag.textContent.trim();
-    if (!tagText) return;
-    searchByTag(tagText);
-  });
-
-  // Handle Enter key on focused tags or search results
+  // Handle Enter key on focused search results
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
-      const activeTag = document.activeElement?.closest?.('.tag');
-      if (activeTag) {
-        e.preventDefault();
-        activeTag.click();
-      }
       const activeResult = document.activeElement?.closest?.('.search-result');
       if (activeResult) {
         e.preventDefault();
@@ -2196,10 +2121,6 @@ function createAchievementCardHtml(item) {
     ? `<img src="${escapeHtml(item.icon)}" alt="${escapeHtml(item.title)}" style="width:36px;height:36px;object-fit:contain;" />`
     : escapeHtml(item.icon);
 
-  const tagsMarkup = (item.tags || [])
-    .map(tag => `<span class="tag">${escapeHtml(tag)}</span>`)
-    .join('');
-
   return `
     <article class="card">
       <div class="card-header">
@@ -2207,7 +2128,6 @@ function createAchievementCardHtml(item) {
         <h4>${escapeHtml(item.title)}</h4>
       </div>
       ${formatTruncatedDesc(item.description, 22)}
-      ${tagsMarkup ? `<div class="tags" style="margin-top:14px;">${tagsMarkup}</div>` : ''}
     </article>
   `;
 }
@@ -2484,10 +2404,6 @@ function createProjectCardHtml(item, index) {
     ? `<img src="${escapeHtml(item.icon)}" alt="${escapeHtml(item.title)}" style="width:36px;height:36px;object-fit:contain;" />`
     : escapeHtml(item.icon || '🚀');
 
-  const tagsMarkup = (item.tags || [])
-    .map(tag => `<span class="tag">${escapeHtml(tag)}</span>`)
-    .join('');
-
   const hasLink = item.link && item.link.trim() !== '' && item.link !== '#';
   const targetAttr = hasLink && !item.link.startsWith('#') ? '_blank' : '_self';
   const relAttr = targetAttr === '_blank' ? 'rel="noopener noreferrer"' : '';
@@ -2501,7 +2417,6 @@ function createProjectCardHtml(item, index) {
           <h4>${escapeHtml(item.title)}</h4>
         </div>
         ${formatTruncatedDesc(item.description, 22)}
-        ${tagsMarkup ? `<div class="tags" style="margin-top:14px;">${tagsMarkup}</div>` : ''}
       </div>
       <div class="project-card-footer">
         ${hasLink ? `
@@ -2525,7 +2440,7 @@ function attachProjectCardEvents() {
 
   grid.addEventListener('click', (e) => {
     // If clicking directly on a tag or description toggle, don't trigger navigation
-    if (e.target.closest('.tag') || e.target.closest('.desc-toggle-btn')) {
+    if (e.target.closest('.desc-toggle-btn')) {
       return;
     }
     // If clicking directly on an <a> link, allow natural browser navigation
@@ -2627,12 +2542,6 @@ function openProjectModal(project) {
     } else {
       imageWrap.style.display = 'none';
     }
-  }
-
-  if (tagsEl) {
-    tagsEl.innerHTML = (project.tags || [])
-      .map(t => `<span class="tag">${escapeHtml(t)}</span>`)
-      .join('');
   }
 
   if (linkBtn) {
