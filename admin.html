@@ -46,6 +46,7 @@
         </div>
       </div>
       <div class="admin-header-right">
+        <button class="btn btn-secondary" id="openSheetGuideBtn" style="padding:7px 14px;font-size:0.85rem;border-radius:8px;cursor:pointer;">📊 Google Sheet Guide</button>
         <a href="index.html" class="admin-header-link" target="_blank">View Site ↗</a>
         <button class="admin-header-link" id="logoutBtn">Logout</button>
       </div>
@@ -89,11 +90,164 @@
       </div>
       <form id="adminForm" class="admin-form">
         <div id="adminFormFields"></div>
-        <div class="admin-form-actions">
+        <div class="admin-form-actions" id="adminFormActions">
           <button type="button" class="btn btn-secondary" id="adminCancelBtn">Cancel</button>
           <button type="submit" class="btn btn-primary" id="adminSaveBtn">Save</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Google Sheet Guide Modal -->
+  <div class="admin-modal" id="sheetGuideModal" aria-hidden="true">
+    <div class="admin-modal-overlay" id="sheetGuideOverlay"></div>
+    <div class="admin-modal-box" style="max-width: 820px; max-height: 85vh; overflow-y: auto;">
+      <div class="admin-modal-header">
+        <h3>📊 Google Sheet Database Setup Guide</h3>
+        <button class="admin-modal-close" id="sheetGuideClose">×</button>
+      </div>
+      <div style="padding: 24px; font-size: 0.92rem; line-height: 1.6; color: var(--admin-text);">
+        <p style="margin-bottom: 16px;">
+          আপনার ওয়েবসাইটের একমাত্র ও মূল ডেটাবেজ হিসেবে <strong>Google Sheet</strong> ব্যবহৃত হচ্ছে। গুগল শিটের যেকোনো পরিবর্তন স্বয়ংক্রিয়ভাবে মূল ওয়েবসাইটে প্রদর্শিত হয় এবং এই এডমিন প্যানেল থেকে আপনি সরাসরি এন্ট্রি যোগ, এডিট ও ডিলিট করতে পারেন।
+        </p>
+
+        <div style="background: var(--admin-bg, #f4f6f8); border: 1px solid var(--admin-border); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+          <strong style="color: var(--admin-primary); display:block; margin-bottom: 6px;">🔗 আপনার লাইভ গুগল অ্যাপস স্ক্রিপ্ট ইউআরএল (Google Script URL):</strong>
+          <code style="word-break: break-all; background: #fff; padding: 6px 10px; border-radius: 6px; display: block; border: 1px solid var(--admin-border); font-size: 0.85rem;">https://script.google.com/macros/s/AKfycbwFIJVTNzF50zCcv6Ppk2n041_tXHFEWcKM1ouSQsCQ-HzcNUkjUTjNvesNnN_KZ38ovg/exec</code>
+        </div>
+
+        <h4 style="margin: 20px 0 10px; font-size: 1.05rem;">📋 গুগল শিটে প্রয়োজনীয় ৮টি ট্যাব (Sheet Tabs) ও হেডার কলাম:</h4>
+        <p style="color: var(--admin-muted); font-size: 0.85rem; margin-bottom: 12px;">আপনার স্প্রেডশিটে নিচের নামের ট্যাবগুলো তৈরি করে প্রথম সারিতে (Row 1) হুবহু কলাম হেডারগুলো লিখুন:</p>
+
+        <div style="display: grid; gap: 12px;">
+          <div style="border: 1px solid var(--admin-border); border-radius: 8px; padding: 12px; background: #fff;">
+            <strong>1. ✍️ blog</strong> (অথবা blog_posts)
+            <div style="color: var(--admin-muted); font-size: 0.82rem; margin-top: 4px;"><strong>কলাম হেডার:</strong> <code>Title</code> | <code>Category</code> | <code>Image</code> | <code>Date</code> | <code>ReadTime</code> | <code>Summary</code> | <code>Content</code> | <code>Link</code> | <code>Published</code></div>
+          </div>
+          <div style="border: 1px solid var(--admin-border); border-radius: 8px; padding: 12px; background: #fff;">
+            <strong>2. 🚀 projects</strong>
+            <div style="color: var(--admin-muted); font-size: 0.82rem; margin-top: 4px;"><strong>কলাম হেডার:</strong> <code>Title</code> | <code>Icon</code> | <code>Category</code> | <code>Description</code> | <code>Link</code> | <code>Published</code></div>
+          </div>
+          <div style="border: 1px solid var(--admin-border); border-radius: 8px; padding: 12px; background: #fff;">
+            <strong>3. 💼 services</strong>
+            <div style="color: var(--admin-muted); font-size: 0.82rem; margin-top: 4px;"><strong>কলাম হেডার:</strong> <code>Title</code> | <code>Icon</code> | <code>Category</code> | <code>Price</code> | <code>Description</code> | <code>Active</code></div>
+          </div>
+          <div style="border: 1px solid var(--admin-border); border-radius: 8px; padding: 12px; background: #fff;">
+            <strong>4. 🏆 achievements</strong>
+            <div style="color: var(--admin-muted); font-size: 0.82rem; margin-top: 4px;"><strong>কলাম হেডার:</strong> <code>Title</code> | <code>Icon</code> | <code>Description</code> | <code>Published</code></div>
+          </div>
+          <div style="border: 1px solid var(--admin-border); border-radius: 8px; padding: 12px; background: #fff;">
+            <strong>5. 💬 testimonials</strong>
+            <div style="color: var(--admin-muted); font-size: 0.82rem; margin-top: 4px;"><strong>কলাম হেডার:</strong> <code>Name</code> | <code>Tag</code> | <code>About</code> | <code>Feedback</code> | <code>Image</code> | <code>Link</code> | <code>Published</code></div>
+          </div>
+          <div style="border: 1px solid var(--admin-border); border-radius: 8px; padding: 12px; background: #fff;">
+            <strong>6. 🖼️ gallery</strong> (অথবা gallery_photos)
+            <div style="color: var(--admin-muted); font-size: 0.82rem; margin-top: 4px;"><strong>কলাম হেডার:</strong> <code>Image_URL</code> | <code>Caption</code> | <code>Category</code></div>
+          </div>
+          <div style="border: 1px solid var(--admin-border); border-radius: 8px; padding: 12px; background: #fff;">
+            <strong>7. 📄 cv</strong> (অথবা cvs)
+            <div style="color: var(--admin-muted); font-size: 0.82rem; margin-top: 4px;"><strong>কলাম হেডার:</strong> <code>Title</code> | <code>Download Link</code> | <code>Password</code> (ফ্রি হলে 0 দিন)</div>
+          </div>
+          <div style="border: 1px solid var(--admin-border); border-radius: 8px; padding: 12px; background: #fff;">
+            <strong>8. ✉️ messages & 📅 bookings</strong>
+            <div style="color: var(--admin-muted); font-size: 0.82rem; margin-top: 4px;">ওয়েবসাইটে মেসেজ পাঠালে বা সার্ভিস বুকিং দিলে এখানে স্বয়ংক্রিয়ভাবে জমা হবে।</div>
+          </div>
+        </div>
+
+        <h4 style="margin: 24px 0 10px; font-size: 1.05rem;">⚙️ গুগল অ্যাপস স্ক্রিপ্ট কোড (Full CRUD Apps Script):</h4>
+        <p style="color: var(--admin-muted); font-size: 0.85rem; margin-bottom: 8px;">গুগল শিটের <em>Extensions → Apps Script</em> এ গিয়ে নিচের পূর্ণাঙ্গ কোডটি পেস্ট করে Deploy > New Deployment > Web app (Who has access: <strong>Anyone</strong>) হিসেবে সেভ করুন:</p>
+        <pre style="background: #1e1e24; color: #e2e8f0; padding: 14px; border-radius: 8px; font-size: 0.8rem; overflow-x: auto; max-height: 240px; font-family: monospace;"><code>function doGet(e) {
+  var sheetName = (e.parameter.sheet || 'messages').trim();
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    // case-insensitive fallback
+    var all = ss.getSheets();
+    for (var i = 0; i < all.length; i++) {
+      if (all[i].getName().toLowerCase() === sheetName.toLowerCase()) {
+        sheet = all[i]; break;
+      }
+    }
+  }
+  if (!sheet) {
+    return ContentService.createTextOutput(JSON.stringify({error: "Sheet not found: " + sheetName}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  var data = sheet.getDataRange().getValues();
+  if (data.length <= 1) {
+    return ContentService.createTextOutput(JSON.stringify([]))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  var headers = data[0];
+  var rows = [];
+  for (var r = 1; r < data.length; r++) {
+    var obj = { id: 'row-' + r };
+    for (var c = 0; c < headers.length; c++) {
+      obj[headers[c]] = data[r][c];
+    }
+    rows.push(obj);
+  }
+  return ContentService.createTextOutput(JSON.stringify(rows))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  try {
+    var postData = JSON.parse(e.postData.contents);
+    var sheetName = (postData.sheet || e.parameter.sheet || 'messages').trim();
+    var action = postData.action || 'insert'; // insert, update, delete
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName(sheetName);
+    if (!sheet) {
+      sheet = ss.insertSheet(sheetName);
+    }
+    var headers = sheet.getRange(1, 1, 1, Math.max(1, sheet.getLastColumn())).getValues()[0];
+    
+    if (action === 'insert') {
+      var row = [];
+      for (var i = 0; i < headers.length; i++) {
+        var col = headers[i];
+        row.push(postData.data[col] !== undefined ? postData.data[col] : '');
+      }
+      sheet.appendRow(row);
+      return ContentService.createTextOutput(JSON.stringify({success: true, message: "Row added"}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    // Update support
+    if (action === 'update') {
+      var updateRowIndex = parseInt(postData.rowIndex, 10);
+      if (updateRowIndex > 1 && updateRowIndex <= sheet.getLastRow()) {
+        for (var i = 0; i < headers.length; i++) {
+          var col = headers[i];
+          if (postData.data[col] !== undefined) {
+            sheet.getRange(updateRowIndex, i + 1).setValue(postData.data[col]);
+          }
+        }
+        return ContentService.createTextOutput(JSON.stringify({success: true, message: "Row updated"}))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    // Delete support
+    if (action === 'delete') {
+      var rowIndex = parseInt(postData.rowIndex, 10);
+      if (rowIndex > 1 && rowIndex <= sheet.getLastRow()) {
+        sheet.deleteRow(rowIndex);
+        return ContentService.createTextOutput(JSON.stringify({success: true, message: "Row deleted"}))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify({success: true}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({error: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}</code></pre>
+
+        <div style="margin-top: 20px; text-align: right;">
+          <button type="button" class="btn btn-primary" id="sheetGuideOkBtn" style="padding: 8px 20px;">ঠিক আছে (Close)</button>
+        </div>
+      </div>
     </div>
   </div>
 
