@@ -395,15 +395,26 @@ async function initSite(){
     if (str.length <= 130) return highlightMatch(str, query);
 
     const lower = str.toLowerCase();
-    const qClean = query.trim().toLowerCase();
-    const index = lower.indexOf(qClean);
+    const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
 
-    if (index === -1) {
+    let bestIndex = -1;
+    if (words.length > 1) {
+      for (const w of words) {
+        const idx = lower.indexOf(w);
+        if (idx !== -1 && (bestIndex === -1 || idx < bestIndex)) {
+          bestIndex = idx;
+        }
+      }
+    } else {
+      bestIndex = lower.indexOf(words[0] || query.trim().toLowerCase());
+    }
+
+    if (bestIndex === -1) {
       return highlightMatch(str.slice(0, 120) + '...', query);
     }
 
-    const start = Math.max(0, index - 40);
-    const end = Math.min(str.length, index + qClean.length + 80);
+    const start = Math.max(0, bestIndex - 40);
+    const end = Math.min(str.length, bestIndex + 80);
     const prefix = start > 0 ? '...' : '';
     const suffix = end < str.length ? '...' : '';
     return highlightMatch(prefix + str.slice(start, end) + suffix, query);
@@ -792,6 +803,26 @@ async function initSite(){
       if (e.key === 'Escape') {
         searchBox.classList.remove('open');
         searchBtn.classList.remove('active');
+      }
+
+      if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && searchBox.classList.contains('open')) {
+        e.preventDefault();
+        const results = searchResults.querySelectorAll('.search-result');
+        if (!results.length) return;
+        const currentFocused = searchResults.querySelector('.search-result.focused');
+        let newIndex = -1;
+        if (currentFocused) {
+          const currentIndex = Array.from(results).indexOf(currentFocused);
+          newIndex = e.key === 'ArrowDown' ? currentIndex + 1 : currentIndex - 1;
+        } else {
+          newIndex = e.key === 'ArrowDown' ? 0 : results.length - 1;
+        }
+        if (newIndex >= 0 && newIndex < results.length) {
+          if (currentFocused) currentFocused.classList.remove('focused');
+          results[newIndex].classList.add('focused');
+          results[newIndex].focus();
+          results[newIndex].scrollIntoView({ block: 'nearest' });
+        }
       }
     });
 

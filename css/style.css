@@ -162,7 +162,7 @@ button,input,textarea{font:inherit;font-size:16px}
 .search-result{
   display:block;padding:12px 13px;margin-bottom:7px;border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:.9rem;line-height:1.55;background:var(--surface);transition:.2s ease
 }
-.search-result:hover{background:var(--surface2);border-color:color-mix(in srgb,var(--primary) 30%,var(--border));transform:translateY(-1px)}
+.search-result:hover,.search-result.focused{background:var(--surface2);border-color:color-mix(in srgb,var(--primary) 30%,var(--border));transform:translateY(-1px)}
 .search-result-title{display:block;font-size:.95rem;font-weight:850;margin-bottom:2px}
 .search-result-meta{display:block;color:var(--muted);font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
 .search-snippet{display:block;color:var(--muted);font-size:.88rem;line-height:1.65}
@@ -173,15 +173,32 @@ button,input,textarea{font:inherit;font-size:16px}
 /* ================= SCROLL REVEAL ANIMATION ================= */
 .reveal{
   opacity:0;
-  transform:translateY(24px);
-  transition:opacity .6s cubic-bezier(0.16,1,0.3,1), transform .6s cubic-bezier(0.16,1,0.3,1);
+  transform:translateY(28px);
+  transition:opacity .65s cubic-bezier(0.16,1,0.3,1), transform .65s cubic-bezier(0.16,1,0.3,1);
 }
 .reveal.visible{
   opacity:1;
   transform:translateY(0);
 }
+.reveal .card,.reveal .gallery-item,.reveal .testimonial-card,.reveal .timeline-item{
+  opacity:0;
+  transform:translateY(20px);
+  transition:opacity .5s cubic-bezier(0.16,1,0.3,1), transform .5s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.visible .card,.reveal.visible .gallery-item,.reveal.visible .testimonial-card,.reveal.visible .timeline-item{
+  opacity:1;
+  transform:translateY(0);
+}
+.reveal.visible .card:nth-child(1),.reveal.visible .gallery-item:nth-child(1),.reveal.visible .testimonial-card:nth-child(1),.reveal.visible .timeline-item:nth-child(1){transition-delay:0s}
+.reveal.visible .card:nth-child(2),.reveal.visible .gallery-item:nth-child(2),.reveal.visible .testimonial-card:nth-child(2),.reveal.visible .timeline-item:nth-child(2){transition-delay:.07s}
+.reveal.visible .card:nth-child(3),.reveal.visible .gallery-item:nth-child(3),.reveal.visible .testimonial-card:nth-child(3),.reveal.visible .timeline-item:nth-child(3){transition-delay:.14s}
+.reveal.visible .card:nth-child(4),.reveal.visible .gallery-item:nth-child(4),.reveal.visible .testimonial-card:nth-child(4),.reveal.visible .timeline-item:nth-child(4){transition-delay:.21s}
+.reveal.visible .card:nth-child(5),.reveal.visible .gallery-item:nth-child(5),.reveal.visible .testimonial-card:nth-child(5),.reveal.visible .timeline-item:nth-child(5){transition-delay:.28s}
+.reveal.visible .card:nth-child(6),.reveal.visible .gallery-item:nth-child(6),.reveal.visible .testimonial-card:nth-child(6),.reveal.visible .timeline-item:nth-child(6){transition-delay:.35s}
+.reveal.visible .card:nth-child(7),.reveal.visible .gallery-item:nth-child(7),.reveal.visible .testimonial-card:nth-child(7),.reveal.visible .timeline-item:nth-child(7){transition-delay:.42s}
+.reveal.visible .card:nth-child(8),.reveal.visible .gallery-item:nth-child(8),.reveal.visible .testimonial-card:nth-child(8),.reveal.visible .timeline-item:nth-child(8){transition-delay:.49s}
 @media(prefers-reduced-motion:reduce){
-  .reveal{opacity:1;transform:none;transition:none}
+  .reveal,.reveal .card,.reveal .gallery-item,.reveal .testimonial-card,.reveal .timeline-item{opacity:1;transform:none;transition:none}
   .hero-photo-wrap{animation:none}
 }
 
@@ -264,7 +281,13 @@ button,input,textarea{font:inherit;font-size:16px}
 .dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 5px rgba(34,197,94,.10)}
 .hero h1{
  font-size:clamp(2.2rem,6vw,4.5rem);line-height:1.05;letter-spacing:-.04em;
- margin-bottom:18px;
+ margin-bottom:6px;font-weight:900;
+ background:linear-gradient(135deg,var(--text) 0%,var(--primary) 60%,#60a5fa 100%);
+ -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-subtitle{
+ font-size:clamp(1rem,2.5vw,1.3rem);font-weight:800;color:var(--primary);
+ margin-bottom:18px;letter-spacing:-.01em;
 }
 .hero p{
  color:var(--muted);max-width:680px;font-size:1.04rem;
@@ -276,7 +299,8 @@ button,input,textarea{font:inherit;font-size:16px}
  display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;
  border:1px solid var(--border);font-weight:800;cursor:pointer;transition:.2s
 }
-.btn:hover{transform:translateY(-2px)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(37,99,235,.18)}
+.btn:active{transform:translateY(0) scale(.98)}
 .btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}
 .btn-primary:hover{background:var(--primary2)}
 .btn-secondary{background:var(--surface)}
@@ -332,7 +356,7 @@ button,input,textarea{font:inherit;font-size:16px}
  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:25px;
  box-shadow:var(--shadow);transition:.25s
 }
-.card:hover{transform:translateY(-5px)}
+.card:hover{transform:translateY(-5px);box-shadow:0 16px 40px rgba(15,23,42,.10),0 0 0 1px color-mix(in srgb,var(--primary) 20%,transparent)}
 .card-header{
   display:flex;align-items:center;gap:14px;margin-bottom:14px
 }
@@ -521,6 +545,16 @@ button,input,textarea{font:inherit;font-size:16px}
   padding:16px;opacity:0;transition:opacity .25s ease;
 }
 .service-modal.open{display:flex;opacity:1}
+.service-modal-box{
+  animation:modalSlideIn .35s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes modalSlideIn{
+  from{opacity:0;transform:translateY(30px) scale(.96)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.content-modal-box{animation:modalSlideIn .35s cubic-bezier(0.16,1,0.3,1);}
+.gallery-lightbox.open .lightbox-img{animation:lightboxFadeIn .3s ease;}
+@keyframes lightboxFadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
 .service-modal-overlay{position:absolute;inset:0;background:rgba(11,17,32,.85);backdrop-filter:blur(10px)}
 .service-modal-box{
   position:relative;z-index:10;width:min(540px,100%);max-height:90vh;overflow-y:auto;
