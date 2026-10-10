@@ -380,7 +380,19 @@ function mapModelToSheetRow(tableName, item) {
   return item;
 }
 
-const DIRECT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwFIJVTNzF50zCcv6Ppk2n041_tXHFEWcKM1ouSQsCQ-HzcNUkjUTjNvesNnN_KZ38ovg/exec';
+let DIRECT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwFIJVTNzF50zCcv6Ppk2n041_tXHFEWcKM1ouSQsCQ-HzcNUkjUTjNvesNnN_KZ38ovg/exec';
+
+// Dynamically sync with server-configured Google Script URL if available
+try {
+  fetch('/api/config')
+    .then(res => res.json())
+    .then(cfg => {
+      if (cfg && cfg.googleScriptUrl) {
+        DIRECT_SCRIPT_URL = cfg.googleScriptUrl;
+      }
+    })
+    .catch(() => {});
+} catch (e) {}
 
 function getSheetTabName(tn) {
   const m = { blog_posts: 'blog', gallery_photos: 'gallery', cvs: 'cv', blog: 'blog', gallery: 'gallery', cv: 'cv' };
