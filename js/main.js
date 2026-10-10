@@ -209,46 +209,225 @@ function initSearch() {
   buildSearchIndex();
 }
 
-/* ---- UI: MENU, THEME, TOP BTN, SCROLL, NAV ---- */
+/* ---- UI: MENU, THEME, TOP BTN, SCROLL, NAV (WEB & MOBILE) ---- */
 function initUI() {
-  const menuBtn = document.getElementById('menuBtn'); const navLinks = document.getElementById('navLinks'); const backdrop = document.getElementById('mobileNavBackdrop');
-  function open(){ navLinks?.classList.add('open'); backdrop?.classList.add('open'); if(menuBtn){menuBtn.classList.add('active');menuBtn.textContent='✕';} }
-  function close(){ navLinks?.classList.remove('open'); backdrop?.classList.remove('open'); if(menuBtn){menuBtn.classList.remove('active');menuBtn.textContent='☰';} }
-  if (menuBtn && navLinks) {
-    menuBtn.addEventListener('click', (e) => { e.stopPropagation(); navLinks.classList.contains('open')?close():open(); });
-    backdrop?.addEventListener('click', close);
-    document.querySelectorAll('.nav-links a').forEach(a => a.addEventListener('click', close));
-    document.addEventListener('click', (e) => { if (navLinks.classList.contains('open') && !navLinks.contains(e.target) && !menuBtn.contains(e.target)) close(); });
-  }
-  const themeBtn = document.getElementById('themeBtn'); const saved = localStorage.getItem('fahim-theme');
-  if (themeBtn) {
-    if (saved) { document.documentElement.setAttribute('data-theme', saved); themeBtn.textContent = saved==='dark'?'☀':'☾'; }
-    themeBtn.addEventListener('click', () => {
-      const dark = document.documentElement.getAttribute('data-theme')==='dark';
-      document.documentElement.setAttribute('data-theme', dark?'light':'dark');
-      localStorage.setItem('fahim-theme', dark?'light':'dark');
-      themeBtn.textContent = dark?'☾':'☀';
-    });
-  }
-  const topBtn = document.getElementById('topBtn');
-  if (topBtn) { window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY>500), {passive:true}); topBtn.addEventListener('click', () => window.scrollTo({top:0,behavior:'smooth'})); }
-  const sp = document.getElementById('scrollProgress');
-  if (sp) { const upd = () => { const h = document.documentElement.scrollHeight-window.innerHeight; sp.style.width = (h>0?(window.scrollY/h)*100:0)+'%'; }; window.addEventListener('scroll', upd, {passive:true}); upd(); }
-  const navSecs = [...document.querySelectorAll('main section[id]')];
-  if (navSecs.length) {
-    const obs = new IntersectionObserver(entries => { entries.forEach(en => { if (en.isIntersecting) {
-      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-      document.querySelector(`.nav-links a[href="#${en.target.id}"]`)?.classList.add('active');
-      document.querySelectorAll('.mobile-bottom-link').forEach(a => a.classList.remove('active'));
-      document.querySelector(`.mobile-bottom-link[href="#${en.target.id}"]`)?.classList.add('active');
-    } }); }, {rootMargin:'-35% 0px -55% 0px', threshold:0});
-    navSecs.forEach(s => obs.observe(s));
-  }
-  const yr = document.getElementById('year'); if (yr) yr.textContent = new Date().getFullYear();
-
-  // Floating Multi-Channel Chat Widget (Pure Speed Dial Icons)
+  const menuBtn = document.getElementById('menuBtn');
+  const navLinks = document.getElementById('navLinks');
+  const backdrop = document.getElementById('mobileNavBackdrop');
   const chatTrigger = document.getElementById('floatingChatTrigger');
   const chatDial = document.getElementById('chatSpeedDial');
+
+  function openMenu() {
+    navLinks?.classList.add('open');
+    backdrop?.classList.add('open');
+    document.body.classList.add('mobile-nav-open');
+    if (menuBtn) {
+      menuBtn.classList.add('active');
+      menuBtn.textContent = '✕';
+      menuBtn.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  function closeMenu() {
+    navLinks?.classList.remove('open');
+    backdrop?.classList.remove('open');
+    document.body.classList.remove('mobile-nav-open');
+    if (menuBtn) {
+      menuBtn.classList.remove('active');
+      menuBtn.textContent = '☰';
+      menuBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  function closeChatDial() {
+    if (chatDial && chatTrigger) {
+      chatDial.classList.remove('open');
+      chatTrigger.classList.remove('active');
+      chatTrigger.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  if (menuBtn && navLinks) {
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navLinks.classList.contains('open') ? closeMenu() : openMenu();
+    });
+    backdrop?.addEventListener('click', closeMenu);
+    document.addEventListener('click', (e) => {
+      if (navLinks.classList.contains('open') && !navLinks.contains(e.target) && !menuBtn.contains(e.target)) {
+        closeMenu();
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && navLinks.classList.contains('open')) {
+        closeMenu();
+      }
+    });
+  }
+
+  // Active section mapping for Top Nav (Web) and Bottom Dock (Mobile)
+  const topNavMap = {
+    home: 'home',
+    about: 'about',
+    journey: 'about',
+    achievements: 'about',
+    cv: 'about',
+    gallery: 'gallery',
+    blog: 'blog',
+    projects: 'projects',
+    services: 'services',
+    testimonials: 'services',
+    contact: 'contact'
+  };
+
+  const bottomNavMap = {
+    home: 'home',
+    about: 'about',
+    journey: 'about',
+    achievements: 'about',
+    cv: 'about',
+    gallery: 'about',
+    blog: 'blog',
+    projects: 'projects',
+    services: 'projects',
+    testimonials: 'projects',
+    contact: 'contact'
+  };
+
+  function setActiveNav(sectionId) {
+    const topTarget = topNavMap[sectionId] || sectionId;
+    const bottomTarget = bottomNavMap[sectionId] || sectionId;
+
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      const href = a.getAttribute('href');
+      a.classList.toggle('active', href === `#${topTarget}`);
+    });
+
+    document.querySelectorAll('.mobile-bottom-link').forEach(a => {
+      const href = a.getAttribute('href');
+      a.classList.toggle('active', href === `#${bottomTarget}`);
+    });
+  }
+
+  // Smooth scroll handler for any navigation anchor
+  function scrollToTarget(targetId) {
+    const targetEl = document.getElementById(targetId);
+    if (!targetEl) return;
+
+    closeMenu();
+    closeChatDial();
+    setActiveNav(targetId);
+
+    const header = document.querySelector('.header');
+    const headerHeight = header ? header.offsetHeight : 65;
+    const targetY = targetEl.getBoundingClientRect().top + window.pageYOffset - (headerHeight - 2);
+
+    window.scrollTo({
+      top: Math.max(0, targetY),
+      behavior: 'smooth'
+    });
+
+    if (history.pushState) {
+      history.pushState(null, '', `#${targetId}`);
+    }
+  }
+
+  // Attach click listeners to desktop/drawer nav links
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const href = a.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        e.preventDefault();
+        scrollToTarget(href.slice(1));
+      } else {
+        closeMenu();
+      }
+    });
+  });
+
+  // Attach click listeners to mobile bottom dock links
+  document.querySelectorAll('.mobile-bottom-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        e.preventDefault();
+        scrollToTarget(href.slice(1));
+      }
+    });
+  });
+
+  // Accurate scroll spy across all sections
+  const spySections = ['contact', 'testimonials', 'services', 'projects', 'blog', 'gallery', 'cv', 'achievements', 'journey', 'about', 'home'];
+  function updateScrollSpy() {
+    const header = document.querySelector('.header');
+    const headerHeight = header ? header.offsetHeight : 65;
+    const scrollPos = window.scrollY + headerHeight + 90;
+
+    // Detect bottom of page
+    if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 70)) {
+      setActiveNav('contact');
+      return;
+    }
+
+    for (const id of spySections) {
+      const el = document.getElementById(id);
+      if (el) {
+        const top = el.offsetTop;
+        if (scrollPos >= top) {
+          setActiveNav(id);
+          return;
+        }
+      }
+    }
+    setActiveNav('home');
+  }
+
+  window.addEventListener('scroll', updateScrollSpy, { passive: true });
+  updateScrollSpy();
+
+  // Dark/Light Theme toggle
+  const themeBtn = document.getElementById('themeBtn');
+  const saved = localStorage.getItem('fahim-theme');
+  if (themeBtn) {
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      themeBtn.textContent = saved === 'dark' ? '☀' : '☾';
+    }
+    themeBtn.addEventListener('click', () => {
+      const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+      localStorage.setItem('fahim-theme', dark ? 'light' : 'dark');
+      themeBtn.textContent = dark ? '☾' : '☀';
+    });
+  }
+
+  // Back to top button
+  const topBtn = document.getElementById('topBtn');
+  if (topBtn) {
+    window.addEventListener('scroll', () => {
+      topBtn.classList.toggle('show', window.scrollY > 400);
+    }, { passive: true });
+    topBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setActiveNav('home');
+    });
+  }
+
+  // Top scroll progress bar
+  const sp = document.getElementById('scrollProgress');
+  if (sp) {
+    const upd = () => {
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      sp.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+    };
+    window.addEventListener('scroll', upd, { passive: true });
+    upd();
+  }
+
+  const yr = document.getElementById('year');
+  if (yr) yr.textContent = new Date().getFullYear();
+
+  // Floating Chat Widget
   if (chatTrigger && chatDial) {
     chatTrigger.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -258,25 +437,25 @@ function initUI() {
     });
     document.addEventListener('click', (e) => {
       if (!e.target.closest('#floatingChatContainer')) {
-        chatDial.classList.remove('open');
-        chatTrigger.classList.remove('active');
-        chatTrigger.setAttribute('aria-expanded', 'false');
+        closeChatDial();
       }
-    });
-
-    document.querySelectorAll('.mobile-bottom-link').forEach(link => {
-      link.addEventListener('click', () => {
-        chatDial.classList.remove('open');
-        chatTrigger.classList.remove('active');
-        chatTrigger.setAttribute('aria-expanded', 'false');
-      });
     });
   }
 
-  const ro = new IntersectionObserver(entries => { entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('visible'); ro.unobserve(en.target); } }); }, {rootMargin:'0px 0px -8% 0px', threshold:0.08});
+  const ro = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        en.target.classList.add('visible');
+        ro.unobserve(en.target);
+      }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
   document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
   window.refreshReveal = () => document.querySelectorAll('.reveal:not(.visible)').forEach(el => ro.observe(el));
-  document.addEventListener('click', (e) => { const b = e.target.closest('.desc-toggle-btn'); if (b) toggleCardDesc(b, e); });
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.desc-toggle-btn');
+    if (b) toggleCardDesc(b, e);
+  });
 }
 
 /* ---- CONTACT FORM ---- */
