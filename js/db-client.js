@@ -523,14 +523,29 @@ function createLocalSupabaseClient() {
         // Server endpoint not reachable (e.g. static hosting on GitHub Pages / custom domain)
       }
 
-      // 2. If not verified via server (static hosting environment like fahimshahriar.com.bd), verify credentials directly
+      // 2. If not verified via server (static hosting environment), verify credentials via cryptographic SHA-256 hash (never plain text)
       if (!loginSuccess) {
-        const isValid = (cleanEmail === 'admin@fahimshahriar.com.bd' && cleanPassword === '3778788467') ||
-                        (cleanEmail === 'admin@fahimshahriar.com' && cleanPassword === 'Fahim#Secure@2025');
-        if (isValid) {
-          loginSuccess = true;
-          userEmail = cleanEmail;
-        } else {
+        try {
+          const encoder = new TextEncoder();
+          const data = encoder.encode(cleanPassword);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const passHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+          // Secure SHA-256 hashes of authorized accounts
+          const authorizedAccounts = [
+            { email: 'admin@fahimshahriar.com.bd', hash: '3ff079a374fde5672c297e589940eef0b28c6af353854be19da6a54d18141206' },
+            { email: 'admin@fahimshahriar.com', hash: '1d43be89254b53dc6ec82c6e9710874251893571704b4e7ccf41ebd10ac1f842' }
+          ];
+
+          const isMatch = authorizedAccounts.some(acc => acc.email === cleanEmail && acc.hash === passHash);
+          if (isMatch) {
+            loginSuccess = true;
+            userEmail = cleanEmail;
+          } else {
+            return { data: { user: null, session: null }, error: new Error('Invalid email or password.') };
+          }
+        } catch (hashErr) {
           return { data: { user: null, session: null }, error: new Error('Invalid email or password.') };
         }
       }
