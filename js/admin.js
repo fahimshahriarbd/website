@@ -1,6 +1,6 @@
 /* ============================================================
    ADMIN PANEL — Fahim Shahriar Website
-   Login + Full CRUD for all content tables via Supabase
+   Login + Full CRUD for all content tables via Google Database
    ============================================================ */
 
 let db = null;
@@ -368,14 +368,20 @@ async function openEditModal(id) {
   const actionsEl = document.getElementById('adminFormActions');
   if (actionsEl) actionsEl.style.display = 'flex';
 
-  // Fetch the specific row
-  try {
-    const { data, error } = await db.from(currentTable).select('*').eq('id', id).maybeSingle();
-    if (error) throw error;
-    renderFormFields(data);
+  // Look up directly from already loaded table data first
+  let row = allCurrentData.find(r => String(r.id) === String(id));
+  if (!row) {
+    try {
+      const { data } = await db.from(currentTable).select('*').eq('id', id).maybeSingle();
+      if (data) row = data;
+    } catch (err) {}
+  }
+
+  if (row) {
+    renderFormFields(row);
     document.getElementById('adminModal').classList.add('open');
-  } catch (err) {
-    alert('Error loading entry: ' + err.message);
+  } else {
+    alert('Entry not found: ' + id);
   }
 }
 
@@ -461,14 +467,25 @@ async function handleFormSubmit(e) {
   }
 
   try {
+    const config = TABLE_CONFIG[currentTable];
     if (currentEditId) {
-      const { error } = await db.from(currentTable).update(data).eq('id', currentEditId);
-      if (error) throw error;
+      const res = await db.from(currentTable).update(data).eq('id', currentEditId);
+      if (res && res.error) throw res.error;
+      // Update in allCurrentData immediately
+      const idx = allCurrentData.findIndex(r => String(r.id) === String(currentEditId));
+      if (idx !== -1) {
+        allCurrentData[idx] = { ...allCurrentData[idx], ...data };
+      }
     } else {
-      const { error } = await db.from(currentTable).insert(data);
-      if (error) throw error;
+      const res = await db.from(currentTable).insert(data);
+      if (res && res.error) throw res.error;
+      if (res && res.data) {
+        const item = Array.isArray(res.data) ? res.data[0] : res.data;
+        allCurrentData.unshift(item);
+      }
     }
     closeModal();
+    renderTable(allCurrentData, config);
     loadTable(currentTable);
   } catch (err) {
     alert('Error saving: ' + err.message);
@@ -487,8 +504,11 @@ function closeModal() {
 async function confirmDelete(id) {
   if (!confirm('Are you sure you want to delete this entry? This cannot be undone.')) return;
   try {
-    const { error } = await db.from(currentTable).delete().eq('id', id);
-    if (error) throw error;
+    const res = await db.from(currentTable).delete().eq('id', id);
+    if (res && res.error) throw res.error;
+    // Remove locally right away for instant visual confirmation
+    allCurrentData = allCurrentData.filter(r => String(r.id) !== String(id));
+    renderTable(allCurrentData, TABLE_CONFIG[currentTable]);
     loadTable(currentTable);
   } catch (err) {
     alert('Error deleting: ' + err.message);
@@ -543,26 +563,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('adminSidebar').classList.toggle('open');
   });
 
-  // Google Sheet Guide modal listeners
-  const guideModal = document.getElementById('sheetGuideModal');
-  const openGuideBtn = document.getElementById('openSheetGuideBtn');
-  const closeGuideBtn = document.getElementById('sheetGuideClose');
-  const okGuideBtn = document.getElementById('sheetGuideOkBtn');
-  const guideOverlay = document.getElementById('sheetGuideOverlay');
-
-  const openGuide = () => { if (guideModal) guideModal.classList.add('open'); };
-  const closeGuide = () => { if (guideModal) guideModal.classList.remove('open'); };
-
-  if (openGuideBtn) openGuideBtn.addEventListener('click', openGuide);
-  if (closeGuideBtn) closeGuideBtn.addEventListener('click', closeGuide);
-  if (okGuideBtn) okGuideBtn.addEventListener('click', closeGuide);
-  if (guideOverlay) guideOverlay.addEventListener('click', closeGuide);
-
   // Escape to close modals
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeModal();
-      closeGuide();
     }
   });
 
