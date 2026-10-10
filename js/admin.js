@@ -407,8 +407,28 @@ async function openEditModal(id) {
     renderFormFields(row);
     document.getElementById('adminModal').classList.add('open');
   } else {
-    alert('Entry not found: ' + id);
+    showAdminToast('Entry not found: ' + id, 'error');
   }
+}
+
+function showAdminToast(message, type = 'info') {
+  let toast = document.getElementById('adminToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'adminToast';
+    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:12px;font-weight:700;font-size:0.92rem;z-index:99999;box-shadow:0 10px 30px rgba(0,0,0,0.3);transition:all 0.3s ease;';
+    document.body.appendChild(toast);
+  }
+  toast.style.background = type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#0284c7';
+  toast.style.color = '#ffffff';
+  toast.textContent = message;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(10px)';
+  }, 3500);
 }
 
 function renderFormFields(row) {
@@ -511,10 +531,11 @@ async function handleFormSubmit(e) {
       }
     }
     closeModal();
+    showAdminToast('Saved successfully!', 'success');
     renderTable(allCurrentData, config);
     loadTable(currentTable);
   } catch (err) {
-    alert('Error saving: ' + err.message);
+    showAdminToast('Error saving: ' + err.message, 'error');
   }
 
   saveBtn.disabled = false;
@@ -522,24 +543,31 @@ async function handleFormSubmit(e) {
 }
 
 function closeModal() {
-  document.getElementById('adminModal').classList.remove('open');
+  document.getElementById('adminModal')?.classList.remove('open');
   currentEditId = null;
 }
 
 /* ---- DELETE ---- */
 async function confirmDelete(id) {
-  if (!confirm('Are you sure you want to delete this entry? This cannot be undone.')) return;
   try {
     const res = await db.from(currentTable).delete().eq('id', id);
     if (res && res.error) throw res.error;
     // Remove locally right away for instant visual confirmation
     allCurrentData = allCurrentData.filter(r => String(r.id) !== String(id));
     renderTable(allCurrentData, TABLE_CONFIG[currentTable]);
+    showAdminToast('Deleted successfully.', 'success');
     loadTable(currentTable);
   } catch (err) {
-    alert('Error deleting: ' + err.message);
+    showAdminToast('Error deleting: ' + err.message, 'error');
   }
 }
+
+// Expose handlers globally for inline HTML onclick attributes
+window.openAddModal = openAddModal;
+window.openEditModal = openEditModal;
+window.confirmDelete = confirmDelete;
+window.viewDetail = viewDetail;
+window.closeModal = closeModal;
 
 /* ---- STORE DATA FOR DETAIL VIEW ---- */
 
@@ -568,25 +596,25 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Event listeners
-  document.getElementById('loginForm').addEventListener('submit', handleLogin);
-  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-  document.getElementById('adminAddBtn').addEventListener('click', openAddModal);
-  document.getElementById('adminForm').addEventListener('submit', handleFormSubmit);
-  document.getElementById('adminCancelBtn').addEventListener('click', closeModal);
-  document.getElementById('adminModalClose').addEventListener('click', closeModal);
-  document.getElementById('adminModalOverlay').addEventListener('click', closeModal);
+  document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
+  document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
+  document.getElementById('adminAddBtn')?.addEventListener('click', openAddModal);
+  document.getElementById('adminForm')?.addEventListener('submit', handleFormSubmit);
+  document.getElementById('adminCancelBtn')?.addEventListener('click', closeModal);
+  document.getElementById('adminModalClose')?.addEventListener('click', closeModal);
+  document.getElementById('adminModalOverlay')?.addEventListener('click', closeModal);
 
   document.querySelectorAll('.admin-nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       loadTable(btn.dataset.table);
       // Close mobile sidebar
-      document.getElementById('adminSidebar').classList.remove('open');
+      document.getElementById('adminSidebar')?.classList.remove('open');
     });
   });
 
   // Sidebar toggle (mobile)
-  document.getElementById('sidebarToggle').addEventListener('click', () => {
-    document.getElementById('adminSidebar').classList.toggle('open');
+  document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+    document.getElementById('adminSidebar')?.classList.toggle('open');
   });
 
   // Theme Toggle in Admin Panel

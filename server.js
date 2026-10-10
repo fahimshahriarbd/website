@@ -4,7 +4,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -201,8 +201,24 @@ function normalizeSheetParam(s) {
   return SHEET_ALIAS_MAP[k] || String(s).trim();
 }
 
+// In-memory cache for Google Sheet responses (prevents simultaneous query lag & cold-start timeouts)
+const sheetCache = new Map();
+const SHEET_CACHE_TTL = 3 * 60 * 1000; // 3 minutes TTL
+
 app.all('/api/sheet-proxy', async (req, res) => {
   const targetScriptUrl = process.env.GOOGLE_SCRIPT_URL || DEFAULT_SCRIPT_URL;
+  const isRead = req.method === 'GET';
+  const targetSheet = normalizeSheetParam(req.query.sheet || (req.body && req.body.sheet) || '');
+  const cacheKey = `${targetSheet}:${JSON.stringify(req.query)}`;
+
+  // Serve from cache on GET if fresh
+  if (isRead && targetSheet && sheetCache.has(cacheKey)) {
+    const cached = sheetCache.get(cacheKey);
+    if (Date.now() - cached.timestamp < SHEET_CACHE_TTL) {
+      return res.json(cached.data);
+    }
+  }
+
   try {
     const url = new URL(targetScriptUrl);
     // Forward all query parameters with normalized sheet name
@@ -234,11 +250,28 @@ app.all('/api/sheet-proxy', async (req, res) => {
 
     try {
       const data = JSON.parse(rawText);
+      // Cache successful read responses
+      if (isRead && targetSheet && scriptRes.ok && Array.isArray(data)) {
+        sheetCache.set(cacheKey, { data, timestamp: Date.now() });
+      } else if (!isRead && targetSheet) {
+        // Invalidate cache on mutations (insert, update, delete)
+        for (const k of sheetCache.keys()) {
+          if (k.startsWith(targetSheet + ':')) sheetCache.delete(k);
+        }
+      }
       return res.status(scriptRes.status).json(data);
     } catch {
+      // If HTML or parse error returned, but we have stale cache, serve stale cache
+      if (isRead && sheetCache.has(cacheKey)) {
+        return res.json(sheetCache.get(cacheKey).data);
+      }
       return res.status(502).json({ error: 'Google Sheet returned non-JSON response (HTML)' });
     }
   } catch (err) {
+    // If request timed out or network error, serve stale cache if available
+    if (isRead && sheetCache.has(cacheKey)) {
+      return res.json(sheetCache.get(cacheKey).data);
+    }
     const isTimeout = err.name === 'TimeoutError' || String(err.message).toLowerCase().includes('timeout') || String(err.message).toLowerCase().includes('aborted');
     if (isTimeout) {
       console.warn('[Sheet Proxy Notice]: Google Apps Script took >15s. Request may still finish in background.');
@@ -382,6 +415,9 @@ app.delete('/api/messages/:id', async (req, res) => {
   const messages = readJsonFile('messages.json', []);
   const updated = messages.filter(m => String(m.id) !== targetId);
   writeJsonFile('messages.json', updated);
+  for (const k of sheetCache.keys()) {
+    if (k.startsWith('messages:')) sheetCache.delete(k);
+  }
   res.json({ success: true, count: messages.length - updated.length });
 });
 
@@ -411,6 +447,9 @@ app.delete('/api/bookings/:id', async (req, res) => {
   const bookings = readJsonFile('bookings.json', []);
   const updated = bookings.filter(b => String(b.id) !== targetId);
   writeJsonFile('bookings.json', updated);
+  for (const k of sheetCache.keys()) {
+    if (k.startsWith('bookings:')) sheetCache.delete(k);
+  }
   res.json({ success: true, count: bookings.length - updated.length });
 });
 

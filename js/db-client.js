@@ -9,8 +9,32 @@
 let supabaseInstance = null;
 
 const DEFAULT_DATABASE = {
-  "blog_posts": [],
-  "gallery_photos": [],
+  "blog_posts": [
+    {
+      "id": "b-sheet-1",
+      "title": "প্রতিদিন দাঁত ব্রাশ না করলে কী হয়?",
+      "category": "Oral Care",
+      "image": "https://i.postimg.cc/7Pz8X31R/screenshot-13.png",
+      "date": "2026-10-10",
+      "read_time": "5",
+      "summary": "নিয়মিত দাঁত ব্রাশ না করার ফলে ডেন্টাল প্লাক, মাড়ির প্রদাহ (জিঞ্জিভাইটিস), মুখে দুর্গন্ধ এবং দাঁতের ক্ষয়রোগের ঝুঁকি বহুগুণ বেড়ে যায়। জেনে নিন সঠিক উপায়ে দাঁত পরিষ্কার রাখার প্রয়োজনীয় কৌশল।",
+      "content": "নিয়মিত দাঁত ব্রাশ না করার ফলে ডেন্টাল প্লাক জমে পাথর বা টার্টারে পরিণত হয়। এর ফলে মাড়ি থেকে রক্ত পড়া, জিঞ্জিভাইটিস এবং মারাত্মক পেরিওডন্টাইটিস হতে পারে।\n\nপ্রতিদিন অন্তত দু'বার ২ মিনিট করে ফ্লুরাইডযুক্ত টুথপেস্ট দিয়ে সঠিক পদ্ধতিতে ব্রাশ করা উচিত। রাতে ঘুমানোর আগে ব্রাশ করা সবচেয়ে বেশি গুরুত্বপূর্ণ।",
+      "link": "#",
+      "published": true,
+      "sort_order": 1,
+      "created_at": "2026-10-09T00:00:00.000Z"
+    }
+  ],
+  "gallery_photos": [
+    {
+      "id": "g-sheet-1",
+      "image_url": "https://res.cloudinary.com/ltd7gw9d/image/upload/fahim200KB.png",
+      "caption": "Chattogram Medical College — Dental Unit Campus",
+      "category": "Campus",
+      "sort_order": 1,
+      "created_at": "2026-10-09T00:00:00.000Z"
+    }
+  ],
   "services": [
     {
       "id": "s-sheet-1",
