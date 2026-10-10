@@ -515,50 +515,30 @@ function initContactForm() {
 
     try {
       const nowIso = new Date().toISOString();
-      let sentToServer = false;
+      const msgId = 'msg-' + Date.now();
+      let sentViaDb = false;
 
-      // 1. Send to server endpoint (Node.js/Express environment)
-      try {
-        const sRes = await fetch('/api/contact-message', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, subject, message })
-        });
-        if (sRes.ok) {
-          sentToServer = true;
-        }
-      } catch (sErr) {
-        // Server endpoint not reachable or static hosting
-      }
-
-      // 2. Direct Google Apps Script fallback (for static hosting or custom domain)
-      if (!sentToServer) {
-        const scriptUrl = (typeof DIRECT_SCRIPT_URL !== 'undefined' && DIRECT_SCRIPT_URL) || 'https://script.google.com/macros/s/AKfycbwFIJVTNzF50zCcv6Ppk2n041_tXHFEWcKM1ouSQsCQ-HzcNUkjUTjNvesNnN_KZ38ovg/exec';
-        try {
-          await fetch(scriptUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({
-              sheet: 'messages',
-              action: 'insert',
-              data: {
-                Time: nowIso,
-                Name: name,
-                Email: email,
-                Subject: subject,
-                Message: message
-              }
-            })
-          });
-        } catch (gErr) {}
-      }
-
-      // 3. Register in local client store
       if (typeof db !== 'undefined' && db && db.from) {
         try {
-          await db.from('messages').insert({ name, email, subject, message, created_at: nowIso });
+          await db.from('messages').insert({
+            id: msgId,
+            name,
+            email,
+            subject,
+            message,
+            status: 'new',
+            created_at: nowIso
+          });
+          sentViaDb = true;
         } catch (dbErr) {}
+      }
+
+      if (!sentViaDb) {
+        await fetch('/api/contact-message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: msgId, name, email, subject, message, created_at: nowIso })
+        });
       }
 
       status.style.display = 'block';
@@ -662,29 +642,11 @@ function renderBlog(append=false) {
 }
 async function loadBlog() {
   const g = document.getElementById('blogGrid'); if (!g) return;
-  let items = null;
-  const sheetData = await fetchFromGoogleSheet('blog');
-  if (sheetData && sheetData.length) {
-    items = sheetData.map((row, idx) => ({
-      id: 'sheet-blog-' + idx,
-      title: row.Title || row.title || 'Untitled',
-      category: row.Category || row.category || 'General',
-      image: row.Image || row.image || '',
-      date: row.Date || row.date || '',
-      read_time: String(row.ReadTime || row['Read Time'] || row.read_time || '5'),
-      summary: row.Summary || row.summary || row.Content || row.content || '',
-      link: row.Link || row.link || '#',
-      published: String(row.Published || row.published || 'yes').toLowerCase() === 'yes',
-      sort_order: idx + 1
-    })).filter(b => b.published);
-  }
-  if (!items) {
-    try {
-      const { data, error } = await db.from('blog_posts').select('*').eq('published', true).order('sort_order', { ascending: true }).order('created_at', { ascending: false });
-      if (error) throw error;
-      items = data || [];
-    } catch { items = []; }
-  }
+  let items = [];
+  try {
+    const { data, error } = await db.from('blog_posts').select('*').eq('published', true).order('sort_order', { ascending: true }).order('created_at', { ascending: false });
+    if (!error && Array.isArray(data)) items = data;
+  } catch { items = []; }
   allBlogPosts = items || [];
   activeFilteredBlog = [...allBlogPosts];
   blogVis = BLOG_PG;
@@ -742,24 +704,11 @@ async function downloadImg(url, fn) {
 }
 async function loadGallery() {
   const g = document.getElementById('galleryGrid'); if(!g) return;
-  let items = null;
-  const sheetData = await fetchFromGoogleSheet('gallery');
-  if (sheetData && sheetData.length) {
-    items = sheetData.map((row, idx) => ({
-      id: 'sheet-gal-' + idx,
-      category: row.Category || row.category || 'Moments',
-      image_url: row.Image || row.image || row.Image_Url || row.image_url || '',
-      caption: row.Caption || row.caption || row.Title || row.title || '',
-      sort_order: idx + 1
-    })).filter(item => item.image_url);
-  }
-  if (!items) {
-    try {
-      const { data, error } = await db.from('gallery_photos').select('*').order('sort_order', { ascending: true });
-      if (error) throw error;
-      items = data || [];
-    } catch { items = []; }
-  }
+  let items = [];
+  try {
+    const { data, error } = await db.from('gallery_photos').select('*').order('sort_order', { ascending: true });
+    if (!error && Array.isArray(data)) items = data.filter(item => item.image_url);
+  } catch { items = []; }
   allGallery = items || [];
   if (!allGallery.length) {
     g.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">No photos available.</div>';
@@ -799,28 +748,11 @@ function renderSvc(append=false) {
 }
 async function loadServices() {
   const g = document.getElementById('servicesGrid'); if(!g) return;
-  let items = null;
-  // Try loading live data from Google Sheet first
-  const sheetData = await fetchFromGoogleSheet('services');
-  if (sheetData && sheetData.length) {
-    items = sheetData.map((row, idx) => ({
-      id: 'sheet-svc-' + idx,
-      icon: row.Icon || row.icon || '💼',
-      title: row.Title || row.title || 'Service',
-      category: row.Catagory || row.Category || row.category || 'General',
-      price: (row.Fee || row.fee || row.Price || row.price || '1000') + ' BDT',
-      description: row.Description || row.description || '',
-      is_active: String(row.Active || row.active || 'yes').toLowerCase() === 'yes',
-      sort_order: idx + 1
-    })).filter(s => s.is_active);
-  }
-  if (!items) {
-    try {
-      const { data, error } = await db.from('services').select('*').eq('is_active', true).order('sort_order', { ascending: true });
-      if (error) throw error;
-      items = data || [];
-    } catch { items = []; }
-  }
+  let items = [];
+  try {
+    const { data, error } = await db.from('services').select('*').eq('is_active', true).order('sort_order', { ascending: true });
+    if (!error && Array.isArray(data)) items = data;
+  } catch { items = []; }
   allServices = items || [];
   if (!allServices.length) {
     g.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">No services available.</div>';
@@ -920,25 +852,11 @@ function renderAch(append=false) {
 }
 async function loadAchievements() {
   const g = document.getElementById('achievementsGrid'); if(!g) return;
-  let items = null;
-  const sheetData = await fetchFromGoogleSheet('achievements');
-  if (sheetData && sheetData.length) {
-    items = sheetData.map((row, idx) => ({
-      id: 'sheet-ach-' + idx,
-      icon: row.Icon || row.icon || '🏆',
-      title: row.Title || row.title || 'Achievement',
-      description: row.Description || row.description || '',
-      published: String(row.Published || row.published || 'yes').toLowerCase() === 'yes',
-      sort_order: idx + 1
-    })).filter(a => a.published);
-  }
-  if (!items) {
-    try {
-      const { data, error } = await db.from('achievements').select('*').eq('published', true).order('sort_order', { ascending: true });
-      if (error) throw error;
-      items = data || [];
-    } catch { items = []; }
-  }
+  let items = [];
+  try {
+    const { data, error } = await db.from('achievements').select('*').eq('published', true).order('sort_order', { ascending: true });
+    if (!error && Array.isArray(data)) items = data;
+  } catch { items = []; }
   allAch = items || [];
   achVis = ACH_PG;
   const sb = document.getElementById('achievementsSeeMoreBtn');
@@ -1038,27 +956,11 @@ function renderProj(append=false) {
 }
 async function loadProjects() {
   const g = document.getElementById('projectsGrid'); if(!g) return;
-  let items = null;
-  const sheetData = await fetchFromGoogleSheet('projects');
-  if (sheetData && sheetData.length) {
-    items = sheetData.map((row, idx) => ({
-      id: 'sheet-proj-' + idx,
-      icon: row.Icon || row.icon || '🚀',
-      title: row.Title || row.title || 'Project',
-      category: row.Category || row.category || 'General',
-      description: row.Description || row.description || '',
-      link: row.Link || row.link || '#',
-      published: String(row.Published || row.published || 'yes').toLowerCase() === 'yes',
-      sort_order: idx + 1
-    })).filter(p => p.published);
-  }
-  if (!items) {
-    try {
-      const { data, error } = await db.from('projects').select('*').eq('published', true).order('sort_order', { ascending: true });
-      if (error) throw error;
-      items = data || [];
-    } catch { items = []; }
-  }
+  let items = [];
+  try {
+    const { data, error } = await db.from('projects').select('*').eq('published', true).order('sort_order', { ascending: true });
+    if (!error && Array.isArray(data)) items = data;
+  } catch { items = []; }
   allProj = items || [];
   renderProjFilter();
   projVis = PROJ_PG;
@@ -1086,28 +988,11 @@ function testiCardHtml(t) {
 }
 async function loadTestimonials() {
   const g = document.getElementById('testimonialsGrid'); if(!g) return;
-  let items = null;
-  const sheetData = await fetchFromGoogleSheet('testimonials');
-  if (sheetData && sheetData.length) {
-    items = sheetData.map((row, idx) => ({
-      id: 'sheet-testi-' + idx,
-      name: (row.Name || row.name || 'Anonymous').trim(),
-      tag: (row.Relation || row.relation || row.tag || 'Friend').trim(),
-      about: (row.About || row.about || 'Website').trim(),
-      feedback: (row.Feedback || row.feedback || '').trim(),
-      image: (row.Image || row.image || '').trim(),
-      link: (row.Link || row.link || '#').trim(),
-      published: String(row.Published || row.published || 'yes').toLowerCase() === 'yes',
-      sort_order: idx + 1
-    })).filter(t => t.published);
-  }
-  if (!items) {
-    try {
-      const { data, error } = await db.from('testimonials').select('*').eq('published', true).order('sort_order', { ascending: true });
-      if (error) throw error;
-      items = data || [];
-    } catch { items = []; }
-  }
+  let items = [];
+  try {
+    const { data, error } = await db.from('testimonials').select('*').eq('published', true).order('sort_order', { ascending: true });
+    if (!error && Array.isArray(data)) items = data;
+  } catch { items = []; }
   allTesti = items || [];
   g.innerHTML = allTesti.length ? allTesti.map(testiCardHtml).join('') : '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">No testimonials yet.</div>';
   window.updateSearchIndex?.();
@@ -1122,23 +1007,9 @@ function renderCvList() {
 }
 async function loadCvs() {
   try {
-    let items = null;
-    const sheetData = await fetchFromGoogleSheet('cv');
-    if (sheetData && sheetData.length) {
-      items = sheetData.map((row, idx) => ({
-        id: 'sheet-cv-' + idx,
-        title: row.Title || row.title || 'Curriculum Vitae',
-        download_link: row['Download Link'] || row.download_link || row.Link || row.link || '',
-        password: String(row.Password !== undefined ? row.Password : (row.password !== undefined ? row.password : '')).trim(),
-        sort_order: idx + 1
-      }));
-    }
-    if (!items) {
-      const { data, error } = await db.from('cvs').select('*').order('sort_order', { ascending: true });
-      if (error) throw error;
-      items = data || [];
-    }
-    allCvs = items || [];
+    const { data, error } = await db.from('cvs').select('*').order('sort_order', { ascending: true });
+    if (error) throw error;
+    allCvs = data || [];
     renderCvList();
   } catch (err) {
     console.warn('Error loading CVs:', err);

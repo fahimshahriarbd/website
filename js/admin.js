@@ -23,7 +23,7 @@ const TABLE_CONFIG = {
       { name: 'summary', label: 'Summary', type: 'textarea' },
       { name: 'content', label: 'Content', type: 'textarea' },
       { name: 'link', label: 'Article Link', type: 'url', default: '#' },
-      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '0' },
+      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '1' },
       { name: 'published', label: 'Published', type: 'checkbox', default: true },
     ],
   },
@@ -37,7 +37,7 @@ const TABLE_CONFIG = {
       { name: 'category', label: 'Category', type: 'text', default: 'General' },
       { name: 'description', label: 'Description', type: 'textarea' },
       { name: 'link', label: 'Project Link', type: 'url', default: '#' },
-      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '0' },
+      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '1' },
       { name: 'published', label: 'Published', type: 'checkbox', default: true },
     ],
   },
@@ -51,7 +51,7 @@ const TABLE_CONFIG = {
       { name: 'category', label: 'Category', type: 'text', default: 'General' },
       { name: 'description', label: 'Description', type: 'textarea' },
       { name: 'price', label: 'Price (BDT)', type: 'text', default: '1,000 BDT' },
-      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '0' },
+      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '1' },
       { name: 'is_active', label: 'Active', type: 'checkbox', default: true },
     ],
   },
@@ -63,7 +63,7 @@ const TABLE_CONFIG = {
       { name: 'title', label: 'Title', type: 'text', required: true },
       { name: 'icon', label: 'Icon (emoji or URL)', type: 'text', default: '🏆' },
       { name: 'description', label: 'Description', type: 'textarea' },
-      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '0' },
+      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '1' },
       { name: 'published', label: 'Published', type: 'checkbox', default: true },
     ],
   },
@@ -78,19 +78,19 @@ const TABLE_CONFIG = {
       { name: 'feedback', label: 'Feedback / Quote', type: 'textarea' },
       { name: 'image', label: 'Avatar Image URL', type: 'url' },
       { name: 'link', label: 'Profile Link', type: 'url', default: '#' },
-      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '0' },
+      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '1' },
       { name: 'published', label: 'Published', type: 'checkbox', default: true },
     ],
   },
   gallery_photos: {
     label: 'Gallery',
     canEdit: true,
-    display: ['caption', 'category'],
+    display: ['image_url', 'caption', 'category'],
     columns: [
       { name: 'image_url', label: 'Image URL', type: 'url', required: true },
       { name: 'caption', label: 'Caption', type: 'text' },
       { name: 'category', label: 'Category', type: 'text', default: 'General' },
-      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '0' },
+      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '1' },
     ],
   },
   cvs: {
@@ -101,20 +101,37 @@ const TABLE_CONFIG = {
       { name: 'title', label: 'CV Title', type: 'text', required: true },
       { name: 'download_link', label: 'Download Link (URL)', type: 'url', required: true },
       { name: 'password', label: 'Password (0 = free)', type: 'text', default: '0', hint: 'Enter 0 for free download, or any text for password protection' },
-      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '0' },
+      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '1' },
     ],
   },
   messages: {
     label: 'Messages',
     canEdit: false,
+    canAdd: true,
     display: ['name', 'email', 'subject', 'created_at'],
-    columns: [],
+    columns: [
+      { name: 'name', label: 'Sender Name', type: 'text', required: true },
+      { name: 'email', label: 'Email Address', type: 'text', required: true },
+      { name: 'subject', label: 'Subject', type: 'text', default: 'General Inquiry' },
+      { name: 'message', label: 'Message', type: 'textarea', required: true },
+    ],
   },
   bookings: {
     label: 'Bookings',
     canEdit: false,
-    display: ['name', 'service_title', 'amount', 'payment_gateway', 'created_at'],
-    columns: [],
+    canAdd: true,
+    display: ['name', 'mobile', 'service_title', 'amount', 'payment_gateway', 'created_at'],
+    columns: [
+      { name: 'name', label: 'Client Name', type: 'text', required: true },
+      { name: 'mobile', label: 'Phone Number', type: 'text', required: true },
+      { name: 'location', label: 'Location / Address', type: 'text' },
+      { name: 'service_title', label: 'Service Title', type: 'text', required: true },
+      { name: 'amount', label: 'Amount (BDT)', type: 'text', default: '1,000 BDT' },
+      { name: 'payment_gateway', label: 'Payment Gateway', type: 'text', default: 'bKash' },
+      { name: 'payment_number', label: 'Sender Number', type: 'text' },
+      { name: 'trx_id', label: 'Transaction ID (TrxID)', type: 'text' },
+      { name: 'notes', label: 'Notes', type: 'textarea' },
+    ],
   },
 };
 
@@ -127,12 +144,13 @@ function formatDate(ts) {
   if (!ts) return '—';
   try {
     const d = new Date(ts);
+    if (isNaN(d.getTime())) return String(ts);
     return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   } catch { return String(ts); }
 }
 
 function getEditableColumns() {
-  return TABLE_CONFIG[currentTable].columns.filter(c => !['id', 'created_at'].includes(c.name));
+  return TABLE_CONFIG[currentTable].columns.filter(c => !['id', 'created_at', '_rowIndex'].includes(c.name));
 }
 
 /* ---- AUTH ---- */
@@ -196,7 +214,7 @@ async function handleLogin(e) {
   }
 
   btn.disabled = false;
-  btn.textContent = 'Sign In →';
+  btn.textContent = 'Access Admin Panel →';
 }
 
 async function handleLogout() {
@@ -207,7 +225,7 @@ async function handleLogout() {
 }
 
 /* ---- TABLE LOADING ---- */
-async function loadTable(tableName) {
+async function loadTable(tableName, forceRefresh = false) {
   currentTable = tableName;
   const config = TABLE_CONFIG[tableName];
 
@@ -217,12 +235,16 @@ async function loadTable(tableName) {
 
   document.getElementById('adminTableTitle').textContent = config.label;
   const addBtn = document.getElementById('adminAddBtn');
-  addBtn.style.display = config.canEdit ? 'inline-block' : 'none';
+  addBtn.style.display = (config.canEdit || config.canAdd) ? 'inline-block' : 'none';
 
   const wrap = document.getElementById('adminTableWrap');
   wrap.innerHTML = '<div class="admin-loading">Loading...</div>';
 
   try {
+    if (forceRefresh && typeof fetchSheetRows === 'function') {
+      await fetchSheetRows(tableName, true).catch(() => {});
+    }
+
     const { data, error } = await db
       .from(tableName)
       .select('*')
@@ -235,7 +257,7 @@ async function loadTable(tableName) {
       allCurrentData = [];
       const badge = document.getElementById('adminTableCountBadge');
       if (badge) badge.textContent = '0 items';
-      wrap.innerHTML = `<div class="admin-empty"><p>No ${config.label.toLowerCase()} yet.</p>${config.canEdit ? '<button class="btn btn-primary admin-add-btn" onclick="openAddModal()">+ Add your first entry</button>' : ''}</div>`;
+      wrap.innerHTML = `<div class="admin-empty"><p>No ${config.label.toLowerCase()} yet.</p>${(config.canEdit || config.canAdd) ? '<button class="btn btn-primary admin-add-btn" onclick="openAddModal()">+ Add your first entry</button>' : ''}</div>`;
       return;
     }
 
@@ -247,7 +269,7 @@ async function loadTable(tableName) {
     renderTable(data, config);
     updateAdminStats();
   } catch (err) {
-    wrap.innerHTML = `<div class="admin-empty"><p style="color:var(--admin-danger);">Error loading data: ${esc(err.message)}</p><p style="font-size:0.8rem;color:var(--admin-muted);">Make sure you are logged in and RLS policies allow access.</p></div>`;
+    wrap.innerHTML = `<div class="admin-empty"><p style="color:var(--admin-danger);">Error loading data: ${esc(err.message)}</p><p style="font-size:0.8rem;color:var(--admin-muted);">Check your connection or click Refresh.</p></div>`;
   }
 }
 
@@ -255,7 +277,6 @@ function renderTable(data, config) {
   const wrap = document.getElementById('adminTableWrap');
 
   if (!config.canEdit) {
-    // Read-only tables: messages & bookings — render detail view
     wrap.innerHTML = renderReadOnlyTable(data, config);
     return;
   }
@@ -264,8 +285,8 @@ function renderTable(data, config) {
   const hasImage = displayCols.includes('image') || displayCols.includes('image_url');
 
   let html = '<table class="admin-table"><thead><tr>';
-  if (hasImage) html += '<th class="col-thumb"></th>';
-  displayCols.forEach(col => {
+  if (hasImage) html += '<th class="col-thumb">Preview</th>';
+  displayCols.filter(c => c !== 'image' && c !== 'image_url').forEach(col => {
     html += `<th>${esc(prettyHeader(col))}</th>`;
   });
   html += '<th class="col-actions">Actions</th>';
@@ -275,9 +296,9 @@ function renderTable(data, config) {
     html += '<tr>';
     if (hasImage) {
       const imgVal = row.image || row.image_url || '';
-      html += `<td class="col-thumb">${imgVal ? `<img src="${esc(imgVal)}" alt="" onerror="this.style.display='none'">` : ''}</td>`;
+      html += `<td class="col-thumb">${imgVal ? `<img src="${esc(imgVal)}" alt="" onerror="this.style.display='none'">` : '—'}</td>`;
     }
-    displayCols.forEach(col => {
+    displayCols.filter(c => c !== 'image' && c !== 'image_url').forEach(col => {
       const val = row[col];
       if (col === 'published' || col === 'is_active') {
         const isOn = val !== false;
@@ -288,7 +309,7 @@ function renderTable(data, config) {
       } else if (col === 'password') {
         const pwd = String(val ?? '').trim();
         const isProtected = pwd && pwd !== '0' && pwd !== 'null';
-        html += `<td>${isProtected ? '🔒 Protected' : '✓ Free'}</td>`;
+        html += `<td>${isProtected ? `🔒 Protected (${esc(pwd)})` : '✓ Free'}</td>`;
       } else {
         html += `<td title="${esc(val)}">${esc(val ?? '—')}</td>`;
       }
@@ -340,6 +361,7 @@ function prettyHeader(col) {
     password: 'Protection', service_title: 'Service', amount: 'Amount',
     payment_gateway: 'Gateway', image: 'Image', image_url: 'Image',
     read_time: 'Read Time', mobile: 'Phone', location: 'Location',
+    payment_number: 'Sender Number', trx_id: 'TrxID', notes: 'Notes'
   };
   return map[col] || col.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
@@ -348,7 +370,7 @@ function prettyHeader(col) {
 let allCurrentData = [];
 
 async function viewDetail(id) {
-  const row = allCurrentData.find(r => r.id === id);
+  const row = allCurrentData.find(r => String(r.id) === String(id));
   if (!row) return;
 
   const config = TABLE_CONFIG[currentTable];
@@ -360,7 +382,7 @@ async function viewDetail(id) {
 
   let html = '<div class="admin-detail">';
   for (const [key, val] of Object.entries(row)) {
-    if (key === 'id') continue;
+    if (key === 'id' || key === '_rowIndex') continue;
     const label = prettyHeader(key);
     const display = (key === 'created_at') ? formatDate(val) : (val === null ? '—' : String(val));
     html += `<div class="admin-detail-row"><div class="admin-detail-label">${esc(label)}</div><div class="admin-detail-value">${esc(display)}</div></div>`;
@@ -371,6 +393,100 @@ async function viewDetail(id) {
   const actionsEl = document.getElementById('adminFormActions');
   if (actionsEl) actionsEl.style.display = 'none';
   if (modal) modal.classList.add('open');
+}
+
+/* ---- DATABASE SETTINGS MODAL ---- */
+function openDbSettingsModal() {
+  currentEditId = null;
+  const modal = document.getElementById('adminModal');
+  const titleEl = document.getElementById('adminModalTitle');
+  const fieldsEl = document.getElementById('adminFormFields');
+  const actionsEl = document.getElementById('adminFormActions');
+  if (!modal || !fieldsEl) return;
+
+  if (titleEl) titleEl.textContent = '⚙️ Database & Google Sheets Settings';
+  if (actionsEl) actionsEl.style.display = 'none';
+
+  const currentScriptUrl = (typeof DIRECT_SCRIPT_URL !== 'undefined' && DIRECT_SCRIPT_URL) || '';
+
+  fieldsEl.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="padding:12px 14px;border-radius:10px;background:var(--admin-surface2);font-size:0.85rem;line-height:1.5;">
+        <strong>Hybrid Database Active:</strong> Your changes save automatically to both the Server JSON Database (<code>/data/*.json</code>) and your connected Google Sheet.
+      </div>
+      <div class="admin-form-field">
+        <label for="dbScriptUrlInput">Google Apps Script Web App URL</label>
+        <input type="url" id="dbScriptUrlInput" value="${esc(currentScriptUrl)}" placeholder="https://script.google.com/macros/s/.../exec" />
+        <span class="field-hint">Paste your deployed Google Apps Script Web App URL here to sync with your Google Sheet.</span>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button type="button" class="btn btn-primary" id="saveDbConfigBtn" style="padding:10px 18px;border-radius:10px;border:none;background:var(--admin-primary);color:#fff;font-weight:700;cursor:pointer;">Save Script URL</button>
+        <button type="button" class="admin-tool-btn" id="syncAllToSheetBtn">☁️ Push Local Data to Google Sheet</button>
+        <button type="button" class="admin-tool-btn" id="exportDbJsonBtn">⬇ Export Backup (.json)</button>
+      </div>
+      <div id="dbSettingsStatus" style="font-size:0.85rem;font-weight:600;display:none;"></div>
+    </div>
+  `;
+
+  modal.classList.add('open');
+
+  document.getElementById('saveDbConfigBtn')?.addEventListener('click', async () => {
+    const urlInput = document.getElementById('dbScriptUrlInput');
+    const st = document.getElementById('dbSettingsStatus');
+    const newUrl = String(urlInput?.value || '').trim();
+    if (!newUrl.startsWith('https://script.google.com/')) {
+      if (st) { st.style.display = 'block'; st.style.color = 'var(--admin-danger)'; st.textContent = 'Please enter a valid https://script.google.com/... URL.'; }
+      return;
+    }
+    try {
+      localStorage.setItem('fahim_custom_google_script_url', newUrl);
+      if (typeof DIRECT_SCRIPT_URL !== 'undefined') DIRECT_SCRIPT_URL = newUrl;
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ googleScriptUrl: newUrl })
+      }).catch(() => {});
+      showAdminToast('Google Script URL updated!', 'success');
+      if (st) { st.style.display = 'block'; st.style.color = 'var(--admin-success)'; st.textContent = '✓ Saved and connected successfully!'; }
+      loadTable(currentTable, true);
+    } catch (e) {
+      showAdminToast('Failed to save URL', 'error');
+    }
+  });
+
+  document.getElementById('syncAllToSheetBtn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('syncAllToSheetBtn');
+    const st = document.getElementById('dbSettingsStatus');
+    if (btn) { btn.disabled = true; btn.textContent = 'Syncing...'; }
+    if (st) { st.style.display = 'block'; st.style.color = 'var(--admin-primary)'; st.textContent = `Syncing ${currentTable} rows to Google Sheet...`; }
+    try {
+      let syncedCount = 0;
+      for (const item of allCurrentData) {
+        await syncWithServerAndSheet(currentTable, 'update', item, item._rowIndex, item.id);
+        syncedCount++;
+      }
+      if (st) { st.style.color = 'var(--admin-success)'; st.textContent = `✓ Synced ${syncedCount} items from ${TABLE_CONFIG[currentTable].label} to Google Sheet!`; }
+      showAdminToast(`Synced ${syncedCount} items to Google Sheet!`, 'success');
+    } catch (err) {
+      if (st) { st.style.color = 'var(--admin-danger)'; st.textContent = 'Sync error: ' + err.message; }
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = '☁️ Push Local Data to Google Sheet'; }
+    }
+  });
+
+  document.getElementById('exportDbJsonBtn')?.addEventListener('click', () => {
+    const store = typeof getLocalStore === 'function' ? getLocalStore() : allCurrentData;
+    const blob = new Blob([JSON.stringify(store, null, 2)], { type: 'application/json' });
+    const u = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = u;
+    a.download = `fahim-website-db-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(u), 1500);
+    showAdminToast('Database backup downloaded!', 'success');
+  });
 }
 
 /* ---- ADD / EDIT MODAL ---- */
@@ -394,7 +510,6 @@ async function openEditModal(id) {
   const actionsEl = document.getElementById('adminFormActions');
   if (actionsEl) actionsEl.style.display = 'flex';
 
-  // Look up directly from already loaded table data first
   let row = allCurrentData.find(r => String(r.id) === String(id));
   if (!row) {
     try {
@@ -458,7 +573,7 @@ function renderFormFields(row) {
         <input type="number" id="${fieldId}" name="${col.name}" value="${esc(val)}" />
       </div>`;
     } else if (col.type === 'date') {
-      const dateVal = val ? String(val).split('T')[0] : '';
+      const dateVal = val ? String(val).split('T')[0] : new Date().toISOString().split('T')[0];
       html += `<div class="admin-form-field">
         <label for="${fieldId}">${esc(col.label)}</label>
         <input type="date" id="${fieldId}" name="${col.name}" value="${esc(dateVal)}" />
@@ -484,7 +599,7 @@ function collectFormData() {
     if (col.type === 'checkbox') {
       data[col.name] = el.checked;
     } else if (col.type === 'number') {
-      data[col.name] = el.value ? parseInt(el.value, 10) : 0;
+      data[col.name] = el.value ? parseInt(el.value, 10) : 1;
     } else {
       data[col.name] = el.value.trim();
     }
@@ -495,6 +610,8 @@ function collectFormData() {
 async function handleFormSubmit(e) {
   e.preventDefault();
   const saveBtn = document.getElementById('adminSaveBtn');
+  if (!saveBtn || saveBtn.closest('#adminFormActions')?.style.display === 'none') return;
+
   saveBtn.disabled = true;
   saveBtn.textContent = 'Saving...';
 
@@ -517,7 +634,6 @@ async function handleFormSubmit(e) {
     if (currentEditId) {
       const res = await db.from(currentTable).update(data).eq('id', currentEditId);
       if (res && res.error) throw res.error;
-      // Update in allCurrentData immediately
       const idx = allCurrentData.findIndex(r => String(r.id) === String(currentEditId));
       if (idx !== -1) {
         allCurrentData[idx] = { ...allCurrentData[idx], ...data };
@@ -531,9 +647,9 @@ async function handleFormSubmit(e) {
       }
     }
     closeModal();
-    showAdminToast('Saved successfully!', 'success');
+    showAdminToast('Saved & synced to Database!', 'success');
     renderTable(allCurrentData, config);
-    loadTable(currentTable);
+    await loadTable(currentTable, true);
   } catch (err) {
     showAdminToast('Error saving: ' + err.message, 'error');
   }
@@ -552,11 +668,10 @@ async function confirmDelete(id) {
   try {
     const res = await db.from(currentTable).delete().eq('id', id);
     if (res && res.error) throw res.error;
-    // Remove locally right away for instant visual confirmation
     allCurrentData = allCurrentData.filter(r => String(r.id) !== String(id));
     renderTable(allCurrentData, TABLE_CONFIG[currentTable]);
-    showAdminToast('Deleted successfully.', 'success');
-    loadTable(currentTable);
+    showAdminToast('Deleted from Database!', 'success');
+    await loadTable(currentTable, true);
   } catch (err) {
     showAdminToast('Error deleting: ' + err.message, 'error');
   }
@@ -568,12 +683,10 @@ window.openEditModal = openEditModal;
 window.confirmDelete = confirmDelete;
 window.viewDetail = viewDetail;
 window.closeModal = closeModal;
-
-/* ---- STORE DATA FOR DETAIL VIEW ---- */
+window.openDbSettingsModal = openDbSettingsModal;
 
 /* ---- INIT ---- */
 window.addEventListener('DOMContentLoaded', async () => {
-  // Wait for supabase-client.js to load
   try {
     db = await initSupabase();
     if (!db) {
@@ -587,7 +700,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Check existing session
   const session = await checkSession();
   if (session) {
     showDashboard(session.user?.email || '');
@@ -595,10 +707,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     showLogin();
   }
 
-  // Event listeners
   document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
   document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
   document.getElementById('adminAddBtn')?.addEventListener('click', openAddModal);
+  document.getElementById('adminDbSettingsBtn')?.addEventListener('click', openDbSettingsModal);
   document.getElementById('adminForm')?.addEventListener('submit', handleFormSubmit);
   document.getElementById('adminCancelBtn')?.addEventListener('click', closeModal);
   document.getElementById('adminModalClose')?.addEventListener('click', closeModal);
@@ -607,17 +719,14 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.querySelectorAll('.admin-nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       loadTable(btn.dataset.table);
-      // Close mobile sidebar
       document.getElementById('adminSidebar')?.classList.remove('open');
     });
   });
 
-  // Sidebar toggle (mobile)
   document.getElementById('sidebarToggle')?.addEventListener('click', () => {
     document.getElementById('adminSidebar')?.classList.toggle('open');
   });
 
-  // Theme Toggle in Admin Panel
   const themeToggle = document.getElementById('adminThemeToggle');
   const savedTheme = localStorage.getItem('fahim-theme');
   if (savedTheme) {
@@ -632,23 +741,21 @@ window.addEventListener('DOMContentLoaded', async () => {
     themeToggle.textContent = nextTheme === 'dark' ? '☀' : '☾';
   });
 
-  // Quick Stat Cards Navigation
   document.querySelectorAll('.admin-stat-card').forEach(card => {
     card.addEventListener('click', () => {
       const targetTable = card.dataset.table;
       if (targetTable) {
         loadTable(targetTable);
-        document.getElementById('adminSidebar').classList.remove('open');
+        document.getElementById('adminSidebar')?.classList.remove('open');
       }
     });
   });
 
-  // Refresh Table Button
   document.getElementById('adminRefreshBtn')?.addEventListener('click', () => {
-    loadTable(currentTable);
+    showAdminToast('Refreshing from Database...', 'info');
+    loadTable(currentTable, true);
   });
 
-  // Real-Time Search Filtering
   const searchInput = document.getElementById('adminSearchInput');
   searchInput?.addEventListener('input', (e) => {
     const query = String(e.target.value || '').trim().toLowerCase();
@@ -669,14 +776,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (badge) badge.textContent = `${filtered.length} matched`;
   });
 
-  // Escape to close modals
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeModal();
     }
   });
 
-  // Listen for auth state changes
   db.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_OUT') {
       showLogin();
