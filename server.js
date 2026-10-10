@@ -161,7 +161,7 @@ async function syncRowToGoogleSheet(sheetName, data) {
     const res = await fetch(targetScriptUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      signal: AbortSignal.timeout(3500),
+      signal: AbortSignal.timeout(15000),
       body: JSON.stringify({
         sheet: sheetName,
         action: 'insert',
@@ -170,7 +170,7 @@ async function syncRowToGoogleSheet(sheetName, data) {
     });
     return res.ok;
   } catch (err) {
-    console.error(`[Google Sheet Sync Error] ${sheetName}:`, err.message);
+    console.warn(`[Google Sheet Sync Notice] ${sheetName}:`, err.message);
     return false;
   }
 }
@@ -204,7 +204,7 @@ app.all('/api/sheet-proxy', async (req, res) => {
     const fetchOptions = {
       method: req.method,
       redirect: 'follow',
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(15000),
       headers: {
         'Accept': 'application/json'
       }
@@ -229,7 +229,12 @@ app.all('/api/sheet-proxy', async (req, res) => {
       return res.status(502).json({ error: 'Google Sheet returned non-JSON response (HTML)' });
     }
   } catch (err) {
-    console.error('[Sheet Proxy Error]:', err.message);
+    const isTimeout = err.name === 'TimeoutError' || String(err.message).toLowerCase().includes('timeout') || String(err.message).toLowerCase().includes('aborted');
+    if (isTimeout) {
+      console.warn('[Sheet Proxy Notice]: Google Apps Script took >15s. Request may still finish in background.');
+      return res.status(504).json({ error: 'Google Sheet operation timed out after 15 seconds', timeout: true });
+    }
+    console.warn('[Sheet Proxy Warning]:', err.message);
     return res.status(502).json({ error: 'Failed to communicate with Google Sheets script: ' + err.message });
   }
 });
@@ -240,7 +245,7 @@ app.get('/api/messages', async (req, res) => {
   try {
     const sheetRes = await fetch(`${targetScriptUrl}?sheet=messages`, {
       headers: { 'Accept': 'application/json' },
-      signal: AbortSignal.timeout(3500),
+      signal: AbortSignal.timeout(12000),
       redirect: 'follow'
     });
     if (sheetRes.ok) {
@@ -260,7 +265,7 @@ app.get('/api/messages', async (req, res) => {
       }
     }
   } catch (e) {
-    console.warn('[Sheet fetch messages fallback]:', e.message);
+    // quiet fallback
   }
   res.json(readJsonFile('messages.json', []));
 });
@@ -310,7 +315,7 @@ app.get('/api/bookings', async (req, res) => {
   try {
     const sheetRes = await fetch(`${targetScriptUrl}?sheet=bookings`, {
       headers: { 'Accept': 'application/json' },
-      signal: AbortSignal.timeout(3500),
+      signal: AbortSignal.timeout(12000),
       redirect: 'follow'
     });
     if (sheetRes.ok) {
@@ -335,7 +340,7 @@ app.get('/api/bookings', async (req, res) => {
       }
     }
   } catch (e) {
-    console.warn('[Sheet fetch bookings fallback]:', e.message);
+    // quiet fallback
   }
   res.json(readJsonFile('bookings.json', []));
 });
@@ -356,11 +361,11 @@ app.delete('/api/messages/:id', async (req, res) => {
       await fetch(targetScriptUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        signal: AbortSignal.timeout(3500),
+        signal: AbortSignal.timeout(15000),
         body: JSON.stringify({ sheet: 'messages', action: 'delete', rowIndex })
       });
     } catch (err) {
-      console.warn('[Sheet delete error]:', err.message);
+      // quiet fallback
     }
   }
 
@@ -385,11 +390,11 @@ app.delete('/api/bookings/:id', async (req, res) => {
       await fetch(targetScriptUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        signal: AbortSignal.timeout(3500),
+        signal: AbortSignal.timeout(15000),
         body: JSON.stringify({ sheet: 'bookings', action: 'delete', rowIndex })
       });
     } catch (err) {
-      console.warn('[Sheet delete error]:', err.message);
+      // quiet fallback
     }
   }
 
