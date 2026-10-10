@@ -31,8 +31,18 @@ function loadEnv() {
 
 loadEnv();
 
-// Prevent direct public browsing of data directory
-app.use('/data', (req, res) => res.status(403).json({ error: 'Access denied' }));
+// Prevent direct public browsing of server-side code, configuration, and data
+app.use((req, res, next) => {
+  const reqPath = (req.path || '').toLowerCase();
+  const blockedPaths = [
+    '/data', '/server.js', '/.env', '/.env.example', '/package.json',
+    '/package-lock.json', '/metadata.json', '/.git', '/google-apps-script.js'
+  ];
+  if (blockedPaths.some(p => reqPath === p || reqPath.startsWith(p + '/'))) {
+    return res.status(403).json({ error: 'Access denied' });
+  }
+  next();
+});
 
 const DATA_DIR = path.join(__dirname, 'data');
 if (!fs.existsSync(DATA_DIR)) {
