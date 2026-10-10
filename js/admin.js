@@ -1,6 +1,6 @@
 /* ============================================================
    ADMIN PANEL — Fahim Shahriar Website
-   Login + Full CRUD for all content tables via Google Database
+   Login + Full CRUD for all content tables via Google Sheets
    ============================================================ */
 
 let db = null;
@@ -23,7 +23,6 @@ const TABLE_CONFIG = {
       { name: 'summary', label: 'Summary', type: 'textarea' },
       { name: 'content', label: 'Content', type: 'textarea' },
       { name: 'link', label: 'Article Link', type: 'url', default: '#' },
-      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '1' },
       { name: 'published', label: 'Published', type: 'checkbox', default: true },
     ],
   },
@@ -37,7 +36,7 @@ const TABLE_CONFIG = {
       { name: 'category', label: 'Category', type: 'text', default: 'General' },
       { name: 'description', label: 'Description', type: 'textarea' },
       { name: 'link', label: 'Project Link', type: 'url', default: '#' },
-      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '1' },
+      { name: 'tags', label: 'Tags (comma separated)', type: 'text', default: '' },
       { name: 'published', label: 'Published', type: 'checkbox', default: true },
     ],
   },
@@ -50,8 +49,7 @@ const TABLE_CONFIG = {
       { name: 'icon', label: 'Icon (emoji or URL)', type: 'text', default: '💼' },
       { name: 'category', label: 'Category', type: 'text', default: 'General' },
       { name: 'description', label: 'Description', type: 'textarea' },
-      { name: 'price', label: 'Price (BDT)', type: 'text', default: '1,000 BDT' },
-      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '1' },
+      { name: 'price', label: 'Price / Fee (BDT)', type: 'text', default: '1,000 BDT' },
       { name: 'is_active', label: 'Active', type: 'checkbox', default: true },
     ],
   },
@@ -63,7 +61,6 @@ const TABLE_CONFIG = {
       { name: 'title', label: 'Title', type: 'text', required: true },
       { name: 'icon', label: 'Icon (emoji or URL)', type: 'text', default: '🏆' },
       { name: 'description', label: 'Description', type: 'textarea' },
-      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '1' },
       { name: 'published', label: 'Published', type: 'checkbox', default: true },
     ],
   },
@@ -78,7 +75,6 @@ const TABLE_CONFIG = {
       { name: 'feedback', label: 'Feedback / Quote', type: 'textarea' },
       { name: 'image', label: 'Avatar Image URL', type: 'url' },
       { name: 'link', label: 'Profile Link', type: 'url', default: '#' },
-      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '1' },
       { name: 'published', label: 'Published', type: 'checkbox', default: true },
     ],
   },
@@ -90,7 +86,6 @@ const TABLE_CONFIG = {
       { name: 'image_url', label: 'Image URL', type: 'url', required: true },
       { name: 'caption', label: 'Caption', type: 'text' },
       { name: 'category', label: 'Category', type: 'text', default: 'General' },
-      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '1' },
     ],
   },
   cvs: {
@@ -101,37 +96,19 @@ const TABLE_CONFIG = {
       { name: 'title', label: 'CV Title', type: 'text', required: true },
       { name: 'download_link', label: 'Download Link (URL)', type: 'url', required: true },
       { name: 'password', label: 'Password (0 = free)', type: 'text', default: '0', hint: 'Enter 0 for free download, or any text for password protection' },
-      { name: 'sort_order', label: 'Sort Order', type: 'number', default: '1' },
     ],
   },
   messages: {
     label: 'Messages',
     canEdit: false,
-    canAdd: true,
     display: ['name', 'email', 'subject', 'created_at'],
-    columns: [
-      { name: 'name', label: 'Sender Name', type: 'text', required: true },
-      { name: 'email', label: 'Email Address', type: 'text', required: true },
-      { name: 'subject', label: 'Subject', type: 'text', default: 'General Inquiry' },
-      { name: 'message', label: 'Message', type: 'textarea', required: true },
-    ],
+    columns: [],
   },
   bookings: {
     label: 'Bookings',
     canEdit: false,
-    canAdd: true,
     display: ['name', 'mobile', 'service_title', 'amount', 'payment_gateway', 'created_at'],
-    columns: [
-      { name: 'name', label: 'Client Name', type: 'text', required: true },
-      { name: 'mobile', label: 'Phone Number', type: 'text', required: true },
-      { name: 'location', label: 'Location / Address', type: 'text' },
-      { name: 'service_title', label: 'Service Title', type: 'text', required: true },
-      { name: 'amount', label: 'Amount (BDT)', type: 'text', default: '1,000 BDT' },
-      { name: 'payment_gateway', label: 'Payment Gateway', type: 'text', default: 'bKash' },
-      { name: 'payment_number', label: 'Sender Number', type: 'text' },
-      { name: 'trx_id', label: 'Transaction ID (TrxID)', type: 'text' },
-      { name: 'notes', label: 'Notes', type: 'textarea' },
-    ],
+    columns: [],
   },
 };
 
@@ -235,10 +212,10 @@ async function loadTable(tableName, forceRefresh = false) {
 
   document.getElementById('adminTableTitle').textContent = config.label;
   const addBtn = document.getElementById('adminAddBtn');
-  addBtn.style.display = (config.canEdit || config.canAdd) ? 'inline-block' : 'none';
+  addBtn.style.display = config.canEdit ? 'inline-block' : 'none';
 
   const wrap = document.getElementById('adminTableWrap');
-  wrap.innerHTML = '<div class="admin-loading">Loading...</div>';
+  wrap.innerHTML = '<div class="admin-loading">Loading from Google Sheet...</div>';
 
   try {
     if (forceRefresh && typeof fetchSheetRows === 'function') {
@@ -247,9 +224,7 @@ async function loadTable(tableName, forceRefresh = false) {
 
     const { data, error } = await db
       .from(tableName)
-      .select('*')
-      .order('sort_order', { ascending: true })
-      .order('created_at', { ascending: false });
+      .select('*');
 
     if (error) throw error;
 
@@ -257,7 +232,7 @@ async function loadTable(tableName, forceRefresh = false) {
       allCurrentData = [];
       const badge = document.getElementById('adminTableCountBadge');
       if (badge) badge.textContent = '0 items';
-      wrap.innerHTML = `<div class="admin-empty"><p>No ${config.label.toLowerCase()} yet.</p>${(config.canEdit || config.canAdd) ? '<button class="btn btn-primary admin-add-btn" onclick="openAddModal()">+ Add your first entry</button>' : ''}</div>`;
+      wrap.innerHTML = `<div class="admin-empty"><p>No ${config.label.toLowerCase()} yet in Google Sheet.</p>${config.canEdit ? '<button class="btn btn-primary admin-add-btn" onclick="openAddModal()">+ Add your first entry</button>' : ''}</div>`;
       return;
     }
 
@@ -382,7 +357,7 @@ async function viewDetail(id) {
 
   let html = '<div class="admin-detail">';
   for (const [key, val] of Object.entries(row)) {
-    if (key === 'id' || key === '_rowIndex') continue;
+    if (key === 'id' || key === '_rowIndex' || key === 'sort_order') continue;
     const label = prettyHeader(key);
     const display = (key === 'created_at') ? formatDate(val) : (val === null ? '—' : String(val));
     html += `<div class="admin-detail-row"><div class="admin-detail-label">${esc(label)}</div><div class="admin-detail-value">${esc(display)}</div></div>`;
@@ -393,100 +368,6 @@ async function viewDetail(id) {
   const actionsEl = document.getElementById('adminFormActions');
   if (actionsEl) actionsEl.style.display = 'none';
   if (modal) modal.classList.add('open');
-}
-
-/* ---- DATABASE SETTINGS MODAL ---- */
-function openDbSettingsModal() {
-  currentEditId = null;
-  const modal = document.getElementById('adminModal');
-  const titleEl = document.getElementById('adminModalTitle');
-  const fieldsEl = document.getElementById('adminFormFields');
-  const actionsEl = document.getElementById('adminFormActions');
-  if (!modal || !fieldsEl) return;
-
-  if (titleEl) titleEl.textContent = '⚙️ Database & Google Sheets Settings';
-  if (actionsEl) actionsEl.style.display = 'none';
-
-  const currentScriptUrl = (typeof DIRECT_SCRIPT_URL !== 'undefined' && DIRECT_SCRIPT_URL) || '';
-
-  fieldsEl.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:16px;">
-      <div style="padding:12px 14px;border-radius:10px;background:var(--admin-surface2);font-size:0.85rem;line-height:1.5;">
-        <strong>Hybrid Database Active:</strong> Your changes save automatically to both the Server JSON Database (<code>/data/*.json</code>) and your connected Google Sheet.
-      </div>
-      <div class="admin-form-field">
-        <label for="dbScriptUrlInput">Google Apps Script Web App URL</label>
-        <input type="url" id="dbScriptUrlInput" value="${esc(currentScriptUrl)}" placeholder="https://script.google.com/macros/s/.../exec" />
-        <span class="field-hint">Paste your deployed Google Apps Script Web App URL here to sync with your Google Sheet.</span>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button type="button" class="btn btn-primary" id="saveDbConfigBtn" style="padding:10px 18px;border-radius:10px;border:none;background:var(--admin-primary);color:#fff;font-weight:700;cursor:pointer;">Save Script URL</button>
-        <button type="button" class="admin-tool-btn" id="syncAllToSheetBtn">☁️ Push Local Data to Google Sheet</button>
-        <button type="button" class="admin-tool-btn" id="exportDbJsonBtn">⬇ Export Backup (.json)</button>
-      </div>
-      <div id="dbSettingsStatus" style="font-size:0.85rem;font-weight:600;display:none;"></div>
-    </div>
-  `;
-
-  modal.classList.add('open');
-
-  document.getElementById('saveDbConfigBtn')?.addEventListener('click', async () => {
-    const urlInput = document.getElementById('dbScriptUrlInput');
-    const st = document.getElementById('dbSettingsStatus');
-    const newUrl = String(urlInput?.value || '').trim();
-    if (!newUrl.startsWith('https://script.google.com/')) {
-      if (st) { st.style.display = 'block'; st.style.color = 'var(--admin-danger)'; st.textContent = 'Please enter a valid https://script.google.com/... URL.'; }
-      return;
-    }
-    try {
-      localStorage.setItem('fahim_custom_google_script_url', newUrl);
-      if (typeof DIRECT_SCRIPT_URL !== 'undefined') DIRECT_SCRIPT_URL = newUrl;
-      await fetch('/api/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ googleScriptUrl: newUrl })
-      }).catch(() => {});
-      showAdminToast('Google Script URL updated!', 'success');
-      if (st) { st.style.display = 'block'; st.style.color = 'var(--admin-success)'; st.textContent = '✓ Saved and connected successfully!'; }
-      loadTable(currentTable, true);
-    } catch (e) {
-      showAdminToast('Failed to save URL', 'error');
-    }
-  });
-
-  document.getElementById('syncAllToSheetBtn')?.addEventListener('click', async () => {
-    const btn = document.getElementById('syncAllToSheetBtn');
-    const st = document.getElementById('dbSettingsStatus');
-    if (btn) { btn.disabled = true; btn.textContent = 'Syncing...'; }
-    if (st) { st.style.display = 'block'; st.style.color = 'var(--admin-primary)'; st.textContent = `Syncing ${currentTable} rows to Google Sheet...`; }
-    try {
-      let syncedCount = 0;
-      for (const item of allCurrentData) {
-        await syncWithServerAndSheet(currentTable, 'update', item, item._rowIndex, item.id);
-        syncedCount++;
-      }
-      if (st) { st.style.color = 'var(--admin-success)'; st.textContent = `✓ Synced ${syncedCount} items from ${TABLE_CONFIG[currentTable].label} to Google Sheet!`; }
-      showAdminToast(`Synced ${syncedCount} items to Google Sheet!`, 'success');
-    } catch (err) {
-      if (st) { st.style.color = 'var(--admin-danger)'; st.textContent = 'Sync error: ' + err.message; }
-    } finally {
-      if (btn) { btn.disabled = false; btn.textContent = '☁️ Push Local Data to Google Sheet'; }
-    }
-  });
-
-  document.getElementById('exportDbJsonBtn')?.addEventListener('click', () => {
-    const store = typeof getLocalStore === 'function' ? getLocalStore() : allCurrentData;
-    const blob = new Blob([JSON.stringify(store, null, 2)], { type: 'application/json' });
-    const u = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = u;
-    a.download = `fahim-website-db-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(u), 1500);
-    showAdminToast('Database backup downloaded!', 'success');
-  });
 }
 
 /* ---- ADD / EDIT MODAL ---- */
@@ -610,10 +491,10 @@ function collectFormData() {
 async function handleFormSubmit(e) {
   e.preventDefault();
   const saveBtn = document.getElementById('adminSaveBtn');
-  if (!saveBtn || saveBtn.closest('#adminFormActions')?.style.display === 'none') return;
+  if (!saveBtn) return;
 
   saveBtn.disabled = true;
-  saveBtn.textContent = 'Saving...';
+  saveBtn.textContent = 'Saving to Sheet...';
 
   const data = collectFormData();
 
@@ -643,11 +524,11 @@ async function handleFormSubmit(e) {
       if (res && res.error) throw res.error;
       if (res && res.data) {
         const item = Array.isArray(res.data) ? res.data[0] : res.data;
-        allCurrentData.unshift(item);
+        allCurrentData.push(item);
       }
     }
     closeModal();
-    showAdminToast('Saved & synced to Database!', 'success');
+    showAdminToast('Saved to Google Sheet!', 'success');
     renderTable(allCurrentData, config);
     await loadTable(currentTable, true);
   } catch (err) {
@@ -666,11 +547,12 @@ function closeModal() {
 /* ---- DELETE ---- */
 async function confirmDelete(id) {
   try {
+    showAdminToast('Deleting from Google Sheet...', 'info');
     const res = await db.from(currentTable).delete().eq('id', id);
     if (res && res.error) throw res.error;
     allCurrentData = allCurrentData.filter(r => String(r.id) !== String(id));
     renderTable(allCurrentData, TABLE_CONFIG[currentTable]);
-    showAdminToast('Deleted from Database!', 'success');
+    showAdminToast('Deleted from Google Sheet!', 'success');
     await loadTable(currentTable, true);
   } catch (err) {
     showAdminToast('Error deleting: ' + err.message, 'error');
@@ -683,7 +565,6 @@ window.openEditModal = openEditModal;
 window.confirmDelete = confirmDelete;
 window.viewDetail = viewDetail;
 window.closeModal = closeModal;
-window.openDbSettingsModal = openDbSettingsModal;
 
 /* ---- INIT ---- */
 window.addEventListener('DOMContentLoaded', async () => {
@@ -710,7 +591,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
   document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
   document.getElementById('adminAddBtn')?.addEventListener('click', openAddModal);
-  document.getElementById('adminDbSettingsBtn')?.addEventListener('click', openDbSettingsModal);
   document.getElementById('adminForm')?.addEventListener('submit', handleFormSubmit);
   document.getElementById('adminCancelBtn')?.addEventListener('click', closeModal);
   document.getElementById('adminModalClose')?.addEventListener('click', closeModal);
@@ -752,7 +632,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   });
 
   document.getElementById('adminRefreshBtn')?.addEventListener('click', () => {
-    showAdminToast('Refreshing from Database...', 'info');
+    showAdminToast('Reloading from Google Sheet...', 'info');
     loadTable(currentTable, true);
   });
 

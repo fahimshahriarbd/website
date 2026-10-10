@@ -1,178 +1,26 @@
 /* ============================================================
-   GOOGLE DATABASE & RESILIENT DATA STORE
+   GOOGLE SHEETS DATABASE CLIENT
    Fahim Shahriar Website
 
-   Loads and syncs live content across:
-   1. Google Sheets (via server proxy & direct Apps Script fallback)
-   2. Server-side JSON Database (/api/db/:table -> data/*.json)
-   3. Browser Persistent LocalStorage Cache
+   Loads and syncs all live content directly with Google Sheets
+   via server proxy (/api/sheet-proxy) and direct Apps Script URL.
    ============================================================ */
 
 let supabaseInstance = null;
 
 const DEFAULT_DATABASE = {
-  "blog_posts": [
-    {
-      "id": "b-sheet-1",
-      "title": "প্রতিদিন দাঁত ব্রাশ না করলে কী হয়?",
-      "category": "Oral Care",
-      "image": "https://i.postimg.cc/7Pz8X31R/screenshot-13.png",
-      "date": "2026-10-10",
-      "read_time": "5",
-      "summary": "নিয়মিত দাঁত ব্রাশ না করার ফলে ডেন্টাল প্লাক, মাড়ির প্রদাহ (জিঞ্জিভাইটিস), মুখে দুর্গন্ধ এবং দাঁতের ক্ষয়রোগের ঝুঁকি বহুগুণ বেড়ে যায়। জেনে নিন সঠিক উপায়ে দাঁত পরিষ্কার রাখার প্রয়োজনীয় কৌশল।",
-      "content": "নিয়মিত দাঁত ব্রাশ না করার ফলে ডেন্টাল প্লাক জমে পাথর বা টার্টারে পরিণত হয়। এর ফলে মাড়ি থেকে রক্ত পড়া, জিঞ্জিভাইটিস এবং মারাত্মক পেরিওডন্টাইটিস হতে পারে।\n\nপ্রতিদিন অন্তত দু'বার ২ মিনিট করে ফ্লুরাইডযুক্ত টুথপেস্ট দিয়ে সঠিক পদ্ধতিতে ব্রাশ করা উচিত। রাতে ঘুমানোর আগে ব্রাশ করা সবচেয়ে বেশি গুরুত্বপূর্ণ।",
-      "link": "#",
-      "published": true,
-      "sort_order": 1,
-      "created_at": "2026-10-09T00:00:00.000Z"
-    }
-  ],
-  "gallery_photos": [
-    {
-      "id": "g-sheet-1",
-      "image_url": "https://res.cloudinary.com/ltd7gw9d/image/upload/fahim200KB.png",
-      "caption": "Chattogram Medical College — Dental Unit Campus",
-      "category": "Campus",
-      "sort_order": 1,
-      "created_at": "2026-10-09T00:00:00.000Z"
-    }
-  ],
-  "services": [
-    {
-      "id": "s-sheet-1",
-      "icon": "🏠",
-      "title": "Home Tutoring - HSC",
-      "category": "Tuition",
-      "price": "9,000 BDT",
-      "description": "Days: 3 Days/Week, Subjects: Biology, Chemistry, Duration: 1 hour",
-      "is_active": true,
-      "sort_order": 1,
-      "created_at": "2026-10-09T00:00:00.000Z"
-    }
-  ],
-  "achievements": [
-    {
-      "id": "a-sheet-1",
-      "icon": "🎓",
-      "title": "Admission to CMC",
-      "description": "Secured admission to the Dental Unit of Chittagong Medical College in 2024, achieving 285 out of 300 marks (95%) in the competitive national admission process.",
-      "published": true,
-      "sort_order": 1,
-      "created_at": "2026-10-09T00:00:00.000Z"
-    }
-  ],
-  "projects": [
-    {
-      "id": "p-sheet-1",
-      "icon": "🎓",
-      "title": "DTC Web App",
-      "category": "Education",
-      "description": "A question-card system to save studied topics, revisit important questions, and refresh forgotten knowledge through quick revision.",
-      "link": "https://bds-to-bcs.vercel.app/",
-      "published": true,
-      "sort_order": 1,
-      "created_at": "2026-10-09T00:00:00.000Z"
-    },
-    {
-      "id": "p-sheet-2",
-      "icon": "🎓",
-      "title": "StudyWise App",
-      "category": "Education",
-      "description": "StudyWise helps students access daily lessons, download notes, and practice topic-based quizzes.",
-      "link": "https://fahimshahriar.com.bd",
-      "published": true,
-      "sort_order": 2,
-      "created_at": "2026-10-09T00:00:00.000Z"
-    },
-    {
-      "id": "p-sheet-3",
-      "icon": "Ω",
-      "title": "Omega Tuition Media",
-      "category": "Business",
-      "description": "Connecting students with suitable tutors and helping build reliable tuition opportunities through a simple and trusted platform.",
-      "link": "https://www.facebook.com/omega.tuition.media",
-      "published": true,
-      "sort_order": 3,
-      "created_at": "2026-10-09T00:00:00.000Z"
-    },
-    {
-      "id": "p-sheet-4",
-      "icon": "🎯",
-      "title": "MediXm",
-      "category": "Education",
-      "description": "Created 8,000+ original questions from core textbooks and organized free study materials, videos, and PDFs for medical and dental admission candidates.",
-      "link": "https://sites.google.com/view/medixm/home",
-      "published": true,
-      "sort_order": 4,
-      "created_at": "2026-10-09T00:00:00.000Z"
-    },
-    {
-      "id": "p-sheet-5",
-      "icon": "🍱",
-      "title": "Food Order Web App",
-      "category": "Automation",
-      "description": "A digital Sehri food-ordering system that collects orders from students and sends organized data directly to dining authorities, eliminating tokens and manual hassle.",
-      "link": "https://food-peach-three-45.vercel.app/",
-      "published": true,
-      "sort_order": 5,
-      "created_at": "2026-10-09T00:00:00.000Z"
-    }
-  ],
-  "testimonials": [
-    {
-      "id": "t-sheet-1",
-      "name": "Nahomir Islam Chowdhury",
-      "tag": "Friend",
-      "about": "Website",
-      "feedback": "Exceptionally well conceived and meticulously executed. The seamless interplay of contemporary design, intuitive navigation, and purposeful functionality creates a digital experience that is both sophisticated and engaging, particularly well suited to presenting medical and research-oriented content with clarity and credibility. I truly appreciate the thought, effort, and attention to detail invested in transforming complex professional work into such an accessible and compelling digital platform. A truly distinctive piece of work that reflects creativity, precision, technical expertise, and a strong sense of vision.",
-      "image": "https://media.licdn.com/dms/image/v2/D4E03AQGN605C8Vp12A/profile-displayphoto-scale_400_400/B4EZqsGV3LKMAg-/0/1763823938540?e=1792627200&v=beta&t=XQKmfSFFITO7sTIrZ9Ft54rjl8t72kmS2BHD05OtxFY",
-      "link": "https://www.linkedin.com/in/nahomirislamchowdhury/",
-      "published": true,
-      "sort_order": 1,
-      "created_at": "2026-10-09T00:00:00.000Z"
-    }
-  ],
-  "cvs": [
-    {
-      "id": "c-sheet-1",
-      "title": "Student CV",
-      "download_link": "https://i.postimg.cc/3JZxV4yk/screenshot-10.png",
-      "password": "12",
-      "sort_order": 1,
-      "created_at": "2026-10-09T00:00:00.000Z"
-    },
-    {
-      "id": "c-sheet-2",
-      "title": "Tuition CV",
-      "download_link": "https://i.postimg.cc/3JZxV4yk/screenshot-10.png",
-      "password": "12",
-      "sort_order": 2,
-      "created_at": "2026-10-09T00:00:00.000Z"
-    },
-    {
-      "id": "c-sheet-3",
-      "title": "Marrige CV",
-      "download_link": "https://i.postimg.cc/3JZxV4yk/screenshot-10.png",
-      "password": "12",
-      "sort_order": 3,
-      "created_at": "2026-10-09T00:00:00.000Z"
-    },
-    {
-      "id": "c-sheet-4",
-      "title": "Career CV",
-      "download_link": "https://i.postimg.cc/3JZxV4yk/screenshot-10.png",
-      "password": "12",
-      "sort_order": 4,
-      "created_at": "2026-10-09T00:00:00.000Z"
-    }
-  ],
-  "dental_tips": [],
-  "faq": [],
-  "messages": [],
-  "bookings": []
+  blog_posts: [],
+  gallery_photos: [],
+  services: [],
+  achievements: [],
+  projects: [],
+  testimonials: [],
+  cvs: [],
+  messages: [],
+  bookings: []
 };
 
-const STORAGE_KEY = 'fahim_website_db_v5';
+const STORAGE_KEY = 'fahim_website_sheet_cache_v1';
 const AUTH_STORAGE_KEY = 'fahim_website_auth_v2';
 
 function getLocalStore() {
@@ -188,12 +36,7 @@ function getLocalStore() {
       return parsed;
     }
   } catch (e) {}
-
-  const fresh = JSON.parse(JSON.stringify(DEFAULT_DATABASE));
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
-  } catch (e) {}
-  return fresh;
+  return JSON.parse(JSON.stringify(DEFAULT_DATABASE));
 }
 
 function saveLocalStore(store) {
@@ -211,12 +54,12 @@ function parseBoolFlag(val, defaultVal = true) {
   return defaultVal;
 }
 
-/* ---- GOOGLE SHEET TO MODEL CONVERTERS ---- */
+/* ---- GOOGLE SHEET TO MODEL CONVERTERS (Matches deployed Google Sheet headers) ---- */
 function mapSheetRowToModel(tableName, row, idx) {
-  const id = String(row.id || ('row-' + (idx + 1)));
   const _rowIndex = Number(row._rowIndex || (idx + 2));
+  const id = String(row.id || ('row-' + (_rowIndex - 1)));
   const sortOrder = Number(row.Sort_Order ?? row.sort_order ?? (idx + 1)) || (idx + 1);
-  const createdAt = row.Created_At || row.created_at || row.Time || row.time || new Date().toISOString();
+  const createdAt = row.Time || row.time || row.Created_At || row.created_at || new Date().toISOString();
 
   if (tableName === 'projects') {
     return {
@@ -227,6 +70,7 @@ function mapSheetRowToModel(tableName, row, idx) {
       category: String(row.Category ?? row.category ?? 'General').trim(),
       description: String(row.Description ?? row.description ?? '').trim(),
       link: String(row.Link ?? row.link ?? '#').trim(),
+      tags: String(row.Tags ?? row.tags ?? '').trim(),
       sort_order: sortOrder,
       published: parseBoolFlag(row.Published ?? row.published, true),
       created_at: createdAt
@@ -253,7 +97,7 @@ function mapSheetRowToModel(tableName, row, idx) {
       id,
       _rowIndex,
       name: String(row.Name ?? row.name ?? 'Anonymous').trim(),
-      tag: String(row.Relation ?? row.relation ?? row.tag ?? 'Friend').trim(),
+      tag: String(row.Tag ?? row.Relation ?? row.relation ?? row.tag ?? 'Friend').trim(),
       about: String(row.About ?? row.about ?? 'Website').trim(),
       feedback: String(row.Feedback ?? row.feedback ?? '').trim(),
       image: String(row.Image ?? row.image ?? '').trim(),
@@ -308,7 +152,7 @@ function mapSheetRowToModel(tableName, row, idx) {
       id,
       _rowIndex,
       title: String(row.Title ?? row.title ?? '').trim(),
-      download_link: String(row.Download_Link ?? row.download_link ?? row['Download Link'] ?? row.Link ?? row.link ?? '').trim(),
+      download_link: String(row['Download Link'] ?? row.Download_Link ?? row.download_link ?? row.Link ?? row.link ?? '').trim(),
       password: row.Password !== undefined ? String(row.Password) : (row.password !== undefined ? String(row.password) : '0'),
       sort_order: sortOrder,
       created_at: createdAt
@@ -322,7 +166,6 @@ function mapSheetRowToModel(tableName, row, idx) {
       email: String(row.Email ?? row.email ?? '').trim(),
       subject: String(row.Subject ?? row.subject ?? '').trim(),
       message: String(row.Message ?? row.message ?? '').trim(),
-      status: String(row.Status ?? row.status ?? 'new').trim(),
       created_at: createdAt
     };
   }
@@ -339,125 +182,99 @@ function mapSheetRowToModel(tableName, row, idx) {
       payment_number: String(row.Payment_Number ?? row.payment_number ?? '').trim(),
       trx_id: String(row.TrxID ?? row.trx_id ?? row.Trx_Id ?? '').trim(),
       notes: String(row.Notes ?? row.notes ?? '').trim(),
-      status: String(row.Status ?? row.status ?? 'pending').trim(),
       created_at: createdAt
     };
   }
   return { id, _rowIndex, ...row };
 }
 
+/* ---- MODEL TO GOOGLE SHEET CONVERTERS (Matches deployed Google Sheet headers) ---- */
 function mapModelToSheetRow(tableName, item) {
-  const baseId = item.id || '';
-  const sortOrder = item.sort_order ?? 1;
-  const createdAt = item.created_at || new Date().toISOString();
-
   if (tableName === 'projects') {
     return {
-      id: baseId,
       Title: item.title || '',
       Icon: item.icon || '🚀',
       Category: item.category || 'General',
       Description: item.description || '',
       Link: item.link || '#',
-      Sort_Order: sortOrder,
-      Published: item.published !== false ? 'yes' : 'no',
-      Created_At: createdAt
+      Tags: item.tags || item.category || '',
+      Published: item.published !== false ? 'yes' : 'no'
     };
   }
   if (tableName === 'services') {
-    const cleanNumPrice = String(item.price || '1,000').replace(/bdt/gi, '').trim();
+    const cleanNumPrice = String(item.price || '1000').replace(/bdt/gi, '').replace(/,/g, '').trim();
     return {
-      id: baseId,
       Title: item.title || '',
       Icon: item.icon || '💼',
-      Category: item.category || 'General',
       Catagory: item.category || 'General',
-      Price: cleanNumPrice,
+      Category: item.category || 'General',
       Fee: cleanNumPrice,
+      Price: cleanNumPrice,
       Description: item.description || '',
-      Sort_Order: sortOrder,
-      Active: item.is_active !== false ? 'yes' : 'no',
-      Created_At: createdAt
+      Active: item.is_active !== false ? 'yes' : 'no'
     };
   }
   if (tableName === 'testimonials') {
     return {
-      id: baseId,
       Name: item.name || '',
+      Tag: item.tag || 'Friend',
       Relation: item.tag || 'Friend',
       About: item.about || 'Website',
       Feedback: item.feedback || '',
       Image: item.image || '',
       Link: item.link || '#',
-      Sort_Order: sortOrder,
-      Published: item.published !== false ? 'yes' : 'no',
-      Created_At: createdAt
+      Published: item.published !== false ? 'yes' : 'no'
     };
   }
   if (tableName === 'blog_posts' || tableName === 'blog') {
     return {
-      id: baseId,
       Title: item.title || '',
       Category: item.category || 'Blog',
       Image: item.image || '',
-      Date: item.date || '',
+      Date: item.date || new Date().toISOString().split('T')[0],
       ReadTime: item.read_time || '5',
       Summary: item.summary || '',
       Content: item.content || '',
       Link: item.link || '#',
-      Sort_Order: sortOrder,
-      Published: item.published !== false ? 'yes' : 'no',
-      Created_At: createdAt
+      Published: item.published !== false ? 'yes' : 'no'
     };
   }
   if (tableName === 'achievements') {
     return {
-      id: baseId,
       Title: item.title || '',
       Icon: item.icon || '🏆',
       Description: item.description || '',
-      Sort_Order: sortOrder,
-      Published: item.published !== false ? 'yes' : 'no',
-      Created_At: createdAt
+      Published: item.published !== false ? 'yes' : 'no'
     };
   }
   if (tableName === 'gallery_photos' || tableName === 'gallery') {
     return {
-      id: baseId,
       Image_URL: item.image_url || '',
       Image: item.image_url || '',
       Caption: item.caption || '',
-      Category: item.category || 'General',
-      Sort_Order: sortOrder,
-      Created_At: createdAt
+      Category: item.category || 'General'
     };
   }
   if (tableName === 'cvs' || tableName === 'cv') {
     return {
-      id: baseId,
       Title: item.title || '',
-      Download_Link: item.download_link || '',
       'Download Link': item.download_link || '',
-      Password: item.password !== undefined ? String(item.password) : '0',
-      Sort_Order: sortOrder,
-      Created_At: createdAt
+      Download_Link: item.download_link || '',
+      Password: item.password !== undefined ? String(item.password) : '0'
     };
   }
   if (tableName === 'messages') {
     return {
-      id: baseId,
-      Time: createdAt,
+      Time: item.created_at || new Date().toISOString(),
       Name: item.name || '',
       Email: item.email || '',
       Subject: item.subject || '',
-      Message: item.message || '',
-      Status: item.status || 'new'
+      Message: item.message || ''
     };
   }
   if (tableName === 'bookings') {
     return {
-      id: baseId,
-      Time: createdAt,
+      Time: item.created_at || new Date().toISOString(),
       Name: item.name || '',
       Mobile: item.mobile || '',
       Location: item.location || '',
@@ -466,8 +283,7 @@ function mapModelToSheetRow(tableName, item) {
       Gateway: item.payment_gateway || 'bKash',
       Payment_Number: item.payment_number || '',
       TrxID: item.trx_id || '',
-      Notes: item.notes || '',
-      Status: item.status || 'pending'
+      Notes: item.notes || ''
     };
   }
   return item;
@@ -476,10 +292,6 @@ function mapModelToSheetRow(tableName, item) {
 let DIRECT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwFIJVTNzF50zCcv6Ppk2n041_tXHFEWcKM1ouSQsCQ-HzcNUkjUTjNvesNnN_KZ38ovg/exec';
 
 try {
-  const savedScriptUrl = localStorage.getItem('fahim_custom_google_script_url');
-  if (savedScriptUrl && savedScriptUrl.startsWith('https://script.google.com/')) {
-    DIRECT_SCRIPT_URL = savedScriptUrl;
-  }
   fetch('/api/config')
     .then(res => res.json())
     .then(cfg => {
@@ -491,46 +303,32 @@ try {
 } catch (e) {}
 
 function getSheetTabName(tn) {
-  const m = { blog_posts: 'blog', gallery_photos: 'gallery', cvs: 'cv', blog: 'blog', gallery: 'gallery', cv: 'cv' };
+  const m = {
+    blog_posts: 'blog',
+    gallery_photos: 'gallery',
+    cvs: 'cv',
+    blog: 'blog',
+    gallery: 'gallery',
+    cv: 'cv'
+  };
   return m[tn] || tn;
 }
 
-async function syncWithServerAndSheet(tableName, action, itemData, rowIndex, id) {
+async function syncToSheet(tableName, action, data, rowIndex) {
   const sheetTab = getSheetTabName(tableName);
-  const sheetPayload = itemData ? mapModelToSheetRow(tableName, itemData) : null;
-
-  // 1. Sync via unified Server Database API (saves to /data/<tableName>.json + syncs to Google Sheets)
-  try {
-    const res = await fetch(`/api/db/${encodeURIComponent(tableName)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action,
-        data: itemData,
-        id,
-        rowIndex,
-        sheetPayload
-      })
-    });
-    if (res.ok) {
-      const json = await res.json();
-      return json;
-    }
-  } catch (e) {}
-
-  // 2. Fallback: Try /api/sheet-proxy directly
-  const proxyPayload = {
+  const payload = {
     sheet: sheetTab,
-    action,
-    data: sheetPayload,
-    id,
-    rowIndex
+    action: action,
+    data: data
   };
+  if (rowIndex) payload.rowIndex = Number(rowIndex);
+
+  // 1. Primary: Server-side Google Sheet proxy (handles redirects & CORS cleanly)
   try {
     const res = await fetch('/api/sheet-proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(proxyPayload)
+      body: JSON.stringify(payload)
     });
     if (res.ok) {
       const text = await res.text();
@@ -540,12 +338,12 @@ async function syncWithServerAndSheet(tableName, action, itemData, rowIndex, id)
     }
   } catch (e) {}
 
-  // 3. Fallback: Direct browser call to Google Apps Script (for GitHub Pages / static hosting)
+  // 2. Fallback: Direct browser call to Google Apps Script (for static hosting / GitHub Pages)
   try {
     const res = await fetch(DIRECT_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(proxyPayload)
+      body: JSON.stringify(payload)
     });
     if (res.ok) {
       const text = await res.text();
@@ -560,52 +358,36 @@ async function syncWithServerAndSheet(tableName, action, itemData, rowIndex, id)
 
 async function fetchSheetRows(tableName, forceRefresh = false) {
   const sheetTab = getSheetTabName(tableName);
-  const refreshParam = forceRefresh ? '&refresh=1' : '';
+  const refreshQuery = forceRefresh ? '&refresh=1' : '';
 
-  // 1. Try server proxy first
+  // 1. Primary: Server proxy
   try {
-    const res = await fetch(`/api/sheet-proxy?sheet=${encodeURIComponent(sheetTab)}${refreshParam}`, {
+    const res = await fetch(`/api/sheet-proxy?sheet=${encodeURIComponent(sheetTab)}${refreshQuery}`, {
       cache: 'no-store'
     });
     if (res.ok) {
       const text = await res.text();
       if (text && !text.trim().startsWith('<')) {
         const data = JSON.parse(text);
-        if (Array.isArray(data) && data.length > 0) return data;
+        if (Array.isArray(data)) return data;
       }
     }
   } catch (e) {}
 
-  // 2. Try direct Google Script URL (works on static hosting)
+  // 2. Fallback: Direct call to Google Apps Script
   try {
-    const res = await fetch(`${DIRECT_SCRIPT_URL}?sheet=${encodeURIComponent(sheetTab)}`);
+    const res = await fetch(`${DIRECT_SCRIPT_URL}?sheet=${encodeURIComponent(sheetTab)}`, {
+      cache: 'no-store'
+    });
     if (res.ok) {
       const text = await res.text();
       if (text && !text.trim().startsWith('<')) {
         const data = JSON.parse(text);
-        if (Array.isArray(data) && data.length > 0) return data;
-      }
-    }
-  } catch (e) {}
-
-  return null;
-}
-
-async function fetchServerDbRows(tableName) {
-  try {
-    if (tableName === 'messages' || tableName === 'bookings') {
-      const res = await fetch(`/api/${tableName}`, { cache: 'no-store' });
-      if (res.ok) {
-        const data = await res.json();
         if (Array.isArray(data)) return data;
       }
     }
-    const res = await fetch(`/api/db/${encodeURIComponent(tableName)}`, { cache: 'no-store' });
-    if (res.ok) {
-      const json = await res.json();
-      if (json && Array.isArray(json.data)) return json.data;
-    }
   } catch (e) {}
+
   return null;
 }
 
@@ -656,7 +438,7 @@ function createLocalSupabaseClient() {
         }
       } catch (err) {}
 
-      // 2. Fallback cryptographic SHA-256 verification for static hosting
+      // 2. Fallback SHA-256 verification for static hosting
       if (!loginSuccess) {
         try {
           const encoder = new TextEncoder();
@@ -793,58 +575,48 @@ function createLocalSupabaseClient() {
 
       then(onFulfilled, onRejected) {
         const execute = async () => {
-          // --- INSERT OPERATION ---
+          // --- INSERT INTO GOOGLE SHEET ---
           if (operation === 'insert') {
             const store = getLocalStore();
             if (!store[tableName]) store[tableName] = [];
 
             const items = Array.isArray(insertPayload) ? insertPayload : [insertPayload];
-            const inserted = items.map((item, i) => ({
-              id: item.id || (`${tableName.charAt(0)}-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`),
-              _rowIndex: (store[tableName].length + i + 2),
-              created_at: item.created_at || new Date().toISOString(),
-              ...item
-            }));
+            const inserted = [];
 
-            if (['messages', 'bookings'].includes(tableName)) {
-              store[tableName].unshift(...inserted);
-            } else {
-              store[tableName].push(...inserted);
-            }
-            saveLocalStore(store);
+            for (let i = 0; i < items.length; i++) {
+              const item = items[i];
+              const createdAt = item.created_at || new Date().toISOString();
+              const tempRowIndex = store[tableName].length + i + 2;
+              const newItem = {
+                id: item.id || ('row-' + (tempRowIndex - 1)),
+                _rowIndex: tempRowIndex,
+                created_at: createdAt,
+                ...item
+              };
 
-            for (const item of inserted) {
-              if (tableName === 'messages') {
-                await fetch('/api/contact-message', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(item)
-                }).catch(() => {});
-              } else if (tableName === 'bookings') {
-                await fetch('/api/book-service', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(item)
-                }).catch(() => {});
-              } else {
-                const syncRes = await syncWithServerAndSheet(tableName, 'insert', item, item._rowIndex, item.id);
-                if (syncRes && syncRes.data && syncRes.data._rowIndex) {
-                  item._rowIndex = syncRes.data._rowIndex;
-                }
+              const sheetPayload = mapModelToSheetRow(tableName, newItem);
+              const sheetRes = await syncToSheet(tableName, 'insert', sheetPayload);
+              if (sheetRes && sheetRes.rowIndex) {
+                newItem._rowIndex = Number(sheetRes.rowIndex);
+                newItem.id = 'row-' + (Number(sheetRes.rowIndex) - 1);
               }
+              inserted.push(newItem);
             }
+
+            store[tableName].push(...inserted);
+            saveLocalStore(store);
 
             const resData = Array.isArray(insertPayload) ? inserted : inserted[0];
             return { data: resData, error: null };
           }
 
-          // --- UPDATE OPERATION ---
+          // --- UPDATE IN GOOGLE SHEET ---
           if (operation === 'update') {
             const store = getLocalStore();
             if (!store[tableName]) store[tableName] = [];
 
             let count = 0;
-            let updatedRows = [];
+            const updatedRows = [];
             store[tableName] = store[tableName].map(row => {
               let matches = true;
               for (const fn of filters) {
@@ -866,18 +638,23 @@ function createLocalSupabaseClient() {
               if (!rowIndex && String(row.id).startsWith('row-')) {
                 rowIndex = parseInt(String(row.id).replace('row-', ''), 10) + 1;
               }
-              await syncWithServerAndSheet(tableName, 'update', row, rowIndex, row.id);
+              const sheetPayload = mapModelToSheetRow(tableName, row);
+              if (rowIndex) {
+                await syncToSheet(tableName, 'update', sheetPayload, rowIndex);
+              } else {
+                await syncToSheet(tableName, 'insert', sheetPayload);
+              }
             }
 
             return { data: updatedRows, count, error: null };
           }
 
-          // --- DELETE OPERATION ---
+          // --- DELETE FROM GOOGLE SHEET ---
           if (operation === 'delete') {
             const store = getLocalStore();
             if (!store[tableName]) store[tableName] = [];
 
-            let deletedRows = [];
+            const deletedRows = [];
             store[tableName] = store[tableName].filter(row => {
               let matches = true;
               for (const fn of filters) {
@@ -897,59 +674,31 @@ function createLocalSupabaseClient() {
               if (!rowIndex && String(row.id).startsWith('row-')) {
                 rowIndex = parseInt(String(row.id).replace('row-', ''), 10) + 1;
               }
-              if (['messages', 'bookings'].includes(tableName)) {
-                const q = rowIndex ? `?rowIndex=${rowIndex}` : '';
-                await fetch(`/api/${tableName}/${encodeURIComponent(row.id)}${q}`, { method: 'DELETE' }).catch(() => {});
-              } else {
-                await syncWithServerAndSheet(tableName, 'delete', null, rowIndex, row.id);
+              if (rowIndex) {
+                await syncToSheet(tableName, 'delete', null, rowIndex);
               }
             }
 
             return { data: deletedRows, error: null };
           }
 
-          // --- SELECT OPERATION ---
-          let finalRows = null;
-
-          // For messages & bookings, use dedicated server endpoints that merge Google Sheets + local JSON
-          if (tableName === 'messages' || tableName === 'bookings') {
-            const serverRows = await fetchServerDbRows(tableName);
-            if (Array.isArray(serverRows) && serverRows.length > 0) {
-              finalRows = serverRows;
+          // --- SELECT FROM GOOGLE SHEET ---
+          let sheetRows = null;
+          try {
+            const rawData = await fetchSheetRows(tableName);
+            if (Array.isArray(rawData)) {
+              sheetRows = rawData.map((row, idx) => mapSheetRowToModel(tableName, row, idx));
             }
-          }
+          } catch (e) {}
 
-          // 1. Try loading from live Google Sheet
-          if (!finalRows) {
-            try {
-              const rawSheet = await fetchSheetRows(tableName);
-              if (Array.isArray(rawSheet) && rawSheet.length > 0) {
-                finalRows = rawSheet.map((row, idx) => mapSheetRowToModel(tableName, row, idx));
-                // Save latest sheet snapshot to server JSON DB for offline resilience
-                fetch(`/api/db/${encodeURIComponent(tableName)}`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ action: 'replace_all', data: finalRows })
-                }).catch(() => {});
-              }
-            } catch (e) {}
-          }
-
-          // 2. Fallback to Server JSON Database (/api/db/:table)
-          if (!finalRows) {
-            const serverDbRows = await fetchServerDbRows(tableName);
-            if (Array.isArray(serverDbRows) && serverDbRows.length > 0) {
-              finalRows = serverDbRows;
-            }
-          }
-
-          // 3. Fallback to Browser LocalStorage store
           const store = getLocalStore();
-          let rows = (finalRows && Array.isArray(finalRows)) ? finalRows.slice() : ((store[tableName] || []).slice());
-
-          if (finalRows && Array.isArray(finalRows) && finalRows.length > 0) {
-            store[tableName] = finalRows;
+          let rows;
+          if (Array.isArray(sheetRows)) {
+            rows = sheetRows.slice();
+            store[tableName] = sheetRows;
             saveLocalStore(store);
+          } else {
+            rows = (store[tableName] || []).slice();
           }
 
           // Apply filters
