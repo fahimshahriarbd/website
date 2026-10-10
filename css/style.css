@@ -1582,11 +1582,12 @@ button,input,textarea{font:inherit;font-size:16px}
   letter-spacing: -0.01em;
 }
 
-/* ================= FLOATING SPEED-DIAL CHAT (BOTTOM-RIGHT) ================= */
+/* ================= FLOATING SPEED-DIAL CHAT (BOTTOM-LEFT) ================= */
 .floating-chat-container {
   position: fixed;
-  bottom: 16px;
-  right: 18px;
+  bottom: 24px;
+  left: 24px;
+  right: auto;
   z-index: 9999;
   display: flex;
   flex-direction: column;
@@ -1675,8 +1676,8 @@ button,input,textarea{font:inherit;font-size:16px}
 /* Back to Top Button: Desktop default */
 .top-btn {
   position: fixed;
-  left: 24px;
-  right: auto;
+  right: 24px;
+  left: auto;
   bottom: 24px;
   width: 44px;
   height: 44px;
@@ -1708,7 +1709,8 @@ button,input,textarea{font:inherit;font-size:16px}
 .floating-chat-container {
   position: fixed;
   bottom: 24px;
-  right: 24px;
+  left: 24px;
+  right: auto;
   z-index: 9000;
 }
 
@@ -1836,10 +1838,11 @@ button,input,textarea{font:inherit;font-size:16px}
     background: var(--primary) !important;
   }
 
-  /* Floating Chat Widget Position on Mobile */
+  /* Floating Chat Widget Position on Mobile: Left side */
   .floating-chat-container {
     bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 12px) !important;
-    right: 14px !important;
+    left: 14px !important;
+    right: auto !important;
     z-index: 9996 !important;
   }
   .floating-chat-trigger {
@@ -1855,11 +1858,11 @@ button,input,textarea{font:inherit;font-size:16px}
     gap: 8px;
   }
 
-  /* Back to Top button on Mobile */
+  /* Back to Top button on Mobile: Right side */
   .top-btn {
     bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 12px) !important;
-    left: 14px !important;
-    right: auto !important;
+    right: 14px !important;
+    left: auto !important;
     width: 42px !important;
     height: 42px !important;
     border-radius: 12px !important;

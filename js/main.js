@@ -77,13 +77,37 @@ function toggleCardDesc(btn, evt) {
 }
 window.toggleCardDesc = toggleCardDesc;
 
-function formatTruncatedDesc(text, maxWords = 22) {
+function formatTruncatedDesc(text, cutAt = 22, threshold = 30) {
   const str = String(text || '').trim();
   if (!str) return '';
   const words = str.split(/\s+/).filter(Boolean);
-  if (words.length <= maxWords) return `<p class="card-desc">${escapeHtml(str)}</p>`;
-  return `<p class="card-desc expandable-desc"><span class="desc-short">${escapeHtml(words.slice(0,maxWords).join(' '))}</span><span class="desc-dots">...</span><span class="desc-full" style="display:none;"> ${escapeHtml(words.slice(maxWords).join(' '))}</span><button type="button" class="desc-toggle-btn" aria-expanded="false" onclick="toggleCardDesc(this, event)">See more</button></p>`;
+  if (words.length <= threshold) return `<p class="card-desc">${escapeHtml(str)}</p>`;
+  return `<p class="card-desc expandable-desc"><span class="desc-short">${escapeHtml(words.slice(0, cutAt).join(' '))}</span><span class="desc-dots">...</span><span class="desc-full" style="display:none;"> ${escapeHtml(words.slice(cutAt).join(' '))}</span><button type="button" class="desc-toggle-btn" aria-expanded="false" onclick="toggleCardDesc(this, event)">See more</button></p>`;
 }
+
+function applyGlobalDescriptionTruncation() {
+  const candidates = document.querySelectorAll(`
+    main p:not(.expandable-desc):not(.desc-short):not(.desc-full),
+    .journey-desc:not(.expandable-desc),
+    .timeline-content p:not(.expandable-desc),
+    .about-grid p:not(.expandable-desc),
+    .bio-desc:not(.expandable-desc),
+    .faq-answer p:not(.expandable-desc)
+  `);
+
+  candidates.forEach(el => {
+    if (el.closest('form') || el.closest('.modal') || el.closest('button') || el.closest('a') || el.closest('.search-box') || el.querySelector('button, a, input, select, textarea')) return;
+    const text = el.textContent || '';
+    const words = text.trim().split(/\s+/).filter(Boolean);
+    if (words.length > 30) {
+      const shortText = words.slice(0, 22).join(' ');
+      const restText = words.slice(22).join(' ');
+      el.classList.add('expandable-desc');
+      el.innerHTML = `<span class="desc-short">${escapeHtml(shortText)}</span><span class="desc-dots">...</span><span class="desc-full" style="display:none;"> ${escapeHtml(restText)}</span><button type="button" class="desc-toggle-btn" aria-expanded="false" onclick="toggleCardDesc(this, event)">See more</button>`;
+    }
+  });
+}
+window.applyGlobalDescriptionTruncation = applyGlobalDescriptionTruncation;
 
 /* ---- SECTION LOADER ---- */
 async function loadSections(){
@@ -99,6 +123,7 @@ async function loadSections(){
       slot.innerHTML = '<div style="padding:40px;text-align:center;color:#999;">Section not available</div>';
     }
   }
+  applyGlobalDescriptionTruncation();
 }
 
 /* ---- SEARCH SYSTEM ---- */
@@ -282,11 +307,11 @@ function initUI() {
 
   const bottomNavMap = {
     home: 'home',
-    about: 'about',
-    journey: 'about',
-    achievements: 'about',
-    cv: 'about',
-    gallery: 'about',
+    about: 'home',
+    journey: 'home',
+    achievements: 'home',
+    cv: 'home',
+    gallery: 'gallery',
     blog: 'blog',
     projects: 'projects',
     services: 'projects',
@@ -451,7 +476,10 @@ function initUI() {
     });
   }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
   document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
-  window.refreshReveal = () => document.querySelectorAll('.reveal:not(.visible)').forEach(el => ro.observe(el));
+  window.refreshReveal = () => {
+    document.querySelectorAll('.reveal:not(.visible)').forEach(el => ro.observe(el));
+    applyGlobalDescriptionTruncation();
+  };
   document.addEventListener('click', (e) => {
     const b = e.target.closest('.desc-toggle-btn');
     if (b) toggleCardDesc(b, e);
@@ -460,21 +488,91 @@ function initUI() {
 
 /* ---- CONTACT FORM ---- */
 function initContactForm() {
-  const form = document.getElementById('contactForm'); const btn = document.getElementById('submitBtn'); const status = document.getElementById('formStatus');
+  const form = document.getElementById('contactForm');
+  const btn = document.getElementById('submitBtn');
+  const status = document.getElementById('formStatus');
   if (!form || !btn || !status) return;
+
   form.addEventListener('submit', async (e) => {
-    e.preventDefault(); btn.disabled = true; btn.textContent = 'Sending...'; status.style.display = 'none';
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const subject = document.getElementById('subject').value.trim();
-    const message = document.getElementById('message').value.trim();
+    e.preventDefault();
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    status.style.display = 'none';
+
+    const name = document.getElementById('name')?.value.trim();
+    const email = document.getElementById('email')?.value.trim();
+    const subject = document.getElementById('subject')?.value.trim() || 'General Inquiry';
+    const message = document.getElementById('message')?.value.trim();
+
+    if (!name || !email || !message) {
+      status.style.display = 'block';
+      status.textContent = 'Please fill in all required fields.';
+      status.style.color = '#dc2626';
+      btn.disabled = false;
+      btn.textContent = 'Send Message →';
+      return;
+    }
+
     try {
-      const { error } = await db.from('messages').insert({ name, email, subject, message });
-      if (error) throw error;
-      status.style.display = 'block'; status.textContent = '✓ Message sent successfully. Thank you!'; status.style.color = '#16a34a';
+      const nowIso = new Date().toISOString();
+      let sentToServer = false;
+
+      // 1. Send to server endpoint (Node.js/Express environment)
+      try {
+        const sRes = await fetch('/api/contact-message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, subject, message })
+        });
+        if (sRes.ok) {
+          sentToServer = true;
+        }
+      } catch (sErr) {
+        // Server endpoint not reachable or static hosting
+      }
+
+      // 2. Direct Google Apps Script fallback (for static hosting or custom domain)
+      if (!sentToServer) {
+        const scriptUrl = (typeof DIRECT_SCRIPT_URL !== 'undefined' && DIRECT_SCRIPT_URL) || 'https://script.google.com/macros/s/AKfycbwFIJVTNzF50zCcv6Ppk2n041_tXHFEWcKM1ouSQsCQ-HzcNUkjUTjNvesNnN_KZ38ovg/exec';
+        try {
+          await fetch(scriptUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              sheet: 'messages',
+              action: 'insert',
+              data: {
+                Time: nowIso,
+                Name: name,
+                Email: email,
+                Subject: subject,
+                Message: message
+              }
+            })
+          });
+        } catch (gErr) {}
+      }
+
+      // 3. Register in local client store
+      if (typeof db !== 'undefined' && db && db.from) {
+        try {
+          await db.from('messages').insert({ name, email, subject, message, created_at: nowIso });
+        } catch (dbErr) {}
+      }
+
+      status.style.display = 'block';
+      status.textContent = '✓ Message sent successfully. Thank you!';
+      status.style.color = '#16a34a';
       form.reset();
-    } catch { status.style.display = 'block'; status.textContent = 'Something went wrong. Please try again.'; status.style.color = '#dc2626'; }
-    btn.disabled = false; btn.textContent = 'Send Message →';
+    } catch (err) {
+      status.style.display = 'block';
+      status.textContent = 'Something went wrong. Please try again.';
+      status.style.color = '#dc2626';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send Message →';
+    }
   });
 }
 
@@ -535,7 +633,7 @@ function blogCardHtml(p, i) {
   const date = formatDateValue(p.date); const rt = String(p.read_time||'5').trim();
   const sum = String(p.summary||p.content||'...').trim();
   const hasExtLink = p.link && p.link !== '#' && p.link.startsWith('http');
-  return `<article class="card blog-card" data-category="${escapeHtml(cat.toLowerCase())}" data-blog-index="${i}"><img class="blog-cover" src="${escapeHtml(img)}" alt="${escapeHtml(p.title)}" loading="lazy"><div class="blog-body"><div class="blog-meta"><span>${escapeHtml(cat)}</span><span>${escapeHtml(date)} · ${escapeHtml(rt)} min</span></div><h4>${escapeHtml(p.title)}</h4>${formatTruncatedDesc(sum,22)}<a class="read-more" href="${hasExtLink ? escapeHtml(p.link) : '#blog-article'}" ${hasExtLink ? 'target="_blank" rel="noopener noreferrer"' : ''}>Read article →</a></div></article>`;
+  return `<article class="card blog-card" data-category="${escapeHtml(cat.toLowerCase())}" data-blog-index="${i}"><img class="blog-cover" src="${escapeHtml(img)}" alt="${escapeHtml(p.title)}" loading="lazy"><div class="blog-body"><div class="blog-meta"><span>${escapeHtml(cat)}</span><span>${escapeHtml(date)} · ${escapeHtml(rt)} min</span></div><h4>${escapeHtml(p.title)}</h4>${formatTruncatedDesc(sum)}<a class="read-more" href="${hasExtLink ? escapeHtml(p.link) : '#blog-article'}" ${hasExtLink ? 'target="_blank" rel="noopener noreferrer"' : ''}>Read article →</a></div></article>`;
 }
 function renderBlog(append=false) {
   const g = document.getElementById('blogGrid'); const sw = document.getElementById('blogSeeMoreWrap'); const sb = document.getElementById('blogSeeMoreBtn');
@@ -679,7 +777,7 @@ function svcCardHtml(s) {
   const isImg = s.icon && (s.icon.startsWith('http')||s.icon.startsWith('//')||s.icon.startsWith('data:'));
   const icon = isImg ? `<img src="${escapeHtml(s.icon)}" alt="${escapeHtml(s.title)}" style="width:36px;height:36px;object-fit:contain;"/>` : escapeHtml(s.icon||'💼');
   const fee = fmtFee(s.price);
-  return `<article class="card service-card"><div class="service-card-body"><div class="card-header"><div class="card-icon">${icon}</div><h4>${escapeHtml(s.title)}</h4></div>${formatTruncatedDesc(s.description,22)}</div><div class="service-footer"><div class="service-price-block"><span class="service-price-label">Charge:</span><span class="service-price-value">${escapeHtml(fee)}</span></div><button type="button" class="service-request-btn" data-service-title="${escapeHtml(s.title)}" data-service-price="${escapeHtml(fee)}">I need this Service →</button></div></article>`;
+  return `<article class="card service-card"><div class="service-card-body"><div class="card-header"><div class="card-icon">${icon}</div><h4>${escapeHtml(s.title)}</h4></div>${formatTruncatedDesc(s.description)}</div><div class="service-footer"><div class="service-price-block"><span class="service-price-label">Charge:</span><span class="service-price-value">${escapeHtml(fee)}</span></div><button type="button" class="service-request-btn" data-service-title="${escapeHtml(s.title)}" data-service-price="${escapeHtml(fee)}">I need this Service →</button></div></article>`;
 }
 function renderSvcFilter() {
   const fw = document.getElementById('servicesFilterWrap'); if(!fw) return;
@@ -811,7 +909,7 @@ let allAch = []; const ACH_PG = 4; let achVis = 4, achInit = false;
 function achCardHtml(a) {
   const isImg = a.icon && (a.icon.startsWith('http')||a.icon.startsWith('//')||a.icon.startsWith('data:'));
   const icon = isImg ? `<img src="${escapeHtml(a.icon)}" alt="${escapeHtml(a.title)}" style="width:36px;height:36px;object-fit:contain;"/>` : escapeHtml(a.icon||'🏆');
-  return `<article class="card"><div class="card-header"><div class="card-icon">${icon}</div><h4>${escapeHtml(a.title)}</h4></div>${formatTruncatedDesc(a.description,22)}</article>`;
+  return `<article class="card"><div class="card-header"><div class="card-icon">${icon}</div><h4>${escapeHtml(a.title)}</h4></div>${formatTruncatedDesc(a.description)}</article>`;
 }
 function renderAch(append=false) {
   const g = document.getElementById('achievementsGrid'); const sw = document.getElementById('achievementsSeeMoreWrap'); const sb = document.getElementById('achievementsSeeMoreBtn');
@@ -902,12 +1000,12 @@ function closeProjectModal() {
 }
 
 let allProj = []; let curProjCat = 'All';
-const PROJ_PG = 6; let projVis = 6, projInit = false;
+const PROJ_PG = 4; let projVis = 4, projInit = false;
 function fmtCat(c) { if(!c) return 'General'; const s = String(c).trim(); if(['commerce','ecommerce','e-commerce'].includes(s.toLowerCase())) return 'Commerce'; return s.charAt(0).toUpperCase()+s.slice(1); }
 function projCardHtml(p, i) {
   const isImg = p.icon && (p.icon.startsWith('http')||p.icon.startsWith('//')||p.icon.startsWith('data:'));
   const icon = isImg ? `<img src="${escapeHtml(p.icon)}" alt="${escapeHtml(p.title)}" style="width:36px;height:36px;object-fit:contain;"/>` : escapeHtml(p.icon||'🚀');
-  return `<article class="card project-card" data-project-index="${i}"><div><div class="card-header"><div class="card-icon">${icon}</div><h4>${escapeHtml(p.title)}</h4></div>${formatTruncatedDesc(p.description,22)}</div><div class="project-card-footer"><button type="button" class="project-view-details-btn" style="background:transparent;border:none;color:var(--primary);cursor:pointer;font-weight:700;padding:0;">View details →</button></div></article>`;
+  return `<article class="card project-card" data-project-index="${i}"><div><div class="card-header"><div class="card-icon">${icon}</div><h4>${escapeHtml(p.title)}</h4></div>${formatTruncatedDesc(p.description)}</div><div class="project-card-footer"><button type="button" class="project-view-details-btn" style="background:transparent;border:none;color:var(--primary);cursor:pointer;font-weight:700;padding:0;">View details →</button></div></article>`;
 }
 function renderProjFilter() {
   const fw = document.getElementById('projectsFilterWrap'); if(!fw) return;
@@ -984,7 +1082,7 @@ function testiCardHtml(t) {
   const link = String(t.link||'#').trim();
   const ext = link.startsWith('http://')||link.startsWith('https://');
   const ta = ext ? 'target="_blank" rel="noopener noreferrer"' : '';
-  return `<article class="card testimonial-card"><div class="testimonial-header"><a href="${escapeHtml(link)}" ${ta} class="person-avatar-link"><img class="avatar" src="${escapeHtml(img)}" alt="${escapeHtml(name)}" loading="lazy"/></a><div class="person-info"><a href="${escapeHtml(link)}" ${ta} class="person-name-link"><b>${escapeHtml(name)}</b></a><div class="testimonial-meta-row">${tag?`<span class="person-relation-tag tag" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</span>`:''}${about?`<span class="testimonial-about-badge">About: ${escapeHtml(about)}</span>`:''}</div></div></div><div class="testimonial-content">${formatTruncatedDesc(fb,22)}</div></article>`;
+  return `<article class="card testimonial-card"><div class="testimonial-header"><a href="${escapeHtml(link)}" ${ta} class="person-avatar-link"><img class="avatar" src="${escapeHtml(img)}" alt="${escapeHtml(name)}" loading="lazy"/></a><div class="person-info"><a href="${escapeHtml(link)}" ${ta} class="person-name-link"><b>${escapeHtml(name)}</b></a><div class="testimonial-meta-row">${tag?`<span class="person-relation-tag tag" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</span>`:''}${about?`<span class="testimonial-about-badge">About: ${escapeHtml(about)}</span>`:''}</div></div></div><div class="testimonial-content">${formatTruncatedDesc(fb)}</div></article>`;
 }
 async function loadTestimonials() {
   const g = document.getElementById('testimonialsGrid'); if(!g) return;

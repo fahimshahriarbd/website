@@ -171,6 +171,7 @@ async function syncRowToGoogleSheet(sheetName, data) {
     const res = await fetch(targetScriptUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      redirect: 'follow',
       signal: AbortSignal.timeout(15000),
       body: JSON.stringify({
         sheet: sheetName,
@@ -313,7 +314,7 @@ app.get('/api/messages', async (req, res) => {
   res.json(readJsonFile('messages.json', []));
 });
 
-const handleContactSubmission = (req, res) => {
+const handleContactSubmission = async (req, res) => {
   const { name, email, subject, message } = req.body || {};
   if (!name || !email) {
     return res.status(400).json({ error: 'Name and email are required.' });
@@ -337,8 +338,13 @@ const handleContactSubmission = (req, res) => {
   messages.unshift(newMsg);
   writeJsonFile('messages.json', messages);
 
+  // Invalidate messages sheet cache
+  for (const k of sheetCache.keys()) {
+    if (k.startsWith('messages:')) sheetCache.delete(k);
+  }
+
   // Sync to Google Sheet
-  syncRowToGoogleSheet('messages', {
+  const synced = await syncRowToGoogleSheet('messages', {
     Time: nowIso,
     Name: cleanName,
     Email: cleanEmail,
@@ -346,7 +352,7 @@ const handleContactSubmission = (req, res) => {
     Message: cleanMessage
   });
 
-  res.json({ success: true, message: 'Message saved successfully.', data: newMsg });
+  res.json({ success: true, message: 'Message saved successfully.', data: newMsg, synced });
 };
 
 app.post('/api/messages', handleContactSubmission);

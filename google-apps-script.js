@@ -151,7 +151,17 @@ function doPost(e) {
     const newRow = [];
     for (let j = 0; j < headers.length; j++) {
       const header = headers[j];
-      newRow.push(dataObj[header] !== undefined ? dataObj[header] : '');
+      let val = dataObj[header];
+      if (val === undefined) {
+        const lowerH = header.toLowerCase();
+        for (const k of Object.keys(dataObj)) {
+          if (k.toLowerCase() === lowerH) {
+            val = dataObj[k];
+            break;
+          }
+        }
+      }
+      newRow.push(val !== undefined && val !== null ? val : '');
     }
 
     sheet.appendRow(newRow);

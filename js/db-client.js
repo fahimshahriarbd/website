@@ -328,6 +328,32 @@ function mapSheetRowToModel(tableName, row, idx) {
       sort_order: idx + 1,
       created_at: new Date().toISOString()
     };
+  if (tableName === 'messages') {
+    return {
+      id,
+      _rowIndex,
+      name: row.Name || row.name || 'Anonymous',
+      email: row.Email || row.email || '',
+      subject: row.Subject || row.subject || '',
+      message: row.Message || row.message || '',
+      created_at: row.Time || row.time || row.created_at || new Date().toISOString()
+    };
+  }
+  if (tableName === 'bookings') {
+    return {
+      id,
+      _rowIndex,
+      name: row.Name || row.name || 'Anonymous',
+      mobile: row.Mobile || row.mobile || '',
+      location: row.Location || row.location || '',
+      service_title: row.Service || row.service || row.Service_Title || row.service_title || 'Service',
+      amount: row.Amount || row.amount || '',
+      payment_gateway: row.Gateway || row.gateway || row.payment_gateway || 'bKash',
+      payment_number: row.Payment_Number || row.payment_number || '',
+      trx_id: row.TrxID || row.trx_id || '',
+      notes: row.Notes || row.notes || '',
+      created_at: row.Time || row.time || row.created_at || new Date().toISOString()
+    };
   }
   return { id, _rowIndex, ...row };
 }
@@ -393,12 +419,27 @@ function mapModelToSheetRow(tableName, item) {
       Category: item.category || 'General'
     };
   }
-  if (tableName === 'cvs' || tableName === 'cv') {
+  if (tableName === 'messages') {
     return {
-      Title: item.title || '',
-      'Download Link': item.download_link || '',
-      Download_Link: item.download_link || '',
-      Password: item.password || '0'
+      Time: item.created_at || new Date().toISOString(),
+      Name: item.name || '',
+      Email: item.email || '',
+      Subject: item.subject || '',
+      Message: item.message || ''
+    };
+  }
+  if (tableName === 'bookings') {
+    return {
+      Time: item.created_at || new Date().toISOString(),
+      Name: item.name || '',
+      Mobile: item.mobile || '',
+      Location: item.location || '',
+      Service: item.service_title || 'Service',
+      Amount: item.amount || '',
+      Gateway: item.payment_gateway || 'bKash',
+      Payment_Number: item.payment_number || '',
+      TrxID: item.trx_id || '',
+      Notes: item.notes || ''
     };
   }
   return item;
