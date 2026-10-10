@@ -1,6 +1,6 @@
 /* ============================================================
    FAHIM SHAHRIAR — WEBSITE MAIN SCRIPT
-   Data source: Supabase database
+   Data source: Google Database (Google Sheets)
    ============================================================ */
 
 let db = null;
@@ -22,17 +22,23 @@ async function initScriptConfig() {
 
 async function fetchFromGoogleSheet(sheetName) {
   try {
-    const res = await fetch(`${GOOGLE_SCRIPT_BASE_URL}?sheet=${encodeURIComponent(sheetName)}`, {
+    // Prefer server-side proxy to prevent CORS issues and HTML redirect errors
+    const res = await fetch(`/api/sheet-proxy?sheet=${encodeURIComponent(sheetName)}`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    if (!res.ok) return null;
+    const text = await res.text();
+    if (!text || text.trim().startsWith('<')) {
+      // Returned HTML instead of JSON
+      return null;
+    }
+    const data = JSON.parse(text);
     if (data && !data.error && Array.isArray(data)) {
       return data;
     }
   } catch (err) {
-    console.warn(`[Google Sheet] Failed to fetch sheet "${sheetName}":`, err.message);
+    // Quietly fallback to local store/cache without throwing
   }
   return null;
 }
