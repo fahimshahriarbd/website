@@ -263,6 +263,14 @@ function initUI() {
         chatTrigger.setAttribute('aria-expanded', 'false');
       }
     });
+
+    document.querySelectorAll('.mobile-bottom-link').forEach(link => {
+      link.addEventListener('click', () => {
+        chatDial.classList.remove('open');
+        chatTrigger.classList.remove('active');
+        chatTrigger.setAttribute('aria-expanded', 'false');
+      });
+    });
   }
 
   const ro = new IntersectionObserver(entries => { entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('visible'); ro.unobserve(en.target); } }); }, {rootMargin:'0px 0px -8% 0px', threshold:0.08});
