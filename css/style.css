@@ -1577,30 +1577,33 @@ button,input,textarea{font:inherit;font-size:16px}
 /* ================= FLOATING SPEED-DIAL CHAT (BOTTOM-RIGHT) ================= */
 .floating-chat-container {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 16px;
+  right: 18px;
   z-index: 9999;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
 }
 
+/* Speed Dial Options: Strictly ABOVE the trigger button, opens UPWARDS */
 .chat-speed-dial {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(14px) scale(0.85);
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   align-items: center;
   gap: 10px;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(14px) scale(0.88);
   transform-origin: bottom center;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1), transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .chat-speed-dial.open {
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(0) scale(1);
+  transform: translateX(-50%) translateY(0) scale(1);
 }
 
 .chat-speed-btn {
@@ -1612,13 +1615,13 @@ button,input,textarea{font:inherit;font-size:16px}
   place-items: center;
   color: #ffffff;
   text-decoration: none;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
   border: 2px solid rgba(255, 255, 255, 0.28);
 }
 .chat-speed-btn:hover {
   transform: scale(1.12);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
 }
 .chat-speed-btn.wa { background: #25d366; }
 .chat-speed-btn.tg { background: #229ed9; }
@@ -1654,11 +1657,87 @@ button,input,textarea{font:inherit;font-size:16px}
   transform: rotate(90deg);
 }
 
+/* ================= MOBILE BOTTOM NAVIGATION BAR ================= */
+.mobile-bottom-nav {
+  display: none;
+}
+
 @media (max-width: 768px) {
+  body {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mobile-bottom-nav {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9990;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .mobile-bottom-nav-inner {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    height: 56px;
+    align-items: center;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 6px;
+  }
+
+  .mobile-bottom-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    padding: 5px 0;
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    position: relative;
+    user-select: none;
+  }
+
+  .mobile-bottom-link svg {
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.2s ease;
+  }
+
+  .mobile-bottom-link:hover,
+  .mobile-bottom-link.active {
+    color: var(--primary);
+  }
+
+  .mobile-bottom-link.active svg {
+    transform: scale(1.14) translateY(-1px);
+    stroke: var(--primary);
+  }
+
+  .mobile-bottom-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    width: 16px;
+    height: 2.5px;
+    border-radius: 2px;
+    background: var(--primary);
+  }
+
+  /* Chat Container Position on Mobile: Docked neatly right above the bottom nav */
   .floating-chat-container {
-    bottom: 16px;
-    right: 16px;
-    gap: 8px;
+    bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 12px);
+    right: 14px;
   }
   .floating-chat-trigger {
     width: 48px;
@@ -1668,12 +1747,19 @@ button,input,textarea{font:inherit;font-size:16px}
     width: 42px;
     height: 42px;
   }
+  .chat-speed-dial {
+    bottom: calc(100% + 10px);
+    gap: 8px;
+  }
+
+  /* Back to Top button on Mobile */
   .top-btn {
-    bottom: 16px !important;
-    left: 16px !important;
+    bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 12px) !important;
+    left: 14px !important;
     right: auto !important;
     width: 42px !important;
     height: 42px !important;
+    border-radius: 12px !important;
   }
 }
 
@@ -1682,7 +1768,7 @@ button,input,textarea{font:inherit;font-size:16px}
   position: fixed;
   left: 20px;
   right: auto;
-  bottom: 20px;
+  bottom: 16px;
   width: 44px;
   height: 44px;
   border: 1px solid var(--border);
