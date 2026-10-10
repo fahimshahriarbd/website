@@ -380,6 +380,87 @@ function mapModelToSheetRow(tableName, item) {
   return item;
 }
 
+const DIRECT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwFIJVTNzF50zCcv6Ppk2n041_tXHFEWcKM1ouSQsCQ-HzcNUkjUTjNvesNnN_KZ38ovg/exec';
+
+function getSheetTabName(tn) {
+  const m = { blog_posts: 'blog', gallery_photos: 'gallery', cvs: 'cv', blog: 'blog', gallery: 'gallery', cv: 'cv' };
+  return m[tn] || tn;
+}
+
+async function syncToSheet(tableName, action, data, rowIndex) {
+  const sheetTab = getSheetTabName(tableName);
+  const payload = {
+    sheet: sheetTab,
+    action: action,
+    data: data
+  };
+  if (rowIndex) payload.rowIndex = rowIndex;
+
+  // 1. Try server-side proxy first (works in Node.js)
+  try {
+    const res = await fetch('/api/sheet-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      const text = await res.text();
+      if (text && !text.trim().startsWith('<')) {
+        return JSON.parse(text);
+      }
+    }
+  } catch (e) {}
+
+  // 2. Direct fallback (works on static hosting like GitHub Pages on custom domain)
+  try {
+    const res = await fetch(DIRECT_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      const text = await res.text();
+      if (text && !text.trim().startsWith('<')) {
+        return JSON.parse(text);
+      }
+    }
+  } catch (e) {}
+
+  return null;
+}
+
+async function fetchSheetRows(tableName) {
+  const sheetTab = getSheetTabName(tableName);
+
+  // 1. Try server proxy first
+  try {
+    const res = await fetch(`/api/sheet-proxy?sheet=${encodeURIComponent(sheetTab)}`, {
+      cache: 'no-store'
+    });
+    if (res.ok) {
+      const text = await res.text();
+      if (text && !text.trim().startsWith('<')) {
+        const data = JSON.parse(text);
+        if (Array.isArray(data) && data.length > 0) return data;
+      }
+    }
+  } catch (e) {}
+
+  // 2. Direct fallback (works on static hosting on custom domain)
+  try {
+    const res = await fetch(`${DIRECT_SCRIPT_URL}?sheet=${encodeURIComponent(sheetTab)}`);
+    if (res.ok) {
+      const text = await res.text();
+      if (text && !text.trim().startsWith('<')) {
+        const data = JSON.parse(text);
+        if (Array.isArray(data) && data.length > 0) return data;
+      }
+    }
+  } catch (e) {}
+
+  return null;
+}
+
 function createLocalSupabaseClient() {
   const authListeners = [];
 
@@ -398,34 +479,65 @@ function createLocalSupabaseClient() {
       if (!email || !password) {
         return { data: { user: null, session: null }, error: new Error('Email and password are required.') };
       }
+      const cleanEmail = String(email).trim().toLowerCase();
+      const cleanPassword = String(password).trim();
+
+      let loginSuccess = false;
+      let userEmail = cleanEmail;
+      let token = 'admin_session_' + Date.now();
+
+      // 1. Try server endpoint first (when running on Node.js/Express)
       try {
         const res = await fetch('/api/admin/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email.trim(), password })
+          body: JSON.stringify({ email: cleanEmail, password: cleanPassword })
         });
-        const result = await res.json();
-        if (!res.ok || !result.success) {
-          return { data: { user: null, session: null }, error: new Error(result.error || 'Invalid email or password.') };
+        const text = await res.text();
+        // Only attempt JSON parsing if the response is valid JSON (not an HTML 404 page)
+        if (text && !text.trim().startsWith('<')) {
+          try {
+            const result = JSON.parse(text);
+            if (res.ok && result.success) {
+              loginSuccess = true;
+              token = result.token || token;
+              userEmail = result.email || cleanEmail;
+            } else if (result && result.error) {
+              return { data: { user: null, session: null }, error: new Error(result.error) };
+            }
+          } catch (e) {}
         }
-        const session = {
-          access_token: result.token,
-          user: {
-            id: 'admin-1',
-            email: result.email,
-            role: 'authenticated'
-          }
-        };
-        try {
-          localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
-        } catch (e) {}
-        authListeners.forEach(cb => {
-          try { cb('SIGNED_IN', session); } catch (e) {}
-        });
-        return { data: { user: session.user, session }, error: null };
       } catch (err) {
-        return { data: { user: null, session: null }, error: err };
+        // Server endpoint not reachable (e.g. static hosting on GitHub Pages / custom domain)
       }
+
+      // 2. If not verified via server (static hosting environment like fahimshahriar.com.bd), verify credentials directly
+      if (!loginSuccess) {
+        const isValid = (cleanEmail === 'admin@fahimshahriar.com.bd' && cleanPassword === '3778788467') ||
+                        (cleanEmail === 'admin@fahimshahriar.com' && cleanPassword === 'Fahim#Secure@2025');
+        if (isValid) {
+          loginSuccess = true;
+          userEmail = cleanEmail;
+        } else {
+          return { data: { user: null, session: null }, error: new Error('Invalid email or password.') };
+        }
+      }
+
+      const session = {
+        access_token: token,
+        user: {
+          id: 'admin-1',
+          email: userEmail,
+          role: 'authenticated'
+        }
+      };
+      try {
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+      } catch (e) {}
+      authListeners.forEach(cb => {
+        try { cb('SIGNED_IN', session); } catch (e) {}
+      });
+      return { data: { user: session.user, session }, error: null };
     },
     async signOut() {
       try {
@@ -541,15 +653,7 @@ function createLocalSupabaseClient() {
             // Sync insert to Google Sheet
             for (const item of inserted) {
               const sheetPayload = mapModelToSheetRow(tableName, item);
-              fetch('/api/sheet-proxy', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  sheet: tableName,
-                  action: 'insert',
-                  data: sheetPayload
-                })
-              }).catch(err => console.warn('[Sheet insert sync err]:', err));
+              await syncToSheet(tableName, 'insert', sheetPayload);
             }
 
             // Also asynchronously notify server endpoints if available
@@ -602,35 +706,10 @@ function createLocalSupabaseClient() {
               }
               const sheetPayload = mapModelToSheetRow(tableName, row);
               if (rowIndex) {
-                try {
-                  await fetch('/api/sheet-proxy', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      sheet: tableName,
-                      action: 'update',
-                      rowIndex: rowIndex,
-                      data: sheetPayload
-                    })
-                  });
-                } catch (err) {
-                  console.warn('[Sheet update sync err]:', err);
-                }
+                await syncToSheet(tableName, 'update', sheetPayload, rowIndex);
               } else {
                 // If item has no rowIndex, insert it so it gets created in Google Sheet
-                try {
-                  await fetch('/api/sheet-proxy', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      sheet: tableName,
-                      action: 'insert',
-                      data: sheetPayload
-                    })
-                  });
-                } catch (err) {
-                  console.warn('[Sheet insert sync err]:', err);
-                }
+                await syncToSheet(tableName, 'insert', sheetPayload);
               }
             }
 
@@ -664,19 +743,7 @@ function createLocalSupabaseClient() {
                 rowIndex = parseInt(String(row.id).replace('row-', ''), 10) + 1;
               }
               if (rowIndex) {
-                try {
-                  await fetch('/api/sheet-proxy', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      sheet: tableName,
-                      action: 'delete',
-                      rowIndex: rowIndex
-                    })
-                  });
-                } catch (err) {
-                  console.warn('[Sheet delete sync err]:', err);
-                }
+                await syncToSheet(tableName, 'delete', null, rowIndex);
               }
             }
 
@@ -698,17 +765,9 @@ function createLocalSupabaseClient() {
 
           // Attempt loading from live Google Sheet for all tables
           try {
-            const sheetRes = await fetch(`/api/sheet-proxy?sheet=${encodeURIComponent(tableName)}`, {
-              cache: 'no-store'
-            });
-            if (sheetRes.ok) {
-              const text = await sheetRes.text();
-              if (text && !text.trim().startsWith('<')) {
-                const resData = JSON.parse(text);
-                if (Array.isArray(resData) && resData.length > 0) {
-                  sheetRows = resData.map((row, idx) => mapSheetRowToModel(tableName, row, idx));
-                }
-              }
+            const rawData = await fetchSheetRows(tableName);
+            if (Array.isArray(rawData) && rawData.length > 0) {
+              sheetRows = rawData.map((row, idx) => mapSheetRowToModel(tableName, row, idx));
             }
           } catch (e) {
             // silent fallback
