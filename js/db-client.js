@@ -328,6 +328,7 @@ function mapSheetRowToModel(tableName, row, idx) {
       sort_order: idx + 1,
       created_at: new Date().toISOString()
     };
+  }
   if (tableName === 'messages') {
     return {
       id,
@@ -417,6 +418,13 @@ function mapModelToSheetRow(tableName, item) {
       Image_URL: item.image_url || '',
       Caption: item.caption || '',
       Category: item.category || 'General'
+    };
+  }
+  if (tableName === 'cvs' || tableName === 'cv') {
+    return {
+      Title: item.title || '',
+      Download_Link: item.download_link || '',
+      Password: item.password !== undefined ? String(item.password) : '0'
     };
   }
   if (tableName === 'messages') {
