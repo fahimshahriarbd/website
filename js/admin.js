@@ -147,7 +147,26 @@ function showDashboard(email) {
   document.getElementById('adminDashboard').style.display = 'block';
   document.getElementById('adminUserEmail').textContent = email || '';
   isAdminLoggedIn = true;
+  updateAdminStats();
   loadTable(currentTable);
+}
+
+async function updateAdminStats() {
+  const statKeys = [
+    { table: 'blog_posts', elId: 'statCountBlogs' },
+    { table: 'projects', elId: 'statCountProjects' },
+    { table: 'services', elId: 'statCountServices' },
+    { table: 'messages', elId: 'statCountMessages' },
+    { table: 'bookings', elId: 'statCountBookings' },
+  ];
+  for (const item of statKeys) {
+    try {
+      const { data } = await db.from(item.table).select('id');
+      const count = Array.isArray(data) ? data.length : 0;
+      const el = document.getElementById(item.elId);
+      if (el) el.textContent = count;
+    } catch {}
+  }
 }
 
 function showLogin() {
@@ -214,12 +233,19 @@ async function loadTable(tableName) {
 
     if (!data || data.length === 0) {
       allCurrentData = [];
+      const badge = document.getElementById('adminTableCountBadge');
+      if (badge) badge.textContent = '0 items';
       wrap.innerHTML = `<div class="admin-empty"><p>No ${config.label.toLowerCase()} yet.</p>${config.canEdit ? '<button class="btn btn-primary admin-add-btn" onclick="openAddModal()">+ Add your first entry</button>' : ''}</div>`;
       return;
     }
 
     allCurrentData = data;
+    const badge = document.getElementById('adminTableCountBadge');
+    if (badge) badge.textContent = `${data.length} ${data.length === 1 ? 'item' : 'items'}`;
+    const sInput = document.getElementById('adminSearchInput');
+    if (sInput) sInput.value = '';
     renderTable(data, config);
+    updateAdminStats();
   } catch (err) {
     wrap.innerHTML = `<div class="admin-empty"><p style="color:var(--admin-danger);">Error loading data: ${esc(err.message)}</p><p style="font-size:0.8rem;color:var(--admin-muted);">Make sure you are logged in and RLS policies allow access.</p></div>`;
   }
@@ -561,6 +587,58 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Sidebar toggle (mobile)
   document.getElementById('sidebarToggle').addEventListener('click', () => {
     document.getElementById('adminSidebar').classList.toggle('open');
+  });
+
+  // Theme Toggle in Admin Panel
+  const themeToggle = document.getElementById('adminThemeToggle');
+  const savedTheme = localStorage.getItem('fahim-theme');
+  if (savedTheme) {
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    if (themeToggle) themeToggle.textContent = savedTheme === 'dark' ? '☀' : '☾';
+  }
+  themeToggle?.addEventListener('click', () => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const nextTheme = isDark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', nextTheme);
+    localStorage.setItem('fahim-theme', nextTheme);
+    themeToggle.textContent = nextTheme === 'dark' ? '☀' : '☾';
+  });
+
+  // Quick Stat Cards Navigation
+  document.querySelectorAll('.admin-stat-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const targetTable = card.dataset.table;
+      if (targetTable) {
+        loadTable(targetTable);
+        document.getElementById('adminSidebar').classList.remove('open');
+      }
+    });
+  });
+
+  // Refresh Table Button
+  document.getElementById('adminRefreshBtn')?.addEventListener('click', () => {
+    loadTable(currentTable);
+  });
+
+  // Real-Time Search Filtering
+  const searchInput = document.getElementById('adminSearchInput');
+  searchInput?.addEventListener('input', (e) => {
+    const query = String(e.target.value || '').trim().toLowerCase();
+    if (!query) {
+      renderTable(allCurrentData, TABLE_CONFIG[currentTable]);
+      const badge = document.getElementById('adminTableCountBadge');
+      if (badge) badge.textContent = `${allCurrentData.length} items`;
+      return;
+    }
+    const filtered = allCurrentData.filter(row => {
+      return Object.values(row).some(val => {
+        if (val === null || val === undefined) return false;
+        return String(val).toLowerCase().includes(query);
+      });
+    });
+    renderTable(filtered, TABLE_CONFIG[currentTable]);
+    const badge = document.getElementById('adminTableCountBadge');
+    if (badge) badge.textContent = `${filtered.length} matched`;
   });
 
   // Escape to close modals
