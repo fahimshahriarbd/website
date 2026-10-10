@@ -83,7 +83,7 @@ const TABLE_CONFIG = {
     canEdit: true,
     display: ['image_url', 'caption', 'category'],
     columns: [
-      { name: 'image_url', label: 'Image URL', type: 'url', required: true },
+      { name: 'image_url', label: 'Image Link (URL)', type: 'url', required: true },
       { name: 'caption', label: 'Caption', type: 'text' },
       { name: 'category', label: 'Category', type: 'text', default: 'General' },
     ],

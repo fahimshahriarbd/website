@@ -140,9 +140,9 @@ function mapSheetRowToModel(tableName, row, idx) {
     return {
       id,
       _rowIndex,
-      image_url: String(row.Image_URL ?? row.image_url ?? row.Image ?? row.image ?? '').trim(),
+      image_url: String(row.ImageLink ?? row['Image Link'] ?? row.Image_Link ?? row.Image_URL ?? row.image_url ?? row.Image ?? row.image ?? '').trim(),
       caption: String(row.Caption ?? row.caption ?? row.Title ?? row.title ?? '').trim(),
-      category: String(row.Category ?? row.category ?? 'General').trim(),
+      category: String(row.Catagory ?? row.Category ?? row.catagory ?? row.category ?? 'General').trim() || 'General',
       sort_order: sortOrder,
       created_at: createdAt
     };
@@ -195,6 +195,7 @@ function mapModelToSheetRow(tableName, item) {
       Title: item.title || '',
       Icon: item.icon || '🚀',
       Category: item.category || 'General',
+      Catagory: item.category || 'General',
       Description: item.description || '',
       Link: item.link || '#',
       Tags: item.tags || item.category || '',
@@ -222,6 +223,7 @@ function mapModelToSheetRow(tableName, item) {
       About: item.about || 'Website',
       Feedback: item.feedback || '',
       Image: item.image || '',
+      ImageLink: item.image || '',
       Link: item.link || '#',
       Published: item.published !== false ? 'yes' : 'no'
     };
@@ -230,7 +232,9 @@ function mapModelToSheetRow(tableName, item) {
     return {
       Title: item.title || '',
       Category: item.category || 'Blog',
+      Catagory: item.category || 'Blog',
       Image: item.image || '',
+      ImageLink: item.image || '',
       Date: item.date || new Date().toISOString().split('T')[0],
       ReadTime: item.read_time || '5',
       Summary: item.summary || '',
@@ -249,9 +253,13 @@ function mapModelToSheetRow(tableName, item) {
   }
   if (tableName === 'gallery_photos' || tableName === 'gallery') {
     return {
+      ImageLink: item.image_url || '',
+      'Image Link': item.image_url || '',
+      Image_Link: item.image_url || '',
       Image_URL: item.image_url || '',
       Image: item.image_url || '',
       Caption: item.caption || '',
+      Catagory: item.category || 'General',
       Category: item.category || 'General'
     };
   }
