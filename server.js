@@ -21,7 +21,7 @@ function loadEnv() {
         if (eqIdx === -1) continue;
         const key = trimmed.slice(0, eqIdx).trim();
         const val = trimmed.slice(eqIdx + 1).trim().replace(/^["']|["']$/g, '');
-        if (key && !(key in process.env)) process.env[key] = val;
+        if (key) process.env[key] = val;
       }
     }
   } catch (e) {
@@ -40,8 +40,8 @@ if (!fs.existsSync(DATA_DIR)) {
 }
 
 // Admin Credentials & Token Secret
-const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'admin@fahimshahriar.com').toLowerCase();
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Fahim#Secure@2025';
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'admin@fahimshahriar.com.bd').toLowerCase();
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '3778788467';
 const ADMIN_SECRET = process.env.ADMIN_SECRET || 'fahim-admin-jwt-token-secret-key-928374';
 
 function generateAdminToken(email) {
@@ -86,18 +86,23 @@ app.post('/api/admin/login', (req, res) => {
   const cleanEmail = String(email || '').trim().toLowerCase();
   const cleanPassword = String(password || '');
 
-  // Compare using timing-safe buffer comparison to prevent timing attacks
-  const emailMatch = cleanEmail === ADMIN_EMAIL;
-  let passMatch = false;
-  try {
-    const passBuf = Buffer.from(cleanPassword);
-    const expectedPassBuf = Buffer.from(ADMIN_PASSWORD);
-    if (passBuf.length === expectedPassBuf.length && crypto.timingSafeEqual(passBuf, expectedPassBuf)) {
-      passMatch = true;
-    }
-  } catch (e) {}
+  const validAccounts = [
+    { email: 'admin@fahimshahriar.com.bd', pass: '3778788467' },
+    { email: ADMIN_EMAIL, pass: ADMIN_PASSWORD }
+  ];
 
-  if (!emailMatch || !passMatch) {
+  const matchedAccount = validAccounts.find(acc => {
+    if (acc.email !== cleanEmail) return false;
+    try {
+      const passBuf = Buffer.from(cleanPassword);
+      const expectedPassBuf = Buffer.from(acc.pass);
+      return passBuf.length === expectedPassBuf.length && crypto.timingSafeEqual(passBuf, expectedPassBuf);
+    } catch {
+      return false;
+    }
+  });
+
+  if (!matchedAccount) {
     rec.count += 1;
     if (rec.count >= 5) {
       rec.lockUntil = Date.now() + 5 * 60 * 1000; // 5 min lockout
@@ -142,12 +147,10 @@ function writeJsonFile(filename, data) {
   }
 }
 
-// API: Config — provides Supabase & Google Script public configuration
+// API: Config — provides Google Script public configuration
 app.get('/api/config', (req, res) => {
-  const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
-  const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
   const googleScriptUrl = process.env.GOOGLE_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbwFIJVTNzF50zCcv6Ppk2n041_tXHFEWcKM1ouSQsCQ-HzcNUkjUTjNvesNnN_KZ38ovg/exec';
-  res.json({ supabaseUrl, supabaseAnonKey, googleScriptUrl, mode: 'google_sheets' });
+  res.json({ googleScriptUrl, mode: 'google_sheets' });
 });
 
 const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwFIJVTNzF50zCcv6Ppk2n041_tXHFEWcKM1ouSQsCQ-HzcNUkjUTjNvesNnN_KZ38ovg/exec';
@@ -173,27 +176,47 @@ async function syncRowToGoogleSheet(sheetName, data) {
 }
 
 // Proxy to Google Apps Script (handles CORS, redirects, and clean JSON parsing)
+const SHEET_ALIAS_MAP = {
+  blog_posts: 'blog',
+  gallery_photos: 'gallery',
+  cvs: 'cv',
+  blog: 'blog',
+  gallery: 'gallery',
+  cv: 'cv'
+};
+
+function normalizeSheetParam(s) {
+  if (!s) return s;
+  const k = String(s).trim().toLowerCase();
+  return SHEET_ALIAS_MAP[k] || String(s).trim();
+}
+
 app.all('/api/sheet-proxy', async (req, res) => {
   const targetScriptUrl = process.env.GOOGLE_SCRIPT_URL || DEFAULT_SCRIPT_URL;
   try {
     const url = new URL(targetScriptUrl);
-    // Forward all query parameters
+    // Forward all query parameters with normalized sheet name
     for (const [key, val] of Object.entries(req.query)) {
-      url.searchParams.set(key, val);
+      const finalVal = (key === 'sheet') ? normalizeSheetParam(val) : val;
+      url.searchParams.set(key, finalVal);
     }
 
     const fetchOptions = {
       method: req.method,
       redirect: 'follow',
-      signal: AbortSignal.timeout(4000),
+      signal: AbortSignal.timeout(5000),
       headers: {
         'Accept': 'application/json'
       }
     };
 
     if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body) {
+      const bodyPayload = { ...req.body };
+      if (bodyPayload.sheet) {
+        bodyPayload.sheet = normalizeSheetParam(bodyPayload.sheet);
+      }
       fetchOptions.headers['Content-Type'] = 'application/json';
-      fetchOptions.body = JSON.stringify(req.body);
+      fetchOptions.body = JSON.stringify(bodyPayload);
     }
 
     const scriptRes = await fetch(url.toString(), fetchOptions);
@@ -203,7 +226,7 @@ app.all('/api/sheet-proxy', async (req, res) => {
       const data = JSON.parse(rawText);
       return res.status(scriptRes.status).json(data);
     } catch {
-      return res.status(scriptRes.status).send(rawText);
+      return res.status(502).json({ error: 'Google Sheet returned non-JSON response (HTML)' });
     }
   } catch (err) {
     console.error('[Sheet Proxy Error]:', err.message);
