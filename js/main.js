@@ -236,10 +236,35 @@ function initUI() {
   if (sp) { const upd = () => { const h = document.documentElement.scrollHeight-window.innerHeight; sp.style.width = (h>0?(window.scrollY/h)*100:0)+'%'; }; window.addEventListener('scroll', upd, {passive:true}); upd(); }
   const navSecs = [...document.querySelectorAll('main section[id]')];
   if (navSecs.length) {
-    const obs = new IntersectionObserver(entries => { entries.forEach(en => { if (en.isIntersecting) { document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active')); document.querySelector(`.nav-links a[href="#${en.target.id}"]`)?.classList.add('active'); } }); }, {rootMargin:'-35% 0px -55% 0px', threshold:0});
+    const obs = new IntersectionObserver(entries => { entries.forEach(en => { if (en.isIntersecting) {
+      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+      document.querySelector(`.nav-links a[href="#${en.target.id}"]`)?.classList.add('active');
+      document.querySelectorAll('.mobile-bottom-link').forEach(a => a.classList.remove('active'));
+      document.querySelector(`.mobile-bottom-link[href="#${en.target.id}"]`)?.classList.add('active');
+    } }); }, {rootMargin:'-35% 0px -55% 0px', threshold:0});
     navSecs.forEach(s => obs.observe(s));
   }
   const yr = document.getElementById('year'); if (yr) yr.textContent = new Date().getFullYear();
+
+  // Floating Multi-Channel Chat Widget (Pure Speed Dial Icons)
+  const chatTrigger = document.getElementById('floatingChatTrigger');
+  const chatDial = document.getElementById('chatSpeedDial');
+  if (chatTrigger && chatDial) {
+    chatTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = chatDial.classList.toggle('open');
+      chatTrigger.classList.toggle('active', isOpen);
+      chatTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#floatingChatContainer')) {
+        chatDial.classList.remove('open');
+        chatTrigger.classList.remove('active');
+        chatTrigger.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
   const ro = new IntersectionObserver(entries => { entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('visible'); ro.unobserve(en.target); } }); }, {rootMargin:'0px 0px -8% 0px', threshold:0.08});
   document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
   window.refreshReveal = () => document.querySelectorAll('.reveal:not(.visible)').forEach(el => ro.observe(el));
@@ -772,21 +797,78 @@ async function initSite() {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
+  const percentEl = document.getElementById('preloaderPercent');
+  const fillEl = document.getElementById('preloaderBarFill');
+
+  let currentProgress = 0;
+  let targetProgress = 25;
+  let isDone = false;
+
+  // Smooth continuous progress ticker that NEVER freezes
+  const progressTicker = setInterval(() => {
+    if (!isDone) {
+      if (currentProgress < targetProgress) {
+        const delta = Math.max(1, Math.ceil((targetProgress - currentProgress) * 0.16));
+        currentProgress += delta;
+      } else if (currentProgress < 94) {
+        // Continuous gentle creep so it never stops moving even during slower network
+        currentProgress += 1;
+      }
+    } else {
+      // Rapid silky glide straight to 100%
+      currentProgress = Math.min(100, currentProgress + 5);
+      if (currentProgress >= 100) {
+        clearInterval(progressTicker);
+      }
+    }
+
+    if (percentEl) percentEl.textContent = currentProgress;
+    if (fillEl) fillEl.style.width = currentProgress + '%';
+  }, 24);
+
+  const setTarget = (val) => {
+    targetProgress = Math.max(targetProgress, Math.min(96, val));
+  };
+
   try {
+    setTarget(35);
     db = await initSupabase();
     if (!db && typeof getSupabase === 'function') {
       db = getSupabase();
     }
     initAudio();
+    setTarget(58);
+
     await loadSections();
     await initScriptConfig();
+    setTarget(82);
+
     await initSite();
+    setTarget(96);
   } catch(error) {
     console.warn('Initialization notice:', error);
     try {
       await loadSections();
       await initScriptConfig();
-    await initSite();
+      await initSite();
     } catch(e) {}
+  } finally {
+    isDone = true;
+    targetProgress = 100;
+
+    // Check when progress visually reaches 100%
+    const finalizeTimer = setInterval(() => {
+      if (currentProgress >= 100) {
+        clearInterval(finalizeTimer);
+
+        setTimeout(() => {
+          const pl = document.getElementById('dentalPreloader');
+          if (pl && !pl.classList.contains('loaded')) {
+            pl.classList.add('loaded');
+            setTimeout(() => { pl.style.display = 'none'; }, 450);
+          }
+        }, 120);
+      }
+    }, 20);
   }
 });
