@@ -588,7 +588,8 @@ function openContentModal(item) {
     text.innerHTML = bodyContent.split('\n').filter(Boolean).map(p => `<p>${escapeHtml(p)}</p>`).join('');
   }
   if (tags) {
-    tags.innerHTML = item.category ? `<span class="tag">${escapeHtml(item.category)}</span>` : '';
+    tags.innerHTML = '';
+    tags.style.display = 'none';
   }
 
   modal.classList.add('open');
