@@ -697,6 +697,24 @@ function initLightbox() {
   document.getElementById('lightboxNext')?.addEventListener('click', nextLb);
   document.getElementById('lightboxDownload')?.addEventListener('click', () => { const p=activeGallery[lbIdx]; if(!p) return; downloadImg(p.image_url, `fahim-${(p.category||'photo').toLowerCase()}-${lbIdx+1}.jpg`); });
   document.addEventListener('keydown', e => { if(!lb.classList.contains('open')) return; if(e.key==='Escape') closeLightbox(); if(e.key==='ArrowLeft') prevLb(); if(e.key==='ArrowRight') nextLb(); });
+
+  // Mobile Touch Swipe Support (Left / Right)
+  let touchStartX = 0;
+  let touchStartY = 0;
+  lb.addEventListener('touchstart', e => {
+    if (!e.touches || !e.touches.length) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  lb.addEventListener('touchend', e => {
+    if (!e.changedTouches || !e.changedTouches.length) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
+      if (dx < 0) nextLb();
+      else prevLb();
+    }
+  }, { passive: true });
 }
 async function downloadImg(url, fn) {
   try { const r = await fetch(url,{mode:'cors'}); if(!r.ok) throw 0; const b = await r.blob(); const u = URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download=fn||'photo.jpg'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),1500); }
