@@ -354,6 +354,106 @@ button,input,textarea{font:inherit;font-size:16px}
 .info-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
 .info-row:last-child{border-bottom:0}
 .info-icon{width:36px;height:36px;border-radius:10px;background:var(--surface2);display:grid;place-items:center;flex:none}
+
+/* Academic Studies Distinct Bordered Cards */
+.academic-studies-list{
+  display:grid;
+  gap:14px;
+  margin-top:16px;
+}
+.info-row.academic-study-card{
+  position:relative;
+  align-items:flex-start;
+  padding:15px 16px;
+  border-radius:15px;
+  background:color-mix(in srgb,var(--surface2) 55%,var(--surface));
+  border:1px solid var(--border);
+  border-left:4px solid color-mix(in srgb,var(--primary) 45%,var(--border));
+  box-shadow:0 3px 10px rgba(15,23,42,.03);
+  transition:all .24s cubic-bezier(0.16,1,0.3,1);
+}
+.info-row.academic-study-card:last-child{
+  border-bottom:1px solid var(--border);
+}
+.info-row.academic-study-card.current-study{
+  background:linear-gradient(135deg,color-mix(in srgb,var(--primary) 9%,var(--surface)),var(--surface));
+  border-color:color-mix(in srgb,var(--primary) 38%,var(--border));
+  border-left:4px solid var(--primary);
+  box-shadow:0 8px 22px -6px var(--primary-glow);
+}
+.info-row.academic-study-card:hover{
+  transform:translateY(-2px);
+  border-color:color-mix(in srgb,var(--primary) 55%,var(--border));
+  border-left-color:var(--primary);
+  background:var(--surface);
+  box-shadow:0 12px 26px -8px var(--primary-glow), 0 4px 12px rgba(15,23,42,.05);
+}
+.academic-study-card .info-icon{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  font-size:1.15rem;
+  box-shadow:0 2px 6px rgba(0,0,0,.04);
+}
+.academic-study-body{
+  flex:1;
+  min-width:0;
+}
+.academic-study-header{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.academic-degree-title{
+  font-size:0.98rem;
+  font-weight:800;
+  color:var(--text);
+  line-height:1.35;
+}
+.academic-study-card.current-study .academic-degree-title{
+  font-size:1.02rem;
+}
+.academic-badge{
+  font-size:0.71rem;
+  font-weight:800;
+  padding:2px 9px;
+  border-radius:999px;
+  line-height:1.4;
+  display:inline-flex;
+  align-items:center;
+}
+.academic-badge.ongoing{
+  background:var(--primary);
+  color:#fff;
+  box-shadow:0 2px 8px var(--primary-glow);
+}
+.academic-badge.passed{
+  background:rgba(16,185,129,.14);
+  color:#059669;
+  border:1px solid rgba(16,185,129,.28);
+}
+[data-theme="dark"] .academic-badge.passed{
+  color:#34d399;
+}
+.academic-badge.gpa{
+  background:color-mix(in srgb,var(--primary) 12%,var(--surface2));
+  color:var(--primary);
+  border:1px solid color-mix(in srgb,var(--primary) 26%,transparent);
+}
+.academic-institution{
+  color:var(--text);
+  font-weight:650;
+  font-size:0.92rem;
+  margin-top:4px;
+}
+.academic-meta{
+  display:block;
+  font-size:0.82rem;
+  margin-top:3px;
+}
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
 .stat{padding:22px;background:var(--surface2);border-radius:17px;border:1px solid var(--border)}
 .stat strong{font-size:1.8rem;display:block}.stat span{color:var(--muted);font-size:.9rem}
@@ -467,13 +567,13 @@ button,input,textarea{font:inherit;font-size:16px}
   font-weight:750;
   cursor:pointer;
   display:inline-block;
-  text-decoration:underline;
-  text-underline-offset:2px;
+  text-decoration:none;
   transition:all .2s ease;
 }
 .desc-toggle-btn:hover{
-  opacity:.8;
+  opacity:.85;
   color:var(--primary2);
+  text-decoration:none;
 }
 
 /* Services Dynamic Category Filter */
@@ -698,8 +798,8 @@ button,input,textarea{font:inherit;font-size:16px}
 .read-more{display:inline-flex;margin-top:16px;color:var(--primary);font-weight:900;font-size:.9rem}
 .about-more-content{display:none}
 .about-more-content.show{display:block}
-.about-see-more{border:0;background:none;color:var(--primary);font-weight:900;cursor:pointer;padding:4px 0;margin-top:2px;font-size:.92rem}
-.about-see-more:hover{text-decoration:underline}
+.about-see-more{border:0;background:none;color:var(--primary);font-weight:900;cursor:pointer;padding:4px 0;margin-top:2px;font-size:.92rem;text-decoration:none}
+.about-see-more:hover{text-decoration:none;opacity:.85}
 
 .video-box{margin-top:18px;border-radius:15px;overflow:hidden;aspect-ratio:16/9;background:#000}
 .video-box iframe{width:100%;height:100%;border:0}
@@ -1491,12 +1591,14 @@ button,input,textarea{font:inherit;font-size:16px}
   position: fixed;
   inset: 0;
   z-index: 99999;
-  background: var(--bg);
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 55%),
+    var(--bg);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.45s ease;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s ease;
 }
 
 .dental-preloader.loaded {
@@ -1514,20 +1616,61 @@ button,input,textarea{font:inherit;font-size:16px}
   width: 100%;
 }
 
+.dental-tooth-stage {
+  position: relative;
+  width: 136px;
+  height: 136px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dental-orbit-ring {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.dental-orbit-ring.ring-outer {
+  inset: 0;
+  border: 1.5px dashed color-mix(in srgb, var(--primary) 32%, transparent);
+  animation: preloaderOrbitSpin 14s linear infinite;
+}
+
+.dental-orbit-ring.ring-inner {
+  inset: 10px;
+  border: 1.5px solid color-mix(in srgb, var(--primary) 18%, transparent);
+  border-top-color: var(--primary);
+  border-right-color: #38bdf8;
+  animation: preloaderOrbitSpin 3.2s cubic-bezier(0.5, 0.15, 0.5, 0.85) infinite;
+}
+
+@keyframes preloaderOrbitSpin {
+  to { transform: rotate(360deg); }
+}
+
 .dental-tooth-pulse-wrap {
   position: relative;
-  width: 96px;
-  height: 96px;
-  margin-bottom: 22px;
+  width: 98px;
+  height: 98px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
-  border: 1.5px solid color-mix(in srgb, var(--primary) 32%, transparent);
-  box-shadow: 0 0 35px color-mix(in srgb, var(--primary) 28%, transparent);
+  background: linear-gradient(145deg, var(--surface), color-mix(in srgb, var(--primary) 10%, var(--surface2)));
+  border: 1.5px solid color-mix(in srgb, var(--primary) 30%, var(--border));
+  box-shadow:
+    0 14px 34px -6px color-mix(in srgb, var(--primary) 26%, transparent),
+    inset 0 2px 6px rgba(255, 255, 255, 0.65);
   animation: toothHeartbeat 2.4s infinite ease-in-out;
   overflow: hidden;
+}
+
+[data-theme="dark"] .dental-tooth-pulse-wrap {
+  box-shadow:
+    0 14px 38px -4px rgba(56, 189, 248, 0.25),
+    inset 0 1px 4px rgba(255, 255, 255, 0.12);
 }
 
 .tooth-enamel-shimmer {
@@ -1538,58 +1681,81 @@ button,input,textarea{font:inherit;font-size:16px}
   height: 200%;
   background: linear-gradient(
     115deg,
-    transparent 35%,
-    rgba(255, 255, 255, 0.45) 50%,
-    transparent 65%
+    transparent 36%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 64%
   );
   transform: rotate(25deg);
-  animation: enamelSweep 2.2s infinite ease-in-out;
+  animation: enamelSweep 2.4s infinite ease-in-out;
   pointer-events: none;
 }
 
 @keyframes enamelSweep {
-  0% { transform: translateY(-80%) rotate(25deg); }
-  60%, 100% { transform: translateY(80%) rotate(25deg); }
+  0% { transform: translateY(-85%) rotate(25deg); }
+  65%, 100% { transform: translateY(85%) rotate(25deg); }
 }
 
 .dental-tooth-svg {
-  color: var(--primary);
-  width: 54px;
-  height: 54px;
-  filter: drop-shadow(0 4px 12px color-mix(in srgb, var(--primary) 45%, transparent));
+  width: 64px;
+  height: 64px;
+  position: relative;
+  z-index: 2;
+  animation: toothFloatGentle 2.4s infinite ease-in-out;
+}
+
+@keyframes toothFloatGentle {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-3px) scale(1.04); }
 }
 
 .dental-sparkle {
   position: absolute;
-  color: #38bdf8;
-  font-size: 1.15rem;
+  color: var(--primary);
+  font-size: 1.05rem;
   line-height: 1;
   pointer-events: none;
-  animation: sparkleTwinkle 2s infinite ease-in-out;
+  z-index: 4;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--primary) 60%, transparent);
+  animation: sparkleTwinkle 2.2s infinite ease-in-out;
 }
-.dental-sparkle.s1 { top: 6px; right: 12px; animation-delay: 0.2s; }
-.dental-sparkle.s2 { bottom: 10px; left: 10px; animation-delay: 0.9s; font-size: 0.9rem; }
-.dental-sparkle.s3 { top: 46%; left: 4px; animation-delay: 1.4s; font-size: 0.8rem; }
+.dental-sparkle.s1 { top: 8px; right: 14px; animation-delay: 0.15s; }
+.dental-sparkle.s2 { bottom: 12px; left: 12px; animation-delay: 0.85s; font-size: 0.9rem; color: #38bdf8; }
+.dental-sparkle.s3 { top: 22px; left: 8px; animation-delay: 1.4s; font-size: 0.78rem; color: #0284c7; }
 
 @keyframes toothHeartbeat {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 25px color-mix(in srgb, var(--primary) 20%, transparent); }
-  50% { transform: scale(1.06); box-shadow: 0 0 45px color-mix(in srgb, var(--primary) 45%, transparent); }
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 12px 30px -6px color-mix(in srgb, var(--primary) 22%, transparent);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 18px 42px -4px color-mix(in srgb, var(--primary) 38%, transparent);
+  }
 }
 
 @keyframes sparkleTwinkle {
-  0%, 100% { opacity: 0.25; transform: scale(0.8) rotate(0deg); }
-  50% { opacity: 1; transform: scale(1.3) rotate(45deg); }
+  0%, 100% { opacity: 0.25; transform: scale(0.75) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.25) rotate(25deg); }
+}
+
+.dental-preloader-label {
+  font-size: 0.96rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+  opacity: 0.88;
+  margin-bottom: 10px;
 }
 
 .dental-preloader-bar {
-  width: 180px;
+  width: 200px;
   height: 6px;
   background: color-mix(in srgb, var(--border) 90%, transparent);
   border-radius: 999px;
   overflow: hidden;
   position: relative;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-top: 14px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 .dental-preloader-fill {
   position: absolute;
@@ -1597,18 +1763,19 @@ button,input,textarea{font:inherit;font-size:16px}
   left: 0;
   bottom: 0;
   width: 0%;
-  background: linear-gradient(90deg, var(--primary), #38bdf8);
+  background: linear-gradient(90deg, var(--primary), #38bdf8, var(--primary));
+  background-size: 200% 100%;
   border-radius: 999px;
   transition: width 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+  box-shadow: 0 0 12px rgba(2, 132, 199, 0.55);
 }
 .dental-preloader-counter {
-  font-size: 1.18rem;
+  font-size: 1.05rem;
   font-weight: 850;
   color: var(--primary);
-  margin-top: 10px;
+  margin-top: 9px;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.02em;
 }
 
 /* ================= FLOATING SPEED-DIAL CHAT (BOTTOM-LEFT) ================= */

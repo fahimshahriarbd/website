@@ -166,20 +166,86 @@
 </head>
 
   <body>
-    <!-- Dental Themed Screen Preloader: Clean Tooth & Progress Bar -->
+    <!-- Dental Themed Screen Preloader: Premium 3D Clinical Tooth & Progress Bar -->
     <div id="dentalPreloader" class="dental-preloader" aria-label="Loading Website">
       <div class="dental-preloader-content">
-        <div class="dental-tooth-pulse-wrap">
-          <div class="tooth-enamel-shimmer"></div>
-          <svg class="dental-tooth-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 7C14 7 10 12 10 19C10 26 13 33 17 42C20 49 24 57 27 57C30 57 30.5 49 32 49C33.5 49 34 57 37 57C40 57 44 49 47 42C51 33 54 26 54 19C54 12 50 7 44 7C38 7 34.5 12 32 12C29.5 12 26 7 20 7Z" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M26 21C26 21 29 24 32 24C35 24 38 21 38 21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-            <circle cx="43" cy="15" r="2.2" fill="currentColor" opacity="0.85"/>
-          </svg>
+        <div class="dental-tooth-stage">
+          <div class="dental-orbit-ring ring-outer"></div>
+          <div class="dental-orbit-ring ring-inner"></div>
+          <div class="dental-tooth-pulse-wrap">
+            <div class="tooth-enamel-shimmer"></div>
+            <svg class="dental-tooth-svg" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="toothPearlGrad" x1="22" y1="14" x2="96" y2="108" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#ffffff" />
+                  <stop offset="48%" stop-color="#f0f9ff" />
+                  <stop offset="100%" stop-color="#bae6fd" />
+                </linearGradient>
+                <linearGradient id="toothRimGrad" x1="18" y1="12" x2="102" y2="108" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#38bdf8" />
+                  <stop offset="50%" stop-color="#0284c7" />
+                  <stop offset="100%" stop-color="#0369a1" />
+                </linearGradient>
+                <linearGradient id="toothInnerShade" x1="60" y1="22" x2="60" y2="104" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.18" />
+                  <stop offset="100%" stop-color="#0284c7" stop-opacity="0.38" />
+                </linearGradient>
+                <filter id="toothSoftShadow" x="-15%" y="-15%" width="130%" height="135%">
+                  <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#0284c7" flood-opacity="0.28" />
+                </filter>
+              </defs>
+              <!-- Main Anatomical Molar Crown & Roots -->
+              <path
+                filter="url(#toothSoftShadow)"
+                d="M38 18C24.5 18 17 27.5 17 40.5C17 52.5 22 63.5 27.5 76.5C32 87 36.5 103 42.5 103C47.5 103 49.5 86 55 82.5C57.8 80.7 62.2 80.7 65 82.5C70.5 86 72.5 103 77.5 103C83.5 103 88 87 92.5 76.5C98 63.5 103 52.5 103 40.5C103 27.5 95.5 18 82 18C71.5 18 66 24.5 60 24.5C54 24.5 48.5 18 38 18Z"
+                fill="url(#toothPearlGrad)"
+                stroke="url(#toothRimGrad)"
+                stroke-width="3.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <!-- Subtle 3D Root & Crown Inner Contour Shading -->
+              <path
+                d="M82 22C92.5 22 98.5 29.5 98.5 40.5C98.5 51.5 93.8 61.8 88.5 74.2C84.2 84.2 80.5 98.5 77.2 98.5C74.5 98.5 72.5 84.5 66.2 80C62.5 77.4 57.5 77.4 53.8 80C47.5 84.5 45.5 98.5 42.8 98.5C40.5 98.5 38 90 35 81C41 90 43.2 94 45 87C48 76 53.5 73 60 73C66.5 73 72 76 75 87C76.8 94 79 90 85 81C90 69 93 53 91 39C89.5 28.5 85 24 76 23C80 22.2 81 22 82 22Z"
+                fill="url(#toothInnerShade)"
+              />
+              <!-- Occlusal Cusp Groove Line -->
+              <path
+                d="M42 36C48 41.5 54 43.5 60 43.5C66 43.5 72 41.5 78 36"
+                stroke="url(#toothRimGrad)"
+                stroke-width="3.2"
+                stroke-linecap="round"
+                opacity="0.75"
+              />
+              <path
+                d="M52 42.5C55 46.5 57.5 48.5 60 48.5C62.5 48.5 65 46.5 68 42.5"
+                stroke="url(#toothRimGrad)"
+                stroke-width="2.4"
+                stroke-linecap="round"
+                opacity="0.45"
+              />
+              <!-- Glossy Enamel Specular Highlights -->
+              <path
+                d="M27 38C26.5 30.5 31 24.5 38.5 23.5"
+                stroke="#ffffff"
+                stroke-width="4.5"
+                stroke-linecap="round"
+                opacity="0.95"
+              />
+              <circle cx="28.5" cy="46.5" r="2.4" fill="#ffffff" opacity="0.9" />
+              <!-- Precision Star Sparkle on Crown -->
+              <path
+                d="M83 25L84.8 30.2L90 32L84.8 33.8L83 39L81.2 33.8L76 32L81.2 30.2L83 25Z"
+                fill="#0284c7"
+                opacity="0.85"
+              />
+            </svg>
+          </div>
           <span class="dental-sparkle s1">✦</span>
           <span class="dental-sparkle s2">✦</span>
-          <span class="dental-sparkle s3">✨</span>
+          <span class="dental-sparkle s3">✚</span>
         </div>
+        <div class="dental-preloader-label">Fahim Shahriar</div>
         <div class="dental-preloader-bar">
           <div class="dental-preloader-fill" id="preloaderBarFill"></div>
         </div>
