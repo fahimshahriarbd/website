@@ -4,12 +4,12 @@
   --admin-primary: #0284c7;
   --admin-primary-hover: #0369a1;
   --admin-primary-glow: rgba(2, 132, 199, 0.15);
-  --admin-bg: #f8fafc;
-  --admin-surface: #ffffff;
-  --admin-surface2: #f1f5f9;
-  --admin-border: #e2e8f0;
-  --admin-text: #0f172a;
-  --admin-muted: #64748b;
+  --admin-bg: #f6f4ef;
+  --admin-surface: #fcfbf8;
+  --admin-surface2: #efeadd;
+  --admin-border: #e4dfd3;
+  --admin-text: #1c1917;
+  --admin-muted: #57534e;
   --admin-danger: #ef4444;
   --admin-success: #10b981;
 }
@@ -30,7 +30,7 @@
   background: var(--admin-bg);
   color: var(--admin-text);
   margin: 0;
-  font-family: 'Outfit', 'Plus Jakarta Sans', 'Hind Siliguri', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', 'Kalpurush', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
