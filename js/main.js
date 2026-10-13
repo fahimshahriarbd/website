@@ -577,7 +577,7 @@ function getBlogShareUrl(item) {
   return `${origin}${path}?blog=${encodeURIComponent(param)}#blog`;
 }
 
-function copyToClipboard(text, successMsg = '✓ লিংক কপি হয়েছে (Link copied!)') {
+function copyToClipboard(text, successMsg = '✓ Link copied to clipboard!') {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(() => {
       showToast(successMsg);
@@ -617,32 +617,40 @@ function shareBlogPost(item, platform = 'native') {
       return;
     }
     // If Web Share API not available on desktop, copy link directly
-    copyToClipboard(shareUrl, '✓ ব্লগ লিংক কপি হয়েছে (Blog link copied!)');
+    copyToClipboard(shareUrl, '✓ Link copied to clipboard!');
     return;
   }
 
   if (platform === 'wa') {
     const u = `https://api.whatsapp.com/send?text=${encodeURIComponent(text + '\n' + shareUrl)}`;
     window.open(u, '_blank', 'noopener,noreferrer');
-  } else if (platform === 'fb') {
-    const u = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
-    window.open(u, '_blank', 'noopener,noreferrer,width=600,height=500');
-  } else if (platform === 'x') {
-    const u = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`;
-    window.open(u, '_blank', 'noopener,noreferrer,width=600,height=500');
+  } else if (platform === 'messenger') {
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+      window.location.href = `fb-messenger://share/?link=${encodeURIComponent(shareUrl)}`;
+      setTimeout(() => {
+        window.open(`https://www.facebook.com/dialog/send?link=${encodeURIComponent(shareUrl)}&app_id=291494419107518&redirect_uri=${encodeURIComponent(shareUrl)}`, '_blank');
+      }, 1500);
+    } else {
+      window.open(`https://www.facebook.com/dialog/send?link=${encodeURIComponent(shareUrl)}&app_id=291494419107518&redirect_uri=${encodeURIComponent(shareUrl)}`, '_blank', 'noopener,noreferrer,width=600,height=520');
+    }
   } else if (platform === 'linkedin') {
     const u = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
     window.open(u, '_blank', 'noopener,noreferrer,width=600,height=500');
+  } else if (platform === 'fb') {
+    const u = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+    window.open(u, '_blank', 'noopener,noreferrer,width=600,height=500');
   } else if (platform === 'copy') {
     const btn = document.getElementById('blogShareCopyBtn');
-    copyToClipboard(shareUrl, '✓ ব্লগ লিংক কপি হয়েছে (Blog link copied!)');
+    copyToClipboard(shareUrl, '✓ Link copied to clipboard!');
     if (btn) {
       btn.classList.add('copied');
-      const span = btn.querySelector('.copy-text');
-      if (span) span.textContent = 'Copied! ✓';
+      btn.setAttribute('title', 'Copied! ✓');
+      btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
       setTimeout(() => {
         btn.classList.remove('copied');
-        if (span) span.textContent = 'Copy Link';
+        btn.setAttribute('title', 'Copy article link');
+        btn.innerHTML = `<svg class="copy-link-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`;
       }, 2000);
     }
   }
@@ -658,20 +666,20 @@ function initBlogShare() {
   document.getElementById('blogShareNativeBtn')?.addEventListener('click', () => {
     if (curBlogModalItem) shareBlogPost(curBlogModalItem, 'native');
   });
+  document.getElementById('blogShareCopyBtn')?.addEventListener('click', () => {
+    if (curBlogModalItem) shareBlogPost(curBlogModalItem, 'copy');
+  });
+  document.getElementById('blogShareMsgBtn')?.addEventListener('click', () => {
+    if (curBlogModalItem) shareBlogPost(curBlogModalItem, 'messenger');
+  });
   document.getElementById('blogShareWaBtn')?.addEventListener('click', () => {
     if (curBlogModalItem) shareBlogPost(curBlogModalItem, 'wa');
-  });
-  document.getElementById('blogShareFbBtn')?.addEventListener('click', () => {
-    if (curBlogModalItem) shareBlogPost(curBlogModalItem, 'fb');
-  });
-  document.getElementById('blogShareXBtn')?.addEventListener('click', () => {
-    if (curBlogModalItem) shareBlogPost(curBlogModalItem, 'x');
   });
   document.getElementById('blogShareInBtn')?.addEventListener('click', () => {
     if (curBlogModalItem) shareBlogPost(curBlogModalItem, 'linkedin');
   });
-  document.getElementById('blogShareCopyBtn')?.addEventListener('click', () => {
-    if (curBlogModalItem) shareBlogPost(curBlogModalItem, 'copy');
+  document.getElementById('blogShareFbBtn')?.addEventListener('click', () => {
+    if (curBlogModalItem) shareBlogPost(curBlogModalItem, 'fb');
   });
 }
 
@@ -1117,8 +1125,8 @@ function openProjectModal(p) {
   if (title) title.textContent = p.title || 'Project Details';
   if (desc) desc.textContent = p.description || '';
   if (detailsWrap && detailsEl) {
-    if (p.details || p.description) {
-      detailsEl.textContent = p.details || p.description;
+    if (p.details && p.details.trim()) {
+      detailsEl.textContent = p.details.trim();
       detailsWrap.style.display = 'block';
     } else {
       detailsWrap.style.display = 'none';

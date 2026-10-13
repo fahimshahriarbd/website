@@ -241,7 +241,7 @@ function mapSheetRowToModel(tableName, row, idx) {
       icon: String(row.Icon ?? row.icon ?? '🚀').trim(),
       category: String(row.Category ?? row.category ?? 'General').trim(),
       description: String(row.Description ?? row.description ?? '').trim(),
-      details: String(row['Key Details & Impact'] ?? row.Key_Details_Impact ?? row['Key Details'] ?? row.Key_Details ?? row.key_details ?? row.Details ?? row.details ?? '').trim(),
+      details: String(row['Key Details & Impact'] ?? row['Key Details'] ?? row['Key Details and Impact'] ?? row['Key Details &amp; Impact'] ?? row.Key_Details_Impact ?? row.Key_Details ?? row.key_details ?? row.Details ?? row.details ?? row.Impact ?? row.impact ?? '').trim(),
       link: String(row.Link ?? row.link ?? '#').trim(),
       tags: String(row.Tags ?? row.tags ?? '').trim(),
       sort_order: sortOrder,
@@ -364,15 +364,19 @@ function mapSheetRowToModel(tableName, row, idx) {
 /* ---- MODEL TO GOOGLE SHEET CONVERTERS (Matches deployed Google Sheet headers) ---- */
 function mapModelToSheetRow(tableName, item) {
   if (tableName === 'projects') {
+    const detailsVal = item.details || item.key_details || '';
     return {
       Title: item.title || '',
       Icon: item.icon || '🚀',
       Category: item.category || 'General',
       Catagory: item.category || 'General',
       Description: item.description || '',
-      'Key Details & Impact': item.details || item.key_details || '',
-      Key_Details: item.details || item.key_details || '',
-      Details: item.details || item.key_details || '',
+      'Key Details & Impact': detailsVal,
+      'Key Details': detailsVal,
+      Key_Details: detailsVal,
+      Details: detailsVal,
+      details: detailsVal,
+      Impact: detailsVal,
       Link: item.link || '#',
       Tags: item.tags || item.category || '',
       Published: item.published !== false ? 'yes' : 'no'
