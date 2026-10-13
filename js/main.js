@@ -792,12 +792,33 @@ async function loadServices() {
 /* ---- SERVICE BOOKING MODAL ---- */
 let curSvc = '', curSvcPrice = '1,000 BDT', curGw = 'bKash'; let svcModalInit = false;
 function gwNum(gw) { return String(gw||'').toLowerCase().includes('rocket') ? '013168311990' : '01316831199'; }
+
+function updGw() {
+  const gwName = curGw || 'bKash';
+  const n = gwNum(gwName);
+  const labelEl = document.getElementById('gatewaySelectedLabel');
+  const textEl = document.getElementById('personalNumberText');
+  const descGwEl = document.getElementById('gatewayNameInDesc');
+  const instructEl = document.getElementById('gatewayInstructions');
+  if (labelEl) labelEl.textContent = `${gwName} Personal Number:`;
+  if (textEl) textEl.textContent = n;
+  if (descGwEl) descGwEl.textContent = gwName;
+  if (instructEl) {
+    instructEl.innerHTML = `Send Money <span class="instruct-price">${escapeHtml(curSvcPrice)}</span> to <strong>${n}</strong> from your <strong>${escapeHtml(gwName)}</strong> account. After sending, enter your sender number below.`;
+  }
+}
+
 function openSvcModal(title, price) {
   const m = document.getElementById('serviceModal'); if(!m) return;
   curSvc = title; curSvcPrice = price || '1,000 BDT';
   document.getElementById('serviceModalSelectedTitle').innerHTML = `📌 <strong>${escapeHtml(title)}</strong> <span class="service-modal-price-pill">Charge: ${escapeHtml(curSvcPrice)}</span>`;
   document.getElementById('summaryServiceTitle').textContent = title;
   document.getElementById('summaryServicePrice').textContent = curSvcPrice;
+  m.querySelectorAll('.gateway-card').forEach((b, idx) => {
+    b.classList.toggle('active', idx === 0);
+  });
+  curGw = 'bKash';
+  updGw();
   document.getElementById('serviceStep1').style.display='block';
   document.getElementById('serviceStep2').style.display='none';
   document.getElementById('serviceStep3').style.display='none';
@@ -829,8 +850,12 @@ function initSvcModal() {
   document.getElementById('serviceBackToStep1Btn').onclick = () => { document.getElementById('serviceStep2').style.display='none'; document.getElementById('serviceStep3').style.display='none'; document.getElementById('serviceStep1').style.display='block'; };
   document.getElementById('serviceGoToStep3Btn').onclick = () => { document.getElementById('serviceStep2').style.display='none'; document.getElementById('serviceStep3').style.display='block'; updGw(); setTimeout(() => document.getElementById('servicePaymentNumber')?.focus(), 50); };
   document.getElementById('serviceBackToStep2Btn').onclick = () => { document.getElementById('serviceStep3').style.display='none'; document.getElementById('serviceStep2').style.display='block'; };
-  m.querySelectorAll('.gateway-card').forEach(b => b.onclick = () => { m.querySelectorAll('.gateway-card').forEach(x => x.classList.remove('active')); b.classList.add('active'); curGw = b.dataset.gateway||'bKash'; updGw(); });
-  function updGw() { const n = gwNum(curGw); document.getElementById('gatewaySelectedLabel').textContent=`${curGw} Personal Number:`; document.getElementById('personalNumberText').textContent=n; document.getElementById('gatewayNameInDesc').textContent=curGw; document.getElementById('gatewayInstructions').innerHTML=`Send Money <span class="instruct-price">${escapeHtml(curSvcPrice)}</span> to <strong>${n}</strong> from your <strong>${curGw}</strong> account. After sending, enter your sender number below.`; }
+  m.querySelectorAll('.gateway-card').forEach(b => b.onclick = () => {
+    m.querySelectorAll('.gateway-card').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    curGw = b.dataset.gateway || b.getAttribute('aria-label') || 'bKash';
+    updGw();
+  });
   const cpb = document.getElementById('copyNumberBtn');
   cpb?.addEventListener('click', () => { const n = gwNum(curGw); if(navigator.clipboard?.writeText) navigator.clipboard.writeText(n).then(() => { cpb.classList.add('copied'); document.getElementById('copyIconDefault').style.display='none'; document.getElementById('copyIconSuccess').style.display='block'; setTimeout(()=>{cpb.classList.remove('copied');document.getElementById('copyIconDefault').style.display='block';document.getElementById('copyIconSuccess').style.display='none';},2000); }).catch(() => {}); });
   document.getElementById('serviceFinalSubmitBtn').onclick = async (e) => {

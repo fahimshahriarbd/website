@@ -9,18 +9,190 @@
 let supabaseInstance = null;
 
 const DEFAULT_DATABASE = {
-  blog_posts: [],
-  gallery_photos: [],
-  services: [],
-  achievements: [],
-  projects: [],
-  testimonials: [],
-  cvs: [],
+  blog_posts: [
+    {
+      id: 'b-sheet-1',
+      title: 'আমি কেন স্বাস্থ্যসেবা ও প্রযুক্তিকে একসঙ্গে কাজে লাগাতে চাই',
+      category: 'Education',
+      image: 'https://res.cloudinary.com/ltd7gw9d/image/upload/fahim200KB.png',
+      date: '2026-10-10',
+      read_time: '5',
+      summary: 'চিকিৎসাবিজ্ঞান এবং আধুনিক প্রযুক্তির সমন্বয় কীভাবে স্বাস্থ্যসেবা ও শিক্ষাক্ষেত্রে নতুন দিগন্ত উন্মোচন করতে পারে তা নিয়ে আমার ভাবনা।',
+      content: 'চিকিৎসাবিজ্ঞান এবং আধুনিক প্রযুক্তির সমন্বয় কীভাবে স্বাস্থ্যসেবা ও শিক্ষাক্ষেত্রে নতুন দিগন্ত উন্মোচন করতে পারে তা নিয়ে আমার ভাবনা।',
+      link: '#',
+      published: true,
+      sort_order: 1,
+      created_at: '2026-10-09T00:00:00.000Z'
+    }
+  ],
+  gallery_photos: [
+    { id: 'g-sheet-1', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655295/18.jpg', caption: '৫ আগস্ট ২০২৪ । শেখ হাসিনার পতন হয়।', category: 'Events', sort_order: 1, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-2', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655295/16.jpg', caption: 'এডমিশন প্রস্তুরির শীতের এক রাতে ঢাকা শহরে।', category: 'Single', sort_order: 2, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-3', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655295/17.jpg', caption: 'রমনা পার্ক, ঢাকা', category: 'Single', sort_order: 3, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-4', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655295/15.jpg', caption: 'Green Road, Dhaka', category: 'Single', sort_order: 4, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-5', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655294/14.jpg', caption: 'চট্টগ্রাম মেডিকেল কলেজ টার্ফে খেলাধুলার সময়।', category: 'Single', sort_order: 5, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-6', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655294/9.jpg', caption: 'Magic Paradise, Cumilla in 2022 with college friends', category: 'Single', sort_order: 6, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-7', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655294/11.jpg', caption: 'খৈয়াছড়া ঝর্ণা, চট্টগ্রাম', category: 'Travel', sort_order: 7, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-8', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655294/13.jpg', caption: 'কাচ্চি ডাইন, জিইসি', category: 'Single', sort_order: 8, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-9', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655294/12.jpg', caption: 'তাজমহল রেস্টুরেন্ট, হোমনা, কুমিল্লা (ইফতার পার্টি)', category: 'Single', sort_order: 9, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-10', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655294/8.jpg', caption: 'BUET Campus Visiting Memory 2022', category: 'Single', sort_order: 10, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-11', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655293/7.jpg', caption: 'ঘনিয়ারচর ব্রীজে, হোমনা, কুমিল্লা', category: 'Single', sort_order: 11, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-12', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655293/6.jpg', caption: 'ঘনিয়ারচর, হোমনা, কুমিল্লা', category: 'Single', sort_order: 12, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-13', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655293/5.jpg', caption: 'গ্রামীন পরিবেশে, শ্রীনগর', category: 'Single', sort_order: 13, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-14', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655293/4.jpg', caption: 'জাতীয় জাদুঘর, ঢাকা', category: 'Single', sort_order: 14, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-15', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655293/3.jpg', caption: 'Batch Day of CMC 66-35', category: 'CMC', sort_order: 15, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-16', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655293/2.jpg', caption: 'Medilogy Invitaton for Hunting Medical College', category: 'Events', sort_order: 16, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-17', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655293/24.jpg', caption: 'Magic Paradise Pool, Cumilla', category: 'Single', sort_order: 17, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-18', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655293/22.jpg', caption: 'Magic Paradise Pool, Cumilla', category: 'Single', sort_order: 18, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-19', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655292/20.jpg', caption: 'Near My Primary School', category: 'Single', sort_order: 19, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-20', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655292/21.jpg', caption: 'কবরস্থান, শ্রীনগর', category: 'Single', sort_order: 20, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-21', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655292/28.jpg', caption: 'Royal Restaurant, Bancharampur, Brammanbaria', category: 'Single', sort_order: 21, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-22', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655292/27.jpg', caption: 'Birthday Celebration 2024', category: 'Single', sort_order: 22, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-23', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655292/23.jpg', caption: 'Magic Paradise', category: 'Single', sort_order: 23, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-24', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655291/19.jpg', caption: 'ঈদগাহ, বাশগাড়ি', category: 'Single', sort_order: 24, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-25', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655291/26.jpg', caption: 'চমেকের লাইব্রেরিতে', category: 'CMC', sort_order: 25, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-26', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655291/WhatsApp_Image_2026-09-03_at_3.01.14_PM.jpg', caption: 'Cox\'s Bazar Night View', category: 'Single', sort_order: 26, created_at: '2026-10-09T00:00:00.000Z' },
+    { id: 'g-sheet-27', image_url: 'https://res.cloudinary.com/ltd7gw9d/image/upload/v1791655291/WhatsApp_Image_2026-09-03_at_3.02.24_PM.jpg', caption: '1st Medicalian Batchmate marriage', category: 'Single', sort_order: 27, created_at: '2026-10-09T00:00:00.000Z' }
+  ],
+  services: [
+    {
+      id: 's-sheet-1',
+      icon: '🏠',
+      title: 'Home Tutoring - HSC',
+      category: 'Tuition',
+      price: '9,000 BDT',
+      description: 'Days: 3 Days/Week, Subjects: Biology, Chemistry, Duration: 1 hour',
+      is_active: true,
+      sort_order: 1,
+      created_at: '2026-10-09T00:00:00.000Z'
+    }
+  ],
+  achievements: [
+    {
+      id: 'a-sheet-1',
+      icon: '🎓',
+      title: 'Admission to CMC',
+      description: 'Secured admission to the Dental Unit of Chittagong Medical College in 2024, achieving 285 out of 300 marks (95%) in the competitive national admission process.',
+      published: true,
+      sort_order: 1,
+      created_at: '2026-10-09T00:00:00.000Z'
+    }
+  ],
+  projects: [
+    {
+      id: 'p-sheet-1',
+      icon: '🎓',
+      title: 'DTC Web App',
+      category: 'Education',
+      description: 'A question-card system to save studied topics, revisit important questions, and refresh forgotten knowledge through quick revision.',
+      details: 'A specialized active-recall platform with 1,000+ high-yield question cards, categorized by subject and chapter for rapid dental and medical student revision.',
+      link: 'https://bds-to-bcs.vercel.app/',
+      published: true,
+      sort_order: 1,
+      created_at: '2026-10-09T00:00:00.000Z'
+    },
+    {
+      id: 'p-sheet-2',
+      icon: '🎓',
+      title: 'StudyWise App',
+      category: 'Education',
+      description: 'StudyWise helps students access daily lessons, download notes, and practice topic-based quizzes.',
+      details: 'Comprehensive educational companion facilitating structured daily curriculum, lecture note downloads, and interactive performance tracking.',
+      link: 'https://fahimshahriar.com.bd',
+      published: true,
+      sort_order: 2,
+      created_at: '2026-10-09T00:00:00.000Z'
+    },
+    {
+      id: 'p-sheet-3',
+      icon: 'Ω',
+      title: 'Omega Tuition Media',
+      category: 'Business',
+      description: 'Connecting students with suitable tutors and helping build reliable tuition opportunities through a simple and trusted platform.',
+      details: 'Transparent mentorship network bridging 500+ verified teachers with school and college candidates across Chittagong and Cumilla regions.',
+      link: 'https://www.facebook.com/omega.tuition.media',
+      published: true,
+      sort_order: 3,
+      created_at: '2026-10-09T00:00:00.000Z'
+    },
+    {
+      id: 'p-sheet-4',
+      icon: '🎯',
+      title: 'MediXm',
+      category: 'Education',
+      description: 'Created 8,000+ original questions from core textbooks and organized free study materials, videos, and PDFs for medical and dental admission candidates.',
+      details: 'Large-scale question bank repository with detailed answer rationales, model test suites, and syllabus roadmap for medical exam aspirants.',
+      link: 'https://sites.google.com/view/medixm/home',
+      published: true,
+      sort_order: 4,
+      created_at: '2026-10-09T00:00:00.000Z'
+    },
+    {
+      id: 'p-sheet-5',
+      icon: '🍱',
+      title: 'Food Order Web App',
+      category: 'Automation',
+      description: 'A digital Sehri food-ordering system that collects orders from students and sends organized data directly to dining authorities, eliminating tokens and manual hassle.',
+      details: 'Automated dining ordering workflow streamlining hostel student food requests, token validation, and real-time meal counts during Ramadan.',
+      link: 'https://food-peach-three-45.vercel.app/',
+      published: true,
+      sort_order: 5,
+      created_at: '2026-10-09T00:00:00.000Z'
+    }
+  ],
+  testimonials: [
+    {
+      id: 't-sheet-1',
+      name: 'Nahomir Islam Chowdhury',
+      tag: 'Friend',
+      about: 'Website',
+      feedback: 'Exceptionally well conceived and meticulously executed. The seamless interplay of contemporary design, intuitive navigation, and purposeful functionality creates a digital experience that is both sophisticated and engaging, particularly well suited to presenting medical and research-oriented content with clarity and credibility. I truly appreciate the thought, effort, and attention to detail invested in transforming complex professional work into such an accessible and compelling digital platform. A truly distinctive piece of work that reflects creativity, precision, technical expertise, and a strong sense of vision.',
+      image: 'https://media.licdn.com/dms/image/v2/D4E03AQGN605C8Vp12A/profile-displayphoto-scale_400_400/B4EZqsGV3LKMAg-/0/1763823938540?e=1792627200&v=beta&t=XQKmfSFFITO7sTIrZ9Ft54rjl8t72kmS2BHD05OtxFY',
+      link: 'https://www.linkedin.com/in/nahomirislamchowdhury/',
+      published: true,
+      sort_order: 1,
+      created_at: '2026-10-09T00:00:00.000Z'
+    }
+  ],
+  cvs: [
+    {
+      id: 'c-sheet-1',
+      title: 'Student CV',
+      download_link: 'https://i.postimg.cc/3JZxV4yk/screenshot-10.png',
+      password: '12',
+      sort_order: 1,
+      created_at: '2026-10-09T00:00:00.000Z'
+    },
+    {
+      id: 'c-sheet-2',
+      title: 'Tuition CV',
+      download_link: 'https://i.postimg.cc/3JZxV4yk/screenshot-10.png',
+      password: '12',
+      sort_order: 2,
+      created_at: '2026-10-09T00:00:00.000Z'
+    },
+    {
+      id: 'c-sheet-3',
+      title: 'Marrige CV',
+      download_link: 'https://i.postimg.cc/3JZxV4yk/screenshot-10.png',
+      password: '12',
+      sort_order: 3,
+      created_at: '2026-10-09T00:00:00.000Z'
+    },
+    {
+      id: 'c-sheet-4',
+      title: 'Career CV',
+      download_link: 'https://i.postimg.cc/3JZxV4yk/screenshot-10.png',
+      password: '12',
+      sort_order: 4,
+      created_at: '2026-10-09T00:00:00.000Z'
+    }
+  ],
   messages: [],
   bookings: []
 };
 
-const STORAGE_KEY = 'fahim_website_sheet_cache_v1';
+const STORAGE_KEY = 'fahim_website_sheet_cache_v2';
 const AUTH_STORAGE_KEY = 'fahim_website_auth_v2';
 
 function getLocalStore() {
@@ -69,6 +241,7 @@ function mapSheetRowToModel(tableName, row, idx) {
       icon: String(row.Icon ?? row.icon ?? '🚀').trim(),
       category: String(row.Category ?? row.category ?? 'General').trim(),
       description: String(row.Description ?? row.description ?? '').trim(),
+      details: String(row['Key Details & Impact'] ?? row.Key_Details_Impact ?? row['Key Details'] ?? row.Key_Details ?? row.key_details ?? row.Details ?? row.details ?? '').trim(),
       link: String(row.Link ?? row.link ?? '#').trim(),
       tags: String(row.Tags ?? row.tags ?? '').trim(),
       sort_order: sortOrder,
@@ -197,6 +370,9 @@ function mapModelToSheetRow(tableName, item) {
       Category: item.category || 'General',
       Catagory: item.category || 'General',
       Description: item.description || '',
+      'Key Details & Impact': item.details || item.key_details || '',
+      Key_Details: item.details || item.key_details || '',
+      Details: item.details || item.key_details || '',
       Link: item.link || '#',
       Tags: item.tags || item.category || '',
       Published: item.published !== false ? 'yes' : 'no'
@@ -701,12 +877,15 @@ function createLocalSupabaseClient() {
 
           const store = getLocalStore();
           let rows;
-          if (Array.isArray(sheetRows)) {
+          if (Array.isArray(sheetRows) && sheetRows.length > 0) {
             rows = sheetRows.slice();
             store[tableName] = sheetRows;
             saveLocalStore(store);
+          } else if (Array.isArray(sheetRows) && sheetRows.length === 0) {
+            const fallbackRows = DEFAULT_DATABASE[tableName] || [];
+            rows = fallbackRows.slice();
           } else {
-            rows = (store[tableName] || []).slice();
+            rows = (store[tableName] && store[tableName].length > 0 ? store[tableName] : (DEFAULT_DATABASE[tableName] || [])).slice();
           }
 
           // Apply filters

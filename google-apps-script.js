@@ -129,6 +129,19 @@ function doPost(e) {
       if (headers.length > 0) {
         sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
       }
+    } else {
+      // যদি ডাটাতে এমন কোনো নতুন কলাম বা ফিল্ড থাকে যা হেডারে নেই, সেটি স্বয়ংক্রিয়ভাবে নতুন কলাম হেডার হিসেবে যুক্ত করা হবে
+      const incomingKeys = Object.keys(dataObj).filter(k => !['_rowIndex', 'id', 'sheet', 'action'].includes(k));
+      const lowerExistingHeaders = headers.map(h => h.toLowerCase());
+      for (let k = 0; k < incomingKeys.length; k++) {
+        const keyName = incomingKeys[k];
+        if (!lowerExistingHeaders.includes(keyName.toLowerCase())) {
+          const nextCol = headers.length + 1;
+          sheet.getRange(1, nextCol).setValue(keyName);
+          headers.push(keyName);
+          lowerExistingHeaders.push(keyName.toLowerCase());
+        }
+      }
     }
 
     // --- ACTION: UPDATE ---
@@ -140,8 +153,17 @@ function doPost(e) {
 
       for (let j = 0; j < headers.length; j++) {
         const header = headers[j];
-        if (header && dataObj.hasOwnProperty(header)) {
+        if (!header) continue;
+        if (dataObj.hasOwnProperty(header)) {
           sheet.getRange(rowIndex, j + 1).setValue(dataObj[header]);
+        } else {
+          const lowerH = header.toLowerCase();
+          for (const k of Object.keys(dataObj)) {
+            if (k.toLowerCase() === lowerH) {
+              sheet.getRange(rowIndex, j + 1).setValue(dataObj[k]);
+              break;
+            }
+          }
         }
       }
       return jsonResponse({ success: true, message: 'Row updated successfully', rowIndex: rowIndex });
