@@ -173,7 +173,7 @@ const DEFAULT_DATABASE = {
     },
     {
       id: 'c-sheet-3',
-      title: 'Marrige CV',
+      title: 'Marriage CV',
       download_link: 'https://i.postimg.cc/3JZxV4yk/screenshot-10.png',
       password: '12',
       sort_order: 3,
@@ -578,6 +578,7 @@ async function fetchSheetRows(tableName, forceRefresh = false) {
 
   return null;
 }
+window.fetchSheetRows = fetchSheetRows;
 
 function createLocalSupabaseClient() {
   const authListeners = [];

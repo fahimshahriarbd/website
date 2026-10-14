@@ -1154,7 +1154,7 @@ function closeProjectModal() {
   document.body.style.overflow = '';
 }
 
-let allProj = []; let curProjCat = 'All';
+let allProj = []; let curProjCat = 'All'; let activeFilteredProj = [];
 const PROJ_PG = 4; let projVis = 4, projInit = false;
 function fmtCat(c) { if(!c) return 'General'; const s = String(c).trim(); if(['commerce','ecommerce','e-commerce'].includes(s.toLowerCase())) return 'Commerce'; return s.charAt(0).toUpperCase()+s.slice(1); }
 function projCardHtml(p, i) {
@@ -1173,11 +1173,11 @@ function renderProjFilter() {
 function renderProj(append=false) {
   const g = document.getElementById('projectsGrid'); const sw = document.getElementById('projectsSeeMoreWrap'); const sb = document.getElementById('projectsSeeMoreBtn');
   if(!g) return;
-  const f = curProjCat==='All' ? allProj : allProj.filter(p => fmtCat(p.category).toLowerCase()===curProjCat.toLowerCase());
-  if(!f.length) { g.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">No projects available yet.</div>'; if(sw) sw.style.display='none'; return; }
-  const vis = f.slice(0, projVis);
+  activeFilteredProj = curProjCat==='All' ? allProj : allProj.filter(p => fmtCat(p.category).toLowerCase()===curProjCat.toLowerCase());
+  if(!activeFilteredProj.length) { g.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">No projects available yet.</div>'; if(sw) sw.style.display='none'; return; }
+  const vis = activeFilteredProj.slice(0, projVis);
   if(!append) g.innerHTML = vis.map((p,i) => projCardHtml(p,i)).join('');
-  else { const si = projVis-PROJ_PG; g.insertAdjacentHTML('beforeend', f.slice(si,projVis).map((p,i) => projCardHtml(p,si+i)).join('')); }
+  else { const si = projVis-PROJ_PG; g.insertAdjacentHTML('beforeend', activeFilteredProj.slice(si,projVis).map((p,i) => projCardHtml(p,si+i)).join('')); }
   if(!g.dataset.pd) {
     g.dataset.pd='1';
     g.addEventListener('click', e => {
@@ -1185,11 +1185,11 @@ function renderProj(append=false) {
       const c = e.target.closest('.project-card');
       if(!c) return;
       const idx = parseInt(c.dataset.projectIndex, 10);
-      const proj = f[idx] || allProj[idx];
+      const proj = activeFilteredProj[idx] || allProj[idx];
       if (proj) openProjectModal(proj);
     });
   }
-  if(sw) { if(projVis<f.length) { sw.style.display='flex'; if(sb) sb.innerHTML=`See More (${f.length-projVis} remaining) ↓`; } else sw.style.display='none'; }
+  if(sw) { if(projVis<activeFilteredProj.length) { sw.style.display='flex'; if(sb) sb.innerHTML=`See More (${activeFilteredProj.length-projVis} remaining) ↓`; } else sw.style.display='none'; }
 }
 async function loadProjects() {
   const g = document.getElementById('projectsGrid'); if(!g) return;
